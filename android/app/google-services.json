@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "853854219509",
+    "project_id": "riskplace",
+    "storage_bucket": "riskplace.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853854219509:android:4526b68733431e6b8da9bc",
+        "android_client_info": {
+          "package_name": "com.example.rpa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "853854219509-5smsmii8r7485hfrr3l9lk502qrfk6hl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8T89SfazkSqDGcRv39m1tVtjHC3BrfKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "853854219509-5smsmii8r7485hfrr3l9lk502qrfk6hl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
