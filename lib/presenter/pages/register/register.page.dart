@@ -1,16 +1,18 @@
-import 'dart:io';
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterfire_ui/auth.dart';
 import 'package:rpa/presenter/controllers/register.controller.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
 
-class RegisterPage extends ConsumerWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends ConsumerState<RegisterPage> {
+  @override
+  Widget build(BuildContext context) {
     final _controller = ref.read(registerControllerProvider);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
@@ -68,6 +70,30 @@ class RegisterPage extends ConsumerWidget {
                     controller: _controller.passwordController,
                     hintText: "Senha"),
                 const SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Sou RFCE",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold),
+                      ),
+                      Switch.adaptive(
+                          activeColor: Theme.of(context).colorScheme.primary,
+                          value: _controller.imRFCE,
+                          onChanged: (newValue) =>
+                              setState(() => _controller.setRFCE(newValue))),
+                    ],
+                  ),
+                ),
+                const SizedBox(
                   height: 30,
                 ),
                 ElevatedButton(
@@ -96,14 +122,12 @@ class RegisterPage extends ConsumerWidget {
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).colorScheme.onSecondary)),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const LoginPage(),
-                          ),
-                        );
-                      },
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LoginPage(),
+                        ),
+                      ),
                       child: Text(
                         "Login",
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(

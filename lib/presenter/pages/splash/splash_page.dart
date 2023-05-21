@@ -1,16 +1,36 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/pages/home_page/home.page.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
 import 'package:rpa/core/utils/navigator_handler.dart';
 
-class SplashPage extends ConsumerWidget {
+class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends ConsumerState<SplashPage> {
+  void _requestPermissionIfNecessary() async {
+    final permission = await Permission.microphone.status;
+    await Geolocator.requestPermission();
+    await RecorderController().checkPermission();
+  }
+
+  @override
+  void initState() {
+    _requestPermissionIfNecessary();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final _authController = ref.watch(authControllerProvider.notifier);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
@@ -34,7 +54,7 @@ class SplashPage extends ConsumerWidget {
               _authController.initialize();
 
               Future.delayed(const Duration(seconds: 2), () {
-                _authController.userStored != null
+                _authController.userStored?.id != null
                     ? context.navigateToAndReplace(HomePage())
                     : context.navigateToAndReplace(const LoginPage());
               });

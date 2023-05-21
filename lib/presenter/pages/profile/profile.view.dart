@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/core/local_storage/user_box_storage.dart';
 import 'package:rpa/data/models/user.model.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
+import 'package:rpa/presenter/controllers/home.controller.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
@@ -17,7 +18,6 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
   _getStoredUser() async {
     ref.read(authControllerProvider).setUser();
-    _userStored = ref.read(authControllerProvider.notifier).userStored;
     setState(() {});
   }
 
@@ -29,8 +29,10 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    _userStored = ref.watch(authControllerProvider).userStored;
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Profile'),
         centerTitle: true,
       ),
@@ -98,6 +100,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
           ElevatedButton(
               onPressed: () {
                 ref.read(authControllerProvider.notifier).logout();
+                ref.read(homeProvider.notifier).pageIndex = 0;
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (_) => const LoginPage(),

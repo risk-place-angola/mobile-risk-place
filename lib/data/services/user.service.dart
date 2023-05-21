@@ -31,7 +31,9 @@ class UserService implements IUserService {
       }
     }
     if (!isSaved) {
-      await _db.setData(collection: BDCollections.USERS, value: user.toJson());
+      await _db.setData(
+          collection: BDCollections.USERS,
+          value: user.isRFCE! ? user.toJsonIsRFCE() : user.toJson());
     }
     return true;
   }

@@ -1,13 +1,8 @@
 import 'dart:io';
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfire_ui/auth.dart';
-import 'package:rpa/data/models/user.model.dart';
-import 'package:rpa/data/services/auth.service.dart';
 import 'package:rpa/presenter/controllers/login.controller.dart';
-import 'package:rpa/presenter/pages/home_page/home.page.dart';
 import 'package:rpa/presenter/pages/register/register.page.dart';
 
 class LoginPage extends ConsumerWidget {
@@ -64,7 +59,7 @@ class LoginPage extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: () => loginProvider.login(context),
+                    onPressed: () => loginProvider.login(context, ref),
                     child: Text("Entrar",
                         style: Theme.of(context).textTheme.titleLarge!.copyWith(
                               color: Theme.of(context).colorScheme.onPrimary,

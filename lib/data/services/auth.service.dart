@@ -23,7 +23,10 @@ class AuthService implements IAuthService {
 
     for (var item in data.values) {
       if (user.email == item["email"]) {
+        log("User Found");
         _foundedUser = User.fromJson(item);
+        log(_foundedUser.toJsonIsRFCE().toString());
+
         UserBox().storeUser(user: _foundedUser);
       }
     }

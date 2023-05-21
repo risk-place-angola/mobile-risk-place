@@ -6,7 +6,6 @@ import 'package:rpa/data/models/user.model.dart';
 class AuthController extends ChangeNotifier {
   void initialize() async {
     setUser();
-    notifyListeners();
   }
 
   User? _userStored;
@@ -20,7 +19,7 @@ class AuthController extends ChangeNotifier {
   }
 
   void setUser() async {
-    _userStored = await UserBox().getUser();
+    _userStored = await UserBox().getUser() ?? User();
     notifyListeners();
   }
 }

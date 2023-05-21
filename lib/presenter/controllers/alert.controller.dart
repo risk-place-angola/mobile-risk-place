@@ -1,12 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-import 'dart:math' as math;
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:rpa/core/database_helper/database_helper.dart';
 import 'package:rpa/core/local_storage/user_box_storage.dart';
 import 'package:rpa/data/models/user.model.dart';
 import 'package:rpa/data/models/warns.model.dart';
@@ -86,3 +86,6 @@ class AlertController extends ChangeNotifier {
     ));
   }
 }
+
+DatabaseReference warnsStream =
+    FirebaseDatabase.instance.ref(BDCollections.WARNINGS);
