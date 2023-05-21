@@ -4,16 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/data/models/user.model.dart';
 import 'package:rpa/data/services/auth.service.dart';
-import 'package:rpa/data/services/user.service.dart';
+import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/pages/home_page/home.page.dart';
-import 'package:rpa/presenter/pages/login/login.page.dart';
 
 class LoginController extends ChangeNotifier {
   TextEditingController emailController = TextEditingController();
 
   TextEditingController passwordController = TextEditingController();
 
-  void login(BuildContext context) async {
+  void login(BuildContext context, WidgetRef ref) async {
     final _authService = AuthService();
     User _user = User(
       email: emailController.text.trim(),
@@ -22,6 +21,7 @@ class LoginController extends ChangeNotifier {
     var saved = await _authService.login(user: _user);
 
     if (saved.id != null) {
+      ref.read(authControllerProvider).setUser();
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => HomePage()));
     } else {

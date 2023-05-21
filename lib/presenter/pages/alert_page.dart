@@ -1,15 +1,13 @@
-import 'dart:developer';
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_document_picker/flutter_document_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:rpa/core/utils/Utils.dart';
 import 'package:rpa/presenter/controllers/alert.controller.dart';
 import 'package:rpa/presenter/pages/home_page/widgets/alert_button.widget.dart';
 
 class AlertPage extends ConsumerStatefulWidget {
+  const AlertPage({super.key});
+
   @override
   ConsumerState<AlertPage> createState() => _AlertPageState();
 }
@@ -56,26 +54,16 @@ class _AlertPageState extends ConsumerState<AlertPage> {
                   child: Hero(
                     tag: "warning",
                     child: AlertButton(
-                      icon: Icons.mic,
-                      onPressed: () async {
-                        provider.toogleRecord(context);
-                        // var distance =
-                        //     await Utils.getDistance(_currentPosition!);
-                        // var distnceInKm = distance / 1000;
-                        // var roundedDistance = distnceInKm.toStringAsFixed(2);
-                      },
-                    ),
+                        icon: Icons.mic,
+                        onPressed: () async => provider.toogleRecord(context)),
                   ),
                 ),
                 Center(
                   child: AlertButton(
-                    icon: provider.isPlaying
-                        ? Icons.play_disabled
-                        : Icons.play_arrow,
-                    onPressed: () async {
-                      provider.tooglePlay();
-                    },
-                  ),
+                      icon: provider.isPlaying
+                          ? Icons.play_disabled
+                          : Icons.play_arrow,
+                      onPressed: () async => provider.tooglePlay()),
                 ),
               ],
             ),
@@ -112,17 +100,6 @@ class _AlertPageState extends ConsumerState<AlertPage> {
                   spacing: 6,
                 ),
               ),
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  var filePath = await FilePicker.platform.pickFiles(
-                    onFileLoading: (p0) => log(p0.toString()),
-                  );
-                  if (filePath != null) print(filePath.paths.toString());
-                },
-                child: const Icon(Icons.folder_open),
-              ),
-            )
           ],
         ));
   }

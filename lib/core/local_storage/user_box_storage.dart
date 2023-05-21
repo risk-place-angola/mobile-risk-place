@@ -19,7 +19,11 @@ class UserBox extends IUserBox {
   @override
   Future<User> getUser() async {
     final box = Hive.box(HiveBoxs.USERBOX);
-    return await box.get("user");
+    try {
+      return await box.get("user");
+    } catch (e) {
+      return User();
+    }
   }
 
   @override

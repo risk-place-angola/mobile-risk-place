@@ -3,14 +3,22 @@ import 'dart:developer';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:rpa/core/utils/navigator_handler.dart';
+import 'package:rpa/data/models/user.model.dart';
+import 'package:rpa/data/models/warns.model.dart';
+import 'package:rpa/presenter/controllers/alert.controller.dart';
+import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/controllers/home.controller.dart';
+import 'package:rpa/presenter/controllers/warns.controller.dart';
 import 'package:rpa/presenter/pages/alert_page.dart';
+import 'package:rpa/presenter/pages/home_page/widgets/alerts_list.widget.dart';
 import 'package:rpa/presenter/pages/profile/profile.view.dart';
 import 'package:unicons/unicons.dart';
+import 'package:latlong2/latlong.dart' as ll;
 
 class HomePage extends ConsumerStatefulWidget {
+  const HomePage({super.key});
+
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
 }
@@ -18,26 +26,8 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   RecorderController _controller = RecorderController();
   Timer? _timer;
-
-  void _requestPermissionIfNecessary() async {
-    await _controller.checkPermission();
-    final status = await Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      log('Microphone permission not granted');
-      await Permission.microphone.request();
-    }
-  }
-
-  Future<void> _toogleRecord() async {
-    if (_controller.isRecording) {
-      _controller.stop();
-      setState(() {});
-    } else {
-      await _controller.record();
-      setState(() {});
-    }
-  }
-
+  late User? _user;
+  List<Warning> _warnings = [];
   handleNavigation() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       print(timer.tick);
@@ -51,32 +41,71 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   @override
+  void initState() {
+    warnsStream.onChildAdded.listen(
+      (event) {
+        var events = event.snapshot.value as Map;
+        var _warn = Warning(
+          additionalData: events['additional_data'],
+          isVictim: events['is_victim'],
+          location: {
+            events['location']['latitude']: events['location']['longitude']
+          },
+          createdAt: DateTime.parse(events['created_at']),
+          description:
+              events['description'] != null ? events['description'] : '',
+          reportedBy: events['reported_by'],
+        );
+        _warnings.add(_warn);
+
+        if (_warn.createdAt!
+            .isAfter(DateTime.now().subtract(Duration(minutes: 3)))) {
+          ref.read(hasNewAlertNotifier.notifier).state = true;
+        }
+        setState(() {});
+      },
+    );
+    ref.read(authControllerProvider).initialize();
+    _user = ref.read(authControllerProvider.notifier).userStored;
+    log('User: ${_user?.toJsonIsRFCE()}');
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: _BottomNavigation(
           pageIndex: ref.watch(homeProvider).pageIndex,
           updateIndex: ref.read(homeProvider).updateIndex),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: GestureDetector(
-        onLongPressEnd: (details) => _timer!.cancel(),
-        onLongPress: () => handleNavigation(),
-        child: FloatingActionButton(
-          heroTag: "warning",
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          onPressed: null,
-          child: const Icon(
-            UniconsThinline.exclamation_triangle,
-            color: Colors.white,
-          ),
-        ),
-      ),
+      floatingActionButton: _user!.isRFCE ?? false
+          ? null
+          : GestureDetector(
+              onLongPressEnd: (details) => _timer!.cancel(),
+              onLongPress: () => handleNavigation(),
+              child: FloatingActionButton(
+                heroTag: "warning",
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                onPressed: null,
+                child: const Icon(
+                  UniconsThinline.exclamation_triangle,
+                  color: Colors.white,
+                ),
+              ),
+            ),
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
         onPageChanged: ref.read(homeProvider).updateIndex,
         controller: ref.read(homeProvider).pageController,
         children: [
-          MainPage(),
-          ProfileView(),
+          MainPage(warnings: _warnings),
+          const ProfileView(),
         ],
       ),
     );
@@ -108,12 +137,21 @@ class _BottomNavigation extends ConsumerWidget {
 }
 
 class MainPage extends StatelessWidget {
+  MainPage({Key? key, this.warnings}) : super(key: key);
+  List<Warning>? warnings;
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Main Page'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Alertas',
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
       ),
+      body: AlertsList(warns: warnings!.reversed.toList()),
     );
   }
 }
