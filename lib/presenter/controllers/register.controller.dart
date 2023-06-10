@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rpa/core/client_helper/client_helper.dart';
+import 'package:rpa/core/local_storage/user_box_storage.dart';
 import 'package:rpa/data/models/user.model.dart';
-import 'package:rpa/data/services/user.service.dart';
+import 'package:rpa/data/sources/auth/remote_source.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
-import 'package:uuid/uuid.dart';
 
 mixin RegisterState implements ChangeNotifier {
   bool imRFCE = false;
+  bool isLoading = false;
+
+  setLoading() {
+    isLoading = !isLoading;
+    notifyListeners();
+  }
 
   setRFCE(bool value) {
     imRFCE = value;
@@ -21,20 +28,19 @@ class RegisterController extends ChangeNotifier with RegisterState {
   TextEditingController passwordController = TextEditingController();
 
   void register(BuildContext context) async {
-    final _userService = UserService();
+    final _userService = AuthRemoteSource(client: HTTPClient());
     User _user = User(
-      id: Uuid().v4(),
       name: nameController.text.trim(),
       email: emailController.text.trim(),
       phoneNumber: phoneController.text.trim(),
       password: passwordController.text.trim(),
       isRFCE: imRFCE,
-      createdAt: DateTime.now(),
     );
 
-    var saved = await _userService.createUser(user: _user);
-    if (!context.mounted) return;
-    if (saved) {
+    var saved = await _userService.register(user: _user);
+
+    if (saved is User) {
+      UserBox().storeUser(user: saved);
       Navigator.push(
         context,
         MaterialPageRoute(

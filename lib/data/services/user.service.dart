@@ -33,26 +33,28 @@ class UserService implements IUserService {
     if (!isSaved) {
       await _db.setData(
           collection: BDCollections.USERS,
-          value: user.isRFCE! ? user.toJsonIsRFCE() : user.toJson());
+          value: user.isRFCE! ? user.toJsonIsRFCE() : user.registerUser());
     }
     return true;
   }
 
   @override
   Future<void> deleteUser({required User user}) async {
-    await _db.deleteData(collection: BDCollections.USERS, value: user.toJson());
+    await _db.deleteData(
+        collection: BDCollections.USERS, value: user.registerUser());
   }
 
   @override
   Future<User> getUser({required User user}) async {
     User _user = await _db.getData(
-        collection: BDCollections.USERS, value: user.toJson());
+        collection: BDCollections.USERS, value: user.registerUser());
 
     return _user;
   }
 
   @override
   Future<void> updateUser({required User user}) async {
-    await _db.updateData(collection: BDCollections.USERS, value: user.toJson());
+    await _db.updateData(
+        collection: BDCollections.USERS, value: user.registerUser());
   }
 }

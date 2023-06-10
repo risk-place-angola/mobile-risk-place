@@ -60,6 +60,7 @@ dependencies:
   hive_generator: ^2.0.0
   uuid: ^3.0.7
   animate_gradient: ^0.0.2
+  dio: ^5.2.0+1
 
 
   # APP Center Distribution and Logs

@@ -39,8 +39,5 @@ class UserBox extends IUserBox {
   }
 
   @override
-  Future<void> updateUser({required User user}) {
-    // TODO: implement updateUser
-    throw UnimplementedError();
-  }
+  Future<void> updateUser({required User user}) async {}
 }

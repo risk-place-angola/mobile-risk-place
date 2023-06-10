@@ -53,7 +53,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
               style: const TextStyle(color: Colors.black, fontSize: 20),
               children: [
                 TextSpan(
-                  text: _userStored!.name ?? '',
+                  text: _userStored?.name ?? '',
                   style: const TextStyle(
                       color: Colors.black,
                       fontSize: 20,
@@ -69,7 +69,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
               style: const TextStyle(color: Colors.black, fontSize: 20),
               children: [
                 TextSpan(
-                  text: _userStored!.email ?? '',
+                  text: _userStored?.email ?? '',
                   style: const TextStyle(
                       color: Colors.black,
                       fontSize: 20,
@@ -85,7 +85,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
               style: const TextStyle(color: Colors.black, fontSize: 20),
               children: [
                 TextSpan(
-                  text: _userStored!.phoneNumber ?? '',
+                  text: _userStored?.phoneNumber ?? '',
                   style: const TextStyle(
                       color: Colors.black,
                       fontSize: 20,

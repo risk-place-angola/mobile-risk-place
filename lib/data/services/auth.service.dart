@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:rpa/core/database_helper/database_helper.dart';
 import 'package:rpa/core/local_storage/user_box_storage.dart';
+import 'package:rpa/core/storage_helper/storage_helper.dart';
 import 'package:rpa/data/models/user.model.dart';
+import 'package:rpa/data/sources/auth/remote_source.dart';
 
 abstract class IAuthService {
   Future<User> login({required User user});
@@ -12,25 +14,12 @@ abstract class IAuthService {
 }
 
 class AuthService implements IAuthService {
-  final _db = DBHelper.instance;
+  final _source = AuthRemoteSource();
   @override
   Future<User> login({required User user}) async {
-    var _foundedUser;
-    var data = await _db.database
-        .child(BDCollections.USERS)
-        .get()
-        .then((v) => v.value as Map);
-
-    for (var item in data.values) {
-      if (user.email == item["email"]) {
-        log("User Found");
-        _foundedUser = User.fromJson(item);
-        log(_foundedUser.toJsonIsRFCE().toString());
-
-        UserBox().storeUser(user: _foundedUser);
-      }
-    }
-    return _foundedUser ?? User();
+    final response = await _source.login(user: user);
+    await UserBox().storeUser(user: user);
+    return response;
   }
 
   @override
@@ -40,9 +29,10 @@ class AuthService implements IAuthService {
   }
 
   @override
-  Future<void> register({required User user}) {
-    // TODO: implement register
-    throw UnimplementedError();
+  Future register({required User user}) async {
+    final response = await _source.register(user: user);
+    await UserBox().storeUser(user: user);
+    return response;
   }
 
   @override

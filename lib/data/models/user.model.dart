@@ -16,9 +16,11 @@ class User extends HiveObject {
   @HiveField(4)
   String? password;
   @HiveField(5)
-  DateTime? createdAt;
+  String? createdAt;
   @HiveField(6)
   bool? isRFCE;
+  @HiveField(7)
+  String? token;
 
   User(
       {this.id,
@@ -27,6 +29,7 @@ class User extends HiveObject {
       this.phoneNumber,
       this.password,
       this.createdAt,
+      this.token,
       this.isRFCE});
 
   factory User.fromJson(var json) {
@@ -37,19 +40,22 @@ class User extends HiveObject {
       phoneNumber: json['phone_number'] != null ? json['phone_number'] : null,
       password: json['password'] != null ? json['password'] : null,
       isRFCE: json['is_rfce'] != null ? json['is_rfce'] : null,
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : null,
+      token: json['token'] != null ? json['token'] : null,
+      createdAt: json['created_at'] != null ? json['created_at'] : null,
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
+  factory User.fromLogin(var json) {
+    return User(
+      token: json['token'] != null ? json['token'] : null,
+    );
+  }
+
+  Map<String, dynamic> registerUser() => {
         'name': name,
         'email': email,
-        'phone_number': phoneNumber,
+        'phone': phoneNumber,
         'password': password,
-        'created_at': createdAt?.toIso8601String()
       };
   Map<String, dynamic> toJsonIsRFCE() => {
         'id': id,
@@ -57,7 +63,9 @@ class User extends HiveObject {
         'email': email,
         'phone_number': phoneNumber,
         'password': password,
-        'created_at': createdAt?.toIso8601String(),
+        'created_at': createdAt,
         'is_rfce': isRFCE
       };
+
+  Map<String, dynamic> toLoginUser() => {'email': email, 'password': password};
 }

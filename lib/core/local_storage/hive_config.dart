@@ -6,10 +6,12 @@ class HiveConfig {
     Hive.registerAdapter(UserAdapter());
 
     await Hive.openBox(HiveBoxs.USERBOX);
+    await Hive.openBox(HiveBoxs.TOKENBOX);
   }
 }
 
 abstract class HiveBoxs {
   static const String USERBOX = "user_box";
   static const String WARNINGSBOX = "warnings_box";
+  static const String TOKENBOX = "token_box";
 }

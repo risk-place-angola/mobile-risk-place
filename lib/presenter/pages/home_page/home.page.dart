@@ -42,32 +42,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   void initState() {
-    warnsStream.onChildAdded.listen(
-      (event) {
-        var events = event.snapshot.value as Map;
-        var _warn = Warning(
-          additionalData: events['additional_data'],
-          isVictim: events['is_victim'],
-          location: {
-            events['location']['latitude']: events['location']['longitude']
-          },
-          createdAt: DateTime.parse(events['created_at']),
-          description:
-              events['description'] != null ? events['description'] : '',
-          reportedBy: events['reported_by'],
-        );
-        _warnings.add(_warn);
-
-        if (_warn.createdAt!
-            .isAfter(DateTime.now().subtract(Duration(minutes: 3)))) {
-          ref.read(hasNewAlertNotifier.notifier).state = true;
-        }
-        setState(() {});
-      },
-    );
     ref.read(authControllerProvider).initialize();
     _user = ref.read(authControllerProvider.notifier).userStored;
-    log('User: ${_user?.toJsonIsRFCE()}');
     super.initState();
   }
 
