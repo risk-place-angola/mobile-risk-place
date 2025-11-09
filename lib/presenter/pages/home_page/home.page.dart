@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,9 +13,9 @@ import 'package:rpa/presenter/controllers/home.controller.dart';
 import 'package:rpa/presenter/controllers/warns.controller.dart';
 import 'package:rpa/presenter/pages/alert_page.dart';
 import 'package:rpa/presenter/pages/home_page/widgets/alerts_list.widget.dart';
+import 'package:rpa/presenter/pages/map/map_view.dart';
 import 'package:rpa/presenter/pages/profile/profile.view.dart';
 import 'package:unicons/unicons.dart';
-import 'package:latlong2/latlong.dart' as ll;
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -24,11 +25,11 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  RecorderController _controller = RecorderController();
+  final RecorderController _controller = RecorderController();
   Timer? _timer;
   late User? _user;
-  List<Warning> _warnings = [];
-  handleNavigation() {
+  final List<Warning> _warnings = [];
+  void handleNavigation() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       print(timer.tick);
       if (timer.tick == 4) {
@@ -45,20 +46,19 @@ class _HomePageState extends ConsumerState<HomePage> {
     warnsStream.onChildAdded.listen(
       (event) {
         var events = event.snapshot.value as Map;
-        var _warn = Warning(
+        var warn = Warning(
           additionalData: events['additional_data'],
           isVictim: events['is_victim'],
           location: {
             events['location']['latitude']: events['location']['longitude']
           },
           createdAt: DateTime.parse(events['created_at']),
-          description:
-              events['description'] != null ? events['description'] : '',
+          description: events['description'] ?? '',
           reportedBy: events['reported_by'],
         );
-        _warnings.add(_warn);
+        _warnings.add(warn);
 
-        if (_warn.createdAt!
+        if (warn.createdAt!
             .isAfter(DateTime.now().subtract(Duration(minutes: 3)))) {
           ref.read(hasNewAlertNotifier.notifier).state = true;
         }
@@ -83,7 +83,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       bottomNavigationBar: _BottomNavigation(
           pageIndex: ref.watch(homeProvider).pageIndex,
           updateIndex: ref.read(homeProvider).updateIndex),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _user!.isRFCE ?? false
           ? null
           : GestureDetector(
@@ -105,6 +105,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         controller: ref.read(homeProvider).pageController,
         children: [
           MainPage(warnings: _warnings),
+          MapView(),
           const ProfileView(),
         ],
       ),
@@ -116,20 +117,21 @@ class _BottomNavigation extends ConsumerWidget {
   Function(int)? updateIndex;
   int? pageIndex;
   _BottomNavigation(
-      {Key? key, required this.pageIndex, required this.updateIndex})
-      : super(key: key);
+      {super.key, required this.pageIndex, required this.updateIndex});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final _provider = ref.read(homeProvider);
+    final provider = ref.read(homeProvider);
     return BottomNavigationBar(
       onTap: updateIndex,
       currentIndex: pageIndex!,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       showUnselectedLabels: false,
       items: const [
         BottomNavigationBarItem(
             icon: Icon(UniconsLine.home_alt), label: 'Home'),
+        BottomNavigationBarItem(
+            icon: Icon(UniconsLine.map), label: 'Mapa de Risco'),
         BottomNavigationBarItem(icon: Icon(UniconsLine.user), label: 'Profile'),
       ],
     );
@@ -137,7 +139,7 @@ class _BottomNavigation extends ConsumerWidget {
 }
 
 class MainPage extends StatelessWidget {
-  MainPage({Key? key, this.warnings}) : super(key: key);
+  MainPage({super.key, this.warnings});
   List<Warning>? warnings;
 
   @override

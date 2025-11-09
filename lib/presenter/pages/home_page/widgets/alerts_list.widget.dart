@@ -3,14 +3,14 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart' as ll;
+import 'package:rpa/core/utils/datetime_helper.dart';
 import 'package:rpa/data/models/warns.model.dart';
 import 'package:rpa/presenter/controllers/home.controller.dart';
 import 'package:rpa/presenter/controllers/warns.controller.dart';
-import 'package:latlong2/latlong.dart' as ll;
-import 'package:rpa/core/utils/datetime_helper.dart';
 
 class AlertsList extends ConsumerWidget {
-  AlertsList({Key? key, this.warns}) : super(key: key);
+  AlertsList({super.key, this.warns});
   List<Warning>? warns;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,12 +53,14 @@ class AlertsList extends ConsumerWidget {
 }
 
 class NewAlert extends ConsumerWidget {
-  PlayerController _playController = PlayerController();
+  final PlayerController _playController = PlayerController();
+
+  NewAlert({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final primary = Theme.of(context).colorScheme.primary;
     final secondary = Theme.of(context).colorScheme.secondary;
-    final _controller = MapController();
+    final controller = MapController();
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       child: AnimateGradient(
@@ -100,7 +102,7 @@ class NewAlert extends ConsumerWidget {
                       height: MediaQuery.of(context).size.height * 0.3,
                       width: MediaQuery.of(context).size.width * 0.85,
                       child: FlutterMap(
-                        mapController: _controller,
+                        mapController: controller,
                         options: MapOptions(
                           onMapReady: () {},
                           initialCenter: ll.LatLng(-8.852845, 13.265561),
