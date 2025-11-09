@@ -1,18 +1,20 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rpa/core/local_storage/hive_config.dart';
 import 'package:rpa/firebase_options.dart';
-import 'package:rpa/presenter/pages/login/login.page.dart';
 import 'package:rpa/presenter/pages/splash/splash_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
+  final firebaseApp = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseDatabase.instanceFor(app: firebaseApp);
 
   //Hive Configurations for local storage
   await Hive.initFlutter();
@@ -34,16 +36,16 @@ void main() async {
 }
 
 class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
           colorScheme: const ColorScheme(
-        background: Colors.white,
         brightness: Brightness.light,
         error: Colors.red,
-        onBackground: Colors.grey,
         onError: Colors.white,
         onPrimary: Colors.white,
         onSecondary: Colors.black,

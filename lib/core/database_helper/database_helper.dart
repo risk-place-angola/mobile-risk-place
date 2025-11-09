@@ -42,7 +42,7 @@ class DBHelper implements IDBHelper {
   @override
   Future<dynamic> getData(
       {required String collection, Map<String, dynamic>? value}) {
-    return database.child(collection).once();
+    return database.child(collection).get().then((v) => v.value);
   }
 
   @override
