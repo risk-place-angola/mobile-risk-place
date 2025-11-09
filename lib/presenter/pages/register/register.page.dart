@@ -4,7 +4,7 @@ import 'package:rpa/presenter/controllers/register.controller.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   ConsumerState<RegisterPage> createState() => _RegisterPageState();
@@ -13,7 +13,7 @@ class RegisterPage extends ConsumerStatefulWidget {
 class _RegisterPageState extends ConsumerState<RegisterPage> {
   @override
   Widget build(BuildContext context) {
-    final _controller = ref.read(registerControllerProvider);
+    final controller = ref.read(registerControllerProvider);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: Stack(children: [
@@ -51,23 +51,23 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   height: 40,
                 ),
                 _AuthTextField(
-                    controller: _controller.nameController, hintText: "Nome"),
+                    controller: controller.nameController, hintText: "Nome"),
                 const SizedBox(
                   height: 10,
                 ),
                 _AuthTextField(
-                    controller: _controller.emailController, hintText: "Email"),
+                    controller: controller.emailController, hintText: "Email"),
                 const SizedBox(
                   height: 10,
                 ),
                 _AuthTextField(
-                    controller: _controller.phoneController,
+                    controller: controller.phoneController,
                     hintText: "Telefone"),
                 const SizedBox(
                   height: 10,
                 ),
                 _AuthTextField(
-                    controller: _controller.passwordController,
+                    controller: controller.passwordController,
                     hintText: "Senha"),
                 const SizedBox(
                   height: 10,
@@ -87,9 +87,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       ),
                       Switch.adaptive(
                           activeColor: Theme.of(context).colorScheme.primary,
-                          value: _controller.imRFCE,
+                          value: controller.imRFCE,
                           onChanged: (newValue) =>
-                              setState(() => _controller.setRFCE(newValue))),
+                              setState(() => controller.setRFCE(newValue))),
                     ],
                   ),
                 ),
@@ -105,9 +105,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     ),
                   ),
                   onPressed: () {
-                    _controller.register(context);
+                    controller.register(context);
                   },
-                  child: Text("Entrar",
+                  child: Text("Registrar-se",
                       style: Theme.of(context).textTheme.titleLarge!.copyWith(
                             color: Theme.of(context).colorScheme.onPrimary,
                           )),
@@ -151,8 +151,7 @@ class _AuthTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool? isPassword;
   const _AuthTextField(
-      {Key? key, this.hintText, required this.controller, this.isPassword})
-      : super(key: key);
+      {super.key, this.hintText, required this.controller, this.isPassword});
 
   @override
   Widget build(BuildContext context) {

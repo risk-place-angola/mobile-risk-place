@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:rpa/core/local_storage/user_box_storage.dart';
 import 'package:rpa/data/models/user.model.dart';
 

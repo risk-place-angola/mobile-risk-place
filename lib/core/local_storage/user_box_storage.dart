@@ -6,7 +6,7 @@ abstract class IUserBox {
   Future<void> storeUser({required User user});
   Future<void> deleteUserInfo();
   Future<void> updateUser({required User user});
-  Future<User> getUser();
+  Future<User?> getUser();
   Future<List<User>> getUsers({required User user});
 }
 
@@ -17,7 +17,7 @@ class UserBox extends IUserBox {
   }
 
   @override
-  Future<User> getUser() async {
+  Future<User?> getUser() async {
     final box = Hive.box(HiveBoxs.USERBOX);
     try {
       return await box.get("user");

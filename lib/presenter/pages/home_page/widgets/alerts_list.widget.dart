@@ -103,8 +103,8 @@ class NewAlert extends ConsumerWidget {
                         mapController: _controller,
                         options: MapOptions(
                           onMapReady: () {},
-                          center: ll.LatLng(-8.852845, 13.265561),
-                          zoom: 16.0,
+                          initialCenter: ll.LatLng(-8.852845, 13.265561),
+                          initialZoom: 16.0,
                         ),
                         children: [
                           TileLayer(
@@ -118,7 +118,7 @@ class NewAlert extends ConsumerWidget {
                                 width: 100.0,
                                 height: 100.0,
                                 point: ll.LatLng(-8.852845, 13.265561),
-                                builder: (ctx) => Icon(
+                                child: Icon(
                                   Icons.person_pin_circle,
                                   size: 50.0,
                                   color:

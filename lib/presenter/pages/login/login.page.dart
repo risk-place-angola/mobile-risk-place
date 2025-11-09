@@ -1,12 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterfire_ui/auth.dart';
 import 'package:rpa/presenter/controllers/login.controller.dart';
 import 'package:rpa/presenter/pages/register/register.page.dart';
 
 class LoginPage extends ConsumerWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loginProvider = ref.read(loginControllerProvider);
@@ -97,50 +95,6 @@ class LoginPage extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: AuthStateListener(
-                      listener: (oldState, state, controller) {
-                        if (state is AuthFailed) {
-                          print("failed");
-                          return;
-                        }
-
-                        if (state is SignedIn) {
-                          print(controller.runtimeType);
-                        }
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          //TODO:FIX - Credentiais are Exposed
-                          OAuthProviderIconButton(
-                            action: AuthAction.signUp,
-                            providerConfig: GoogleProviderConfiguration(
-                              clientId: Platform.isAndroid
-                                  ? '1:853854219509:android:4526b68733431e6b8da9bc'
-                                  : '1:853854219509:ios:10706b0c5d965e568da9bc',
-                            ),
-                          ),
-                          OAuthProviderIconButton(
-                            action: AuthAction.signIn,
-                            providerConfig: FacebookProviderConfiguration(
-                              clientId: Platform.isAndroid
-                                  ? '1:853854219509:android:4526b68733431e6b8da9bc'
-                                  : '1:853854219509:ios:10706b0c5d965e568da9bc',
-                            ),
-                          ),
-                          const OAuthProviderIconButton(
-                            action: AuthAction.signIn,
-                            providerConfig: TwitterProviderConfiguration(
-                                apiKey: '123',
-                                apiSecretKey: '',
-                                redirectUri: ''),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -186,8 +140,7 @@ class _AuthTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool? isPassword;
   const _AuthTextField(
-      {Key? key, this.hintText, required this.controller, this.isPassword})
-      : super(key: key);
+      {super.key, this.hintText, required this.controller, this.isPassword});
 
   @override
   Widget build(BuildContext context) {
