@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -50,20 +47,33 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA8T89SfazkSqDGcRv39m1tVtjHC3BrfKo',
-    appId: '1:853854219509:android:4526b68733431e6b8da9bc',
-    messagingSenderId: '853854219509',
-    projectId: 'riskplace',
-    storageBucket: 'riskplace.appspot.com',
+    apiKey: 'AIzaSyAVh-zkFgR6ZSOZeAZ7K26A1a0aPKP_xT0',
+    appId: '1:982759520741:android:ad9b3684e031923691d70c',
+    messagingSenderId: '982759520741',
+    projectId: 'riskplace-ao',
+    storageBucket: 'riskplace-ao.firebasestorage.app',
+    databaseURL: 'https://riskplace-ao-default-rtdb.firebaseio.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD38btfGd5NGLk1TxsHbRF3dsXPEjngODY',
-    appId: '1:853854219509:ios:10706b0c5d965e568da9bc',
-    messagingSenderId: '853854219509',
-    projectId: 'riskplace',
-    storageBucket: 'riskplace.appspot.com',
-    iosClientId: '853854219509-6o3siq3f6hsfbm0kngmfukf53a75vdqd.apps.googleusercontent.com',
-    iosBundleId: 'com.example.rpa',
+    apiKey: 'AIzaSyAyHbRLd89tq1QCpLjLxQpKQmizDQHvy4w',
+    appId: '1:982759520741:ios:01306662a59be32091d70c',
+    messagingSenderId: '982759520741',
+    projectId: 'riskplace-ao',
+    storageBucket: 'riskplace-ao.firebasestorage.app',
+    iosBundleId: 'ao.riskplace.maka',
+    databaseURL: 'https://riskplace-ao-default-rtdb.firebaseio.com',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCh8CEWp9E4IaZAj-CcN52DikvgaCx_VBc',
+    appId: '1:982759520741:web:e3a77efb2fadd71691d70c',
+    messagingSenderId: '982759520741',
+    projectId: 'riskplace-ao',
+    authDomain: 'riskplace-ao.firebaseapp.com',
+    storageBucket: 'riskplace-ao.firebasestorage.app',
+    measurementId: 'G-4NNYDPLXDT',
+    databaseURL: 'https://riskplace-ao-default-rtdb.firebaseio.com',
+  );
+
 }
