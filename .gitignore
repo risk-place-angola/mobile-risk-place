@@ -61,3 +61,4 @@ lib/firebase_options.dart
 *.keystore
 *.jks
 key.properties
+firebase.json
