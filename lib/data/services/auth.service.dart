@@ -7,7 +7,7 @@ import 'package:rpa/data/models/user.model.dart';
 abstract class IAuthService {
   Future<User> login({required User user});
   Future<void> logout();
-  Future<void> register({required User user});
+  Future<bool> register({required User user});
   Future<void> resetPassword({required String email});
 }
 
@@ -40,9 +40,15 @@ class AuthService implements IAuthService {
   }
 
   @override
-  Future<void> register({required User user}) {
-    // TODO: implement register
-    throw UnimplementedError();
+  Future<bool> register({required User user}) async {
+    try {
+      await _db.setData(
+          collection: BDCollections.USERS, value: user.toJson());
+          return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
   }
 
   @override

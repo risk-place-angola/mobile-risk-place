@@ -52,6 +52,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '982759520741',
     projectId: 'riskplace-ao',
     storageBucket: 'riskplace-ao.firebasestorage.app',
+    databaseURL: 'https://riskplace-ao-default-rtdb.firebaseio.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -61,6 +62,7 @@ class DefaultFirebaseOptions {
     projectId: 'riskplace-ao',
     storageBucket: 'riskplace-ao.firebasestorage.app',
     iosBundleId: 'ao.riskplace.maka',
+    databaseURL: 'https://riskplace-ao-default-rtdb.firebaseio.com',
   );
 
   static const FirebaseOptions web = FirebaseOptions(
@@ -71,6 +73,7 @@ class DefaultFirebaseOptions {
     authDomain: 'riskplace-ao.firebaseapp.com',
     storageBucket: 'riskplace-ao.firebasestorage.app',
     measurementId: 'G-4NNYDPLXDT',
+    databaseURL: 'https://riskplace-ao-default-rtdb.firebaseio.com',
   );
 
 }
