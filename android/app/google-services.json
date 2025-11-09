@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "853854219509",
-    "project_id": "riskplace",
-    "storage_bucket": "riskplace.appspot.com"
+    "project_number": "982759520741",
+    "project_id": "riskplace-ao",
+    "storage_bucket": "riskplace-ao.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:853854219509:android:4526b68733431e6b8da9bc",
+        "mobilesdk_app_id": "1:982759520741:android:ad9b3684e031923691d70c",
         "android_client_info": {
-          "package_name": "com.example.rpa"
+          "package_name": "ao.riskplace.maka"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "853854219509-5smsmii8r7485hfrr3l9lk502qrfk6hl.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA8T89SfazkSqDGcRv39m1tVtjHC3BrfKo"
+          "current_key": "AIzaSyAVh-zkFgR6ZSOZeAZ7K26A1a0aPKP_xT0"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "853854219509-5smsmii8r7485hfrr3l9lk502qrfk6hl.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

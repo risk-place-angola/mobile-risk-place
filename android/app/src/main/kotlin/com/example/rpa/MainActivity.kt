@@ -1,4 +1,4 @@
-package com.example.rpa
+package ao.riskplace.maka
 
 import io.flutter.embedding.android.FlutterActivity
 
