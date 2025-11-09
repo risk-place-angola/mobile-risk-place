@@ -15,14 +15,10 @@ mixin RegisterState implements ChangeNotifier {
 }
 
 class RegisterController extends ChangeNotifier with RegisterState {
-  TextEditingController nameController =
-      TextEditingController(text: 'Jorge Carlos');
-  TextEditingController emailController =
-      TextEditingController(text: 'paulinofonsecass@gmail.com');
-  TextEditingController phoneController =
-      TextEditingController(text: '987654321');
-  TextEditingController passwordController =
-      TextEditingController(text: 'password');
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   void register(BuildContext context) async {
     final name = nameController.text.trim();
@@ -57,16 +53,19 @@ class RegisterController extends ChangeNotifier with RegisterState {
     );
 
     var saved = await userService.createUser(user: user);
+
     if (!context.mounted) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("Erro ao registrar usuário!"),
+          // ignore: use_build_context_synchronously
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
       return;
     }
+
     if (saved) {
       Navigator.push(
         context,
