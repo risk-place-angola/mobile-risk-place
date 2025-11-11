@@ -1,29 +1,36 @@
+import 'dart:developer' show log;
+import 'dart:math' hide log;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:rpa/presenter/pages/map/providers/markers_provider.dart';
 
-class MapView extends StatefulWidget {
+class MapView extends ConsumerStatefulWidget {
   const MapView({super.key});
 
   @override
-  State<MapView> createState() => _MapViewState();
+  ConsumerState<MapView> createState() => _MapViewState();
 }
 
-class _MapViewState extends State<MapView> {
+class _MapViewState extends ConsumerState<MapView> {
   final MapController controller = MapController();
+
   @override
   Widget build(BuildContext context) {
+    final streamMarkers = ref.watch(markersProvider);
+
     return FlutterMap(
       mapController: controller,
       options: MapOptions(
         onMapReady: () {},
         initialCenter: LatLng(-8.852845, 13.265561),
-        initialZoom: 16.0,
+        initialZoom: 12.0,
       ),
       children: [
         TileLayer(
-          urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          subdomains: ['a', 'b', 'c'],
+          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         ),
         MarkerLayer(
           markers: [
@@ -38,6 +45,20 @@ class _MapViewState extends State<MapView> {
               ),
             ),
           ],
+        ),
+        streamMarkers.when(
+          data: (markers) {
+            log('Loaded ${markers.length} markers', name: 'MapView');
+            return MarkerLayer(markers: markers);
+          },
+          loading: () {
+            log('Loading markers', name: 'MapView');
+            return MarkerLayer(markers: []);
+          },
+          error: (error, stackTrace) {
+            log('Error loading markers: $error', name: 'MapView');
+            return MarkerLayer(markers: []);
+          },
         ),
       ],
     );
