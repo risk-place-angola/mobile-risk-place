@@ -48,9 +48,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-.fvm/flutter_sdk
-
-
 # Firebase
 ios/Runner/GoogleService-Info.plist
 android/app/google-services.json
@@ -61,3 +58,6 @@ lib/firebase_options.dart
 *.keystore
 *.jks
 key.properties
+
+# FVM Version Cache
+.fvm/
