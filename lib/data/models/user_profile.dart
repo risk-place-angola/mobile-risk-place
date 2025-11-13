@@ -30,4 +30,16 @@ class UserProfile {
       roles: List<String>.from(json['role_name'] ?? []),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'nif': nif,
+      'address': address.toJson(),
+      'role_name': roles,
+    };
+  }
 }

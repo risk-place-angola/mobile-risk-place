@@ -1,9 +1,9 @@
-// ignore_for_file: use_build_context_synchronously
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:rpa/data/models/user.model.dart';
+import 'package:rpa/data/dtos/auth_request_dto.dart';
 import 'package:rpa/data/services/auth.service.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/pages/home_page/home.page.dart';
@@ -13,18 +13,36 @@ class LoginController extends ChangeNotifier {
 
   TextEditingController passwordController = TextEditingController();
 
-  void login(BuildContext context, WidgetRef ref) async {
-    final _authService = AuthService();
-    User _user = User(
+  Future<void> login(BuildContext context, WidgetRef ref) async {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Preencha todos os campos!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final authService = ref.read(authServiceProvider);
+
+    final loginRequester = LoginRequestDTO(
       email: emailController.text.trim(),
       password: passwordController.text.trim(),
     );
-    var saved = await _authService.login(user: _user);
 
-    if (saved.id != null) {
-      ref.read(authControllerProvider).setUser();
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => HomePage()));
+    var userSaved = await authService.login(user: loginRequester);
+
+    if (!context.mounted) {
+      log("context not mounted");
+      return;
+    }
+
+    if (userSaved != null) {
+      ref.read(authControllerProvider).updateUser();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

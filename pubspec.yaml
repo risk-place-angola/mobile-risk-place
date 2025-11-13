@@ -60,6 +60,7 @@ dependencies:
   uuid: ^4.5.2
   animate_gradient: ^0.0.2
   latlong2: ^0.9.1
+  dio: ^5.9.0
 
 
   # APP Center Distribution and Logs

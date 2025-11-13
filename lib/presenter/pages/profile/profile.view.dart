@@ -7,7 +7,7 @@ import 'package:rpa/presenter/controllers/home.controller.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
-  const ProfileView({Key? key}) : super(key: key);
+  const ProfileView({super.key});
 
   @override
   ConsumerState<ProfileView> createState() => _ProfileViewState();
@@ -16,8 +16,8 @@ class ProfileView extends ConsumerStatefulWidget {
 class _ProfileViewState extends ConsumerState<ProfileView> {
   User? _userStored;
 
-  _getStoredUser() async {
-    ref.read(authControllerProvider).setUser();
+  Future<void> _getStoredUser() async {
+    ref.read(authControllerProvider).updateUser();
     setState(() {});
   }
 

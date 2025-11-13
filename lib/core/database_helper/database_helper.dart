@@ -1,5 +1,10 @@
 // ignore_for_file: constant_identifier_names
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final dbHelperProvider = Provider<IDBHelper>((ref) {
+  return DBHelper.instance;
+});
 
 class BDCollections {
   static const String USERS = "users";
