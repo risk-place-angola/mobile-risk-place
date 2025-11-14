@@ -30,7 +30,7 @@ class UserService implements IUserService {
       user.password = hashedPass;
 
       await _db.setData(
-        boxName: HiveBoxs.USERBOX,
+        collection: HiveBoxs.USERBOX,
         key: user.email!,
         value: user,
       );
@@ -45,19 +45,19 @@ class UserService implements IUserService {
 
   @override
   Future<void> deleteUser({required User user}) async {
-    await _db.deleteData(boxName: HiveBoxs.USERBOX, key: user.email!);
+    await _db.deleteData(collection: HiveBoxs.USERBOX, key: user.email!);
   }
 
   @override
   Future<User?> getUser({required String email}) async {
-    final user = await _db.getData(boxName: HiveBoxs.USERBOX, key: email);
+    final user = await _db.getData(collection: HiveBoxs.USERBOX, key: email);
     return user as User?;
   }
 
   @override
   Future<void> updateUser({required User user}) async {
     await _db.updateData(
-      boxName: HiveBoxs.USERBOX,
+      collection: HiveBoxs.USERBOX,
       key: user.email!,
       value: user,
     );

@@ -1,6 +1,7 @@
 import 'package:rpa/core/database_helper/database_helper.dart';
 import 'package:rpa/core/storage_helper/storage_helper.dart';
 import 'package:rpa/data/models/warns.model.dart';
+import 'package:uuid/uuid.dart';
 
 abstract class IWarnService {
   Future<Warning> getWarn(String id);
@@ -18,8 +19,11 @@ class WarnService implements IWarnService {
       final storage = Storage.instance;
       String url = await storage.sendFile(file: warning.additionalData);
       warning.additionalData = url;
+      var uuid = const Uuid();
       await db.setData(
-          collection: BDCollections.WARNINGS, value: warning.toJson());
+          collection: BDCollections.WARNINGS,
+          key: uuid.v4(),
+          value: warning.toJson());
       return 'Alerta Gerado com Sucesso';
     } on Exception catch (e) {
       return e.toString();
