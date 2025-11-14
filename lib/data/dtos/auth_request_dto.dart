@@ -33,7 +33,7 @@ class AuthTokenResponseDTO {
   final String refreshToken;
   final String tokenType;
   final int expiresIn;
-  final AuthUserSummaryDTO user; 
+  final AuthUserSummaryDTO user;
 
   const AuthTokenResponseDTO({
     required this.accessToken,
@@ -51,6 +51,16 @@ class AuthTokenResponseDTO {
       expiresIn: json['expires_in'] ?? 0,
       user: AuthUserSummaryDTO.fromJson(json['user'] ?? {}),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'access_token': accessToken,
+      'refresh_token': refreshToken,
+      'token_type': tokenType,
+      'expires_in': expiresIn,
+      'user': user.toJson(),
+    };
   }
 }
 
@@ -77,5 +87,15 @@ class AuthUserSummaryDTO {
       activeRole: json['active_role'] ?? '',
       roles: List<String>.from(json['role_name'] ?? []),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'active_role': activeRole,
+      'role_name': roles,
+    };
   }
 }

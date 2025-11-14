@@ -1,3 +1,4 @@
+import 'package:rpa/data/dtos/auth_request_dto.dart';
 import 'package:rpa/data/models/address.dart';
 
 class UserProfile {
@@ -41,5 +42,25 @@ class UserProfile {
       'address': address.toJson(),
       'role_name': roles,
     };
+  }
+
+  // from AuthUserSummaryDTO
+
+  factory UserProfile.fromAuthUserSummaryDTO(AuthUserSummaryDTO dto) {
+    return UserProfile(
+      id: dto.id,
+      name: dto.name,
+      email: dto.email,
+      phone: '', // AuthUserSummaryDTO does not have phone
+      nif: '', // AuthUserSummaryDTO does not have nif
+      address: const Address(
+        zipCode: '',
+        country: '',
+        municipality: '',
+        neighborhood: '',
+        province: '',
+      ),
+      roles: dto.roles,
+    );
   }
 }

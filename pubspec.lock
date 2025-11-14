@@ -370,7 +370,7 @@ packages:
     source: hosted
     version: "6.1.0"
   firebase_core:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: firebase_core
       sha256: "1f2dfd9f535d81f8b06d7a50ecda6eac1e6922191ed42e09ca2c84bd2288927c"
@@ -393,56 +393,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.0"
-  firebase_database:
-    dependency: "direct main"
-    description:
-      name: firebase_database
-      sha256: b747618af9093af3769c15ed1fe3511e4ee1ef223fc0d339a7722b9b69cafafb
-      url: "https://pub.dev"
-    source: hosted
-    version: "12.0.4"
-  firebase_database_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_database_platform_interface
-      sha256: "5360c48539b855922e21b81059f502186f5fb490a3eec97403d2c723031124cf"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.6+15"
-  firebase_database_web:
-    dependency: transitive
-    description:
-      name: firebase_database_web
-      sha256: e3113fa20dbfe663b75464c3f74bd2ad267787107e5a7d1542cfbaf1e2258ccb
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.7"
-  firebase_storage:
-    dependency: "direct main"
-    description:
-      name: firebase_storage
-      sha256: "3438f38590186010ce76ece683ebf3b842cd637f31f83a13620917d7438a58fd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "13.0.4"
-  firebase_storage_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_storage_platform_interface
-      sha256: "5d56021a9d30f7ca89559c96cc4c7250ce6ff8881382ff7238fde64a1f449e39"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.2.15"
-  firebase_storage_web:
-    dependency: transitive
-    description:
-      name: firebase_storage_web
-      sha256: a06775d1df6dd90f5fa3fe9e221b988dcbc221e73a0f8951136536e6d5e548e6
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.11.0"
   firebase_ui_auth:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: firebase_ui_auth
       sha256: "980dec84aabb6d2845381a517a225392244aea08a10a458a5242b0344cae914e"

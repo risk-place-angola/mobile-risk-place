@@ -32,21 +32,22 @@ class AuthService implements IAuthService {
   Future<UserProfile?> login({required LoginRequestDTO user}) async {
     try {
       final response = await _httpClient.post(
-        '/login',
+        '/auth/login',
         body: user.toJson(),
       );
 
       if (response.statusCode == 200) {
         final data = response.data;
 
-        final loggedInUser = UserProfile.fromJson(data);
+        final loggedInUser = AuthTokenResponseDTO.fromJson(data);
 
         await _dbHelper.setData(
           collection: BDCollections.USERS,
+          key: loggedInUser.user.id,
           value: loggedInUser.toJson(),
         );
 
-        return loggedInUser;
+        return UserProfile.fromAuthUserSummaryDTO(loggedInUser.user);
       } else {
         log('Failed to login: ${response.statusMessage}', name: 'AuthService');
         throw Exception('Failed to login: ${response.statusMessage}');
@@ -60,7 +61,7 @@ class AuthService implements IAuthService {
   @override
   Future<bool> logout() async {
     try {
-      await _dbHelper.deleteData(collection: BDCollections.USERS);
+      await _dbHelper.deleteData(collection: BDCollections.USERS, key: '');
       log('User logged out successfully', name: 'AuthService');
       return true;
     } catch (e) {
@@ -73,7 +74,7 @@ class AuthService implements IAuthService {
   Future<bool> register({required RegisterRequestDTO registerDto}) async {
     try {
       final response = await _httpClient.post(
-        '/register',
+        '/auth/register',
         body: registerDto.toJson(),
       );
 
