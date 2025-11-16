@@ -1,9 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rpa/core/database_helper/database_helper.dart';
 import 'package:rpa/core/http_client/dio_http_client.dart';
 import 'package:rpa/core/http_client/i_http_client.dart';
-import 'package:rpa/core/database_helper/database_helper.dart';
 import 'package:rpa/data/dtos/auth_request_dto.dart';
 import 'package:rpa/data/models/user_profile.dart';
 
@@ -43,14 +43,15 @@ class AuthService implements IAuthService {
 
         await _dbHelper.setData(
           collection: BDCollections.USERS,
-          key: loggedInUser.user.id,
+          key: 'user',
           value: loggedInUser.toJson(),
         );
 
         return UserProfile.fromAuthUserSummaryDTO(loggedInUser.user);
       } else {
         log('Failed to login: ${response.statusMessage}', name: 'AuthService');
-        throw Exception('Failed to login: ${response.statusMessage}');
+        throw Exception(
+            'Failed to login: ${response.statusMessage}, statusCode: ${response.statusCode}');
       }
     } catch (e) {
       log('Error during login: $e', name: 'AuthService');
