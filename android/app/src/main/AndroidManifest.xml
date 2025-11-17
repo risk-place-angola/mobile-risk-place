@@ -1,7 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ao.riskplace.maka">
+   <!-- Para notificações -->
+   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+   
+   <!-- Para localização (Waze-like) -->
+   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+   
+   <!-- Para vibração -->
+   <uses-permission android:name="android.permission.VIBRATE"/>
+   
    <application
-        android:label="rpa"
+        android:label="Maka"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:rpa/core/database_helper/database_helper.dart';
 import 'package:rpa/data/dtos/auth_request_dto.dart';
 import 'package:rpa/data/models/user.model.dart';
+import 'package:rpa/data/providers/repository_providers.dart';
 
 abstract class IUserBox {
   Future<void> storeUser({required User user});
@@ -18,6 +19,10 @@ class UserBox extends IUserBox {
   Future<void> deleteUserInfo() async {
     await Hive.openBox(BDCollections.USERS);
     await Hive.box(BDCollections.USERS).delete("user");
+    
+    // 🔑 Limpar token do AuthTokenManager
+    log('Clearing auth token on user delete...', name: 'UserBox');
+    AuthTokenManager().clearToken();
   }
 
   @override
@@ -30,6 +35,14 @@ class UserBox extends IUserBox {
       log(result.toString(), name: "UserBox - getUser()");
 
       final userData = AuthTokenResponseDTO.fromJson(result);
+      
+      // 🔑 Restaurar token no AuthTokenManager quando carregar usuário
+      if (userData.accessToken.isNotEmpty) {
+        log('Restoring auth token from storage...', name: 'UserBox');
+        AuthTokenManager().setToken(userData.accessToken);
+        log('Auth token restored successfully', name: 'UserBox');
+      }
+      
       return User(
         id: userData.user.id,
         name: userData.user.name,

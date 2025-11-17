@@ -1,130 +1,105 @@
-import 'dart:async';
-import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/constants.dart';
+import 'package:rpa/core/database_helper/database_helper.dart';
 
 import 'i_http_client.dart';
+import 'interceptors/auth_interceptor.dart';
+import 'interceptors/logging_interceptor.dart';
+import 'interceptors/error_interceptor.dart';
+import 'exceptions/http_exceptions.dart';
 
+/// Provider for HTTP client instance
 final httpClientProvider = Provider<IHttpClient>((ref) {
-  final dio = Dio();
-  return ClientHttpService(dio: dio);
+  final dbHelper = ref.read(dbHelperProvider);
+  return HttpClient(dbHelper);
 });
 
-class ClientHttpService implements IHttpClient {
-  Dio dio;
+/// HTTP client implementation using Dio
+class HttpClient implements IHttpClient {
+  late final Dio _dio;
+  final IDBHelper _dbHelper;
 
-  ClientHttpService({required this.dio}) {
-    dio.options.connectTimeout = const Duration(seconds: 10);
-    dio.options.receiveTimeout = const Duration(seconds: 10);
-    dio.options.sendTimeout = const Duration(seconds: 10);
-    dio.options.responseType = ResponseType.json;
-    dio.options.baseUrl = BASE_URL;
-    dio.options.contentType = Headers.jsonContentType;
+  HttpClient(this._dbHelper) {
+    _dio = Dio(_createBaseOptions());
+    _setupInterceptors();
+  }
 
-    dio.interceptors.add(LogInterceptor(
-      requestHeader: false,
-      requestBody: false,
-      responseBody: true,
-      responseHeader: false,
-      error: true,
-    ));
+  /// Create base Dio options
+  BaseOptions _createBaseOptions() {
+    return BaseOptions(
+      baseUrl: BASE_URL,
+      responseType: ResponseType.json,
+      contentType: Headers.jsonContentType,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      sendTimeout: const Duration(seconds: 30),
+      validateStatus: (status) => status != null && status < 600, // Accept all status codes to handle them properly
+    );
+  }
+
+  /// Setup interceptors for logging and error handling
+  void _setupInterceptors() {
+    _dio.interceptors.addAll([
+      AuthInterceptor(_dbHelper),
+      ErrorInterceptor(),
+      LoggingInterceptor(),
+    ]);
   }
 
   @override
-  Future<Response> get(String route, {Map<String, dynamic>? body}) async {
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
     try {
-      final result = await dio.get(
-        route,
-        queryParameters: body,
-      );
-      return result;
+      return await _dio.get(path, queryParameters: queryParameters);
     } on DioException catch (e) {
-      log('GET request failed for route: $route, Error: $e',
-          name: 'ClientHttpService');
-      return Response(
-        statusMessage:
-            "{\"data\": null, \"message\": \"Ocorreu um erro interno\"}",
-        statusCode: e.response?.statusCode ?? 500,
-        requestOptions: RequestOptions(),
-      );
+      throw _extractException(e);
     }
   }
 
   @override
-  Future<Response> post(
-    String route, {
-    Map<String, dynamic>? body,
-  }) async {
+  Future<Response> post(String path, {Map<String, dynamic>? data}) async {
     try {
-      final data = await dio.post(route, data: body);
-      log(data.data.toString(), name: "Response");
-      return data;
+      return await _dio.post(path, data: data);
     } on DioException catch (e) {
-      log('POST request failed for route: $route, Error: $e',
-          name: 'ClientHttpService');
-      return Response(
-        statusMessage:
-            "{\"data\": null, \"message\": \"Ocorreu um erro interno\"}",
-        statusCode: e.response?.statusCode ?? 500,
-        requestOptions: RequestOptions(),
-      );
+      throw _extractException(e);
     }
   }
 
   @override
-  Future<Response> put(String route, {Map<String, dynamic>? body}) async {
+  Future<Response> put(String path, {Map<String, dynamic>? data}) async {
     try {
-      final data = await dio.put(
-        route,
-        data: body,
-      );
-
-      return data;
+      return await _dio.put(path, data: data);
     } on DioException catch (e) {
-      log('PUT request failed for route: $route, Error: $e',
-          name: 'ClientHttpService');
-      return Response(
-        statusMessage:
-            "{\"data\": null, \"message\": \"Ocorreu um erro interno\"}",
-        statusCode: e.response?.statusCode ?? 500,
-        requestOptions: RequestOptions(),
-      );
+      throw _extractException(e);
     }
   }
 
   @override
-  Future<void> delete(String route, {Map<String, dynamic>? body}) async {
+  Future<Response> patch(String path, {Map<String, dynamic>? data}) async {
     try {
-      await dio.delete(
-        route,
-        data: body,
-      );
+      return await _dio.patch(path, data: data);
     } on DioException catch (e) {
-      log('Erro ao deletar recurso: $e', name: 'ClientHttpService');
-      rethrow;
+      throw _extractException(e);
     }
   }
 
   @override
-  Future<Response> patch(String route,
-      {required Map<String, dynamic> body}) async {
+  Future<Response> delete(String path, {Map<String, dynamic>? data}) async {
     try {
-      final data = dio.patch(
-        route,
-        data: body,
-      );
-
-      return data;
+      return await _dio.delete(path, data: data);
     } on DioException catch (e) {
-      log('PATCH request failed for route: $route, Error: $e',
-          name: 'ClientHttpService');
-      return Response(
-        statusMessage:
-            "{\"data\": null, \"message\": \"Ocorreu um erro interno\"}",
-        statusCode: e.response?.statusCode ?? 500,
-        requestOptions: RequestOptions(),
-      );
+      throw _extractException(e);
     }
+  }
+
+  /// Extract custom exception from DioException
+  HttpException _extractException(DioException error) {
+    if (error.error is HttpException) {
+      return error.error as HttpException;
+    }
+    return HttpException(
+      message: error.message ?? 'Erro desconhecido',
+      statusCode: error.response?.statusCode,
+    );
   }
 }
