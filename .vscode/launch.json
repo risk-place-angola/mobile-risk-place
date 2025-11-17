@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "MakaNetu (debug)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "--dart-define=BASE_URL=https://risk-place-angola-904a.onrender.com/api/v1", 
+                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            ]
+        },
+        {
+            "name": "MakaNetu (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--dart-define=BASE_URL=https://risk-place-angola-904a.onrender.com/api/v1", 
+                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            ]
+
+        },
+        {
+            "name": "MakaNetu (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                "--dart-define=BASE_URL=https://risk-place-angola-904a.onrender.com/api/v1", 
+                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            ]
+        }
+    ]
+}
+

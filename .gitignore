@@ -63,3 +63,21 @@ key.properties
 
 # FVM Version Cache
 .fvm/
+
+# iOS Build artifacts (already covered by /build/ but more explicit)
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/build/
+
+# iOS specific - Firebase config should be ignored (already listed above)
+# ios/Runner/GoogleService-Info.plist
+
+# Android local config (already covered)
+# android/local.properties
+
+# Build directories (more specific)
+build/
+android/build/
+ios/build/
