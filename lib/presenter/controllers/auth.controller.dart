@@ -5,20 +5,20 @@ import 'package:rpa/data/models/user.model.dart';
 
 class AuthController extends ChangeNotifier {
   void initialize() async {
-    setUser();
+    updateUser();
   }
 
   User? _userStored;
 
   User? get userStored => _userStored;
 
-  logout() async {
+  Future<void> logout() async {
     await UserBox().deleteUserInfo();
     _userStored = null;
     notifyListeners();
   }
 
-  void setUser() async {
+  void updateUser() async {
     _userStored = await UserBox().getUser() ?? User();
     notifyListeners();
   }

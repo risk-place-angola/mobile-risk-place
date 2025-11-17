@@ -1,5 +1,11 @@
 // ignore_for_file: constant_identifier_names
-import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
+import 'package:rpa/core/local_storage/hive_config.dart';
+
+final dbHelperProvider = Provider<IDBHelper>((ref) {
+  return DBHelper.instance;
+});
 
 class BDCollections {
   static const String USERS = "users";
@@ -9,45 +15,46 @@ class BDCollections {
 
 abstract class IDBHelper {
   Future<void> setData(
-      {required String collection, Map<String, dynamic>? value});
+      {required String collection, required String key, dynamic value});
   Future<void> updateData(
-      {required String collection, Map<String, dynamic>? value});
-  Future<void> deleteData(
-      {required String collection, Map<String, dynamic>? value});
-  Future<dynamic> getData(
-      {required String collection, Map<String, dynamic>? value});
+      {required String collection, required String key, dynamic value});
+  Future<void> deleteData({required String collection, required String key});
+  Future<dynamic> getData({required String collection, required String key});
 }
 
 class DBHelper implements IDBHelper {
   DBHelper._();
-  final DatabaseReference database = FirebaseDatabase.instance.ref();
   static final instance = DBHelper._();
 
   @override
   Future<void> setData(
-      {required String collection, Map<String, dynamic>? value}) async {
-    bool isExist = false;
-
-    if (!isExist) {
-      return database.child(collection).push().set(value);
-    }
+      {required String collection, required String key, dynamic value}) async {
+    final box = await Hive.openBox(collection);
+    return box.put(key, value);
   }
 
   @override
   Future<void> deleteData(
-      {required String collection, Map<String, dynamic>? value}) {
-    return database.child(collection).remove();
+      {required String collection, required String key}) async {
+    final box = await Hive.openBox(collection);
+    if (!box.containsKey(key)) {
+      box.deleteFromDisk();
+      await HiveConfig.initialize();
+    }
+    return box.delete(key);
   }
 
   @override
   Future<dynamic> getData(
-      {required String collection, Map<String, dynamic>? value}) {
-    return database.child(collection).get().then((v) => v.value);
+      {required String collection, required String key}) async {
+    final box = await Hive.openBox(collection);
+    return box.get(key);
   }
 
   @override
   Future<void> updateData(
-      {required String collection, Map<String, dynamic>? value}) {
-    return database.child(collection).update(value!);
+      {required String collection, required String key, dynamic value}) async {
+    final box = await Hive.openBox(collection);
+    return box.put(key, value);
   }
 }
