@@ -1,21 +1,10 @@
-import 'dart:async';
 import 'dart:developer';
-
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rpa/core/utils/navigator_handler.dart';
-import 'package:rpa/data/models/user.model.dart';
-import 'package:rpa/data/models/warns.model.dart';
-import 'package:rpa/presenter/controllers/alert.controller.dart';
+import 'package:rpa/core/managers/anonymous_user_manager.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
-import 'package:rpa/presenter/controllers/home.controller.dart';
-import 'package:rpa/presenter/controllers/warns.controller.dart';
-import 'package:rpa/presenter/pages/alert_page.dart';
-import 'package:rpa/presenter/pages/home_page/widgets/alerts_list.widget.dart';
+import 'package:rpa/presenter/controllers/location.controller.dart';
 import 'package:rpa/presenter/pages/map/map_view.dart';
-import 'package:rpa/presenter/pages/profile/profile.view.dart';
-import 'package:unicons/unicons.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -25,135 +14,39 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  final RecorderController _controller = RecorderController();
-  Timer? _timer;
-  late User? _user;
-  final List<Warning> _warnings = [];
-  void handleNavigation() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      print(timer.tick);
-      if (timer.tick == 4) {
-        context.navigateAnimateTo(AlertPage(), fullScreenDialog: true);
-      }
-      if (timer.tick >= 4) {
-        timer.cancel();
+  @override
+  void initState() {
+    super.initState();
+    
+    ref.read(authControllerProvider).initialize();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _initializeAnonymousUser();
+        ref.read(locationControllerProvider).requestLocationPermission();
       }
     });
   }
 
-  @override
-  void initState() {
-    warnsStream.onChildAdded.listen(
-      (event) {
-        var events = event.snapshot.value as Map;
-        var warn = Warning(
-          additionalData: events['additional_data'],
-          isVictim: events['is_victim'],
-          location: {
-            events['location']['latitude']: events['location']['longitude']
-          },
-          createdAt: DateTime.parse(events['created_at']),
-          description: events['description'] ?? '',
-          reportedBy: events['reported_by'],
-        );
-        _warnings.add(warn);
-
-        if (warn.createdAt!
-            .isAfter(DateTime.now().subtract(Duration(minutes: 3)))) {
-          ref.read(hasNewAlertNotifier.notifier).state = true;
-        }
-        setState(() {});
-      },
-    );
-    ref.read(authControllerProvider).initialize();
-    _user = ref.read(authControllerProvider.notifier).userStored;
-    log('User: ${_user?.toJsonIsRFCE()}');
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  Future<void> _initializeAnonymousUser() async {
+    try {
+      log('🌟 [HomePage] Initializing anonymous user (Waze-style)');
+      final manager = ref.read(anonymousUserManagerProvider);
+      await manager.initialize();
+    } catch (e) {
+      log('❌ [HomePage] Anonymous initialization error: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // App opens directly on the map view with all Waze-style features:
+    // - Hamburger menu (slide-out)
+    // - Floating profile button
+    // - Draggable home panel with search, quick actions, and recent items
     return Scaffold(
-      bottomNavigationBar: _BottomNavigation(
-          pageIndex: ref.watch(homeProvider).pageIndex,
-          updateIndex: ref.read(homeProvider).updateIndex),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _user!.isRFCE ?? false
-          ? null
-          : GestureDetector(
-              onLongPressEnd: (details) => _timer!.cancel(),
-              onLongPress: () => handleNavigation(),
-              child: FloatingActionButton(
-                heroTag: "warning",
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                onPressed: null,
-                child: const Icon(
-                  UniconsThinline.exclamation_triangle,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-      body: PageView(
-        physics: const NeverScrollableScrollPhysics(),
-        onPageChanged: ref.read(homeProvider).updateIndex,
-        controller: ref.read(homeProvider).pageController,
-        children: [
-          MainPage(warnings: _warnings),
-          MapView(),
-          const ProfileView(),
-        ],
-      ),
-    );
-  }
-}
-
-class _BottomNavigation extends ConsumerWidget {
-  Function(int)? updateIndex;
-  int? pageIndex;
-  _BottomNavigation(
-      {super.key, required this.pageIndex, required this.updateIndex});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.read(homeProvider);
-    return BottomNavigationBar(
-      onTap: updateIndex,
-      currentIndex: pageIndex!,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      showUnselectedLabels: false,
-      items: const [
-        BottomNavigationBarItem(
-            icon: Icon(UniconsLine.home_alt), label: 'Home'),
-        BottomNavigationBarItem(
-            icon: Icon(UniconsLine.map), label: 'Mapa de Risco'),
-        BottomNavigationBarItem(icon: Icon(UniconsLine.user), label: 'Profile'),
-      ],
-    );
-  }
-}
-
-class MainPage extends StatelessWidget {
-  MainPage({super.key, this.warnings});
-  List<Warning>? warnings;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Alertas',
-          style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-        ),
-      ),
-      body: AlertsList(warns: warnings!.reversed.toList()),
-    );
+    body: const MapView(),
+    // note: no BottomNavigationBar here
+  );
   }
 }

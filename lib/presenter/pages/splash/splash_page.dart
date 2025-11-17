@@ -6,7 +6,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/pages/home_page/home.page.dart';
-import 'package:rpa/presenter/pages/login/login.page.dart';
 import 'package:rpa/core/utils/navigator_handler.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -18,7 +17,7 @@ class SplashPage extends ConsumerStatefulWidget {
 
 class _SplashPageState extends ConsumerState<SplashPage> {
   void _requestPermissionIfNecessary() async {
-    final permission = await Permission.microphone.status;
+    await Permission.microphone.status;
     await Geolocator.requestPermission();
     await RecorderController().checkPermission();
   }
@@ -31,7 +30,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    final _authController = ref.watch(authControllerProvider.notifier);
+    final authController = ref.watch(authControllerProvider.notifier);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: Column(
@@ -47,16 +46,14 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                 begin: Offset(0, 0),
                 end: Offset(1.0, 1.0),
                 curve: Curves.fastOutSlowIn,
-                duration: Duration(seconds: 2),
+                duration: Duration(milliseconds: 1200),
               )
             ],
             onComplete: (controller) {
-              _authController.initialize();
+              authController.initialize();
 
-              Future.delayed(const Duration(seconds: 2), () {
-                _authController.userStored?.id != null
-                    ? context.navigateToAndReplace(HomePage())
-                    : context.navigateToAndReplace(const LoginPage());
+              Future.delayed(const Duration(milliseconds: 800), () {
+                context.navigateToAndReplace(const HomePage());
               });
             },
           )
