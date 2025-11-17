@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Rpa</string>
+	<string>Maka</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -27,13 +27,18 @@
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app requires location permission.</string>
+	<string>Precisamos da sua localização para mostrar alertas próximos</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app requires location permission.</string>
+	<string>Precisamos da sua localização para atualizações em tempo real</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app requires location permission.</string>
+	<string>Precisamos da sua localização para atualizações em tempo real</string>
 	<key>NSLocationUsageDescription</key>
-	<string>This app requires location permission.</string>
+	<string>Precisamos da sua localização para mostrar alertas próximos</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
