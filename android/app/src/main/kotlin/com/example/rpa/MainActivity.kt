@@ -1,4 +1,4 @@
-package ao.riskplace.maka
+package ao.riskplace.makanetu
 
 import io.flutter.embedding.android.FlutterActivity
 

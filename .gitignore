@@ -57,9 +57,19 @@ lib/firebase_options.dart
 
 # Env
 .env
+.env.local
+.env.*.local
 *.keystore
 *.jks
 key.properties
+
+# CI/CD Credentials (não commitar!)
+service-account-*.json
+google-services-dev.json
+google-services-prod.json
+google-services-staging.json
+firebase-credentials.json
+*-credentials.json
 
 # FVM Version Cache
 .fvm/
@@ -74,6 +84,19 @@ ios/build/
 # iOS specific - Firebase config should be ignored (already listed above)
 # ios/Runner/GoogleService-Info.plist
 
+# iOS Certificates and Provisioning (não commitar!)
+*.p12
+*.cer
+*.mobileprovision
+*.certSigningRequest
+ios/ExportOptions.plist.local
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcworkspace/xcuserdata/
+
+# iOS Private Keys (APNs, App Store Connect)
+AuthKey_*.p8
+*.p8
+
 # Android local config (already covered)
 # android/local.properties
 
@@ -81,3 +104,5 @@ ios/build/
 build/
 android/build/
 ios/build/
+
+*.pem
