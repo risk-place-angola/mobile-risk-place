@@ -4,18 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:rpa/data/mock/mock_map_data.dart';
 import 'package:rpa/data/models/websocket/alert_model.dart';
 import 'package:rpa/data/models/websocket/report_model.dart';
+import 'package:rpa/data/models/websocket/nearby_user_model.dart';
+import 'package:rpa/data/providers/risk_providers.dart';
+import 'package:rpa/data/services/alert_websocket_service.dart';
 import 'package:rpa/presenter/controllers/location.controller.dart';
 import 'package:rpa/presenter/controllers/home_panel.controller.dart';
 import 'package:rpa/presenter/controllers/menu.controller.dart' as menu_ctrl;
 import 'package:rpa/presenter/pages/map/providers/map_markers_notifier.dart';
+import 'package:rpa/presenter/pages/map/providers/user_avatars_notifier.dart';
 import 'package:rpa/presenter/pages/map/widgets/marker_details_sheet.dart';
 import 'package:rpa/presenter/pages/map/widgets/report_button.dart';
 import 'package:rpa/presenter/pages/map/widgets/location_button.dart';
+import 'package:rpa/presenter/pages/map/widgets/user_avatar_marker.dart';
 import 'package:rpa/presenter/pages/map/widgets/report_selection_bottom_sheet_v2.dart';
 import 'package:rpa/presenter/pages/map/widgets/report_location_editor.dart';
+import 'package:rpa/presenter/widgets/radius_control_widget.dart';
 import 'package:rpa/data/models/risk_type.dart';
 import 'package:rpa/data/models/enums/risk_type.dart' as enums;
 import 'package:rpa/presenter/pages/home_page/widgets/home_panel.widget.dart';
@@ -24,12 +29,11 @@ import 'package:rpa/presenter/pages/home_page/widgets/floating_profile_button.wi
 import 'package:rpa/presenter/pages/menu/widgets/hamburger_button.widget.dart';
 import 'package:rpa/presenter/pages/menu/slide_out_menu.dart';
 import 'package:rpa/presenter/pages/profile/profile.view.dart';
-// import 'package:rpa/presenter/pages/map/search/map_search_screen.dart'; // Commented while search is disabled
 import 'package:rpa/data/models/place_search_result.dart';
+import 'package:rpa/core/error/error_handler.dart';
 import 'package:rpa/domain/usecases/create_report_usecase.dart';
 import 'package:rpa/domain/usecases/update_report_location_usecase.dart';
-import 'package:rpa/data/providers/user_provider.dart';
-import 'package:rpa/presenter/pages/login/login.page.dart';
+import 'package:rpa/core/services/risk_topic_translation_service.dart';
 
 class MapView extends ConsumerStatefulWidget {
   const MapView({super.key});
@@ -41,29 +45,43 @@ class MapView extends ConsumerStatefulWidget {
 class _MapViewState extends ConsumerState<MapView> {
   final MapController controller = MapController();
   PlaceSearchResult? _selectedSearchResult;
+  int _currentRadius = 5000; // Default 5km radius for nearby reports
+  bool _isLoadingReports = false; // Prevent duplicate loads
 
   @override
   void initState() {
     super.initState();
-    // Start location updates when map is initialized
-    // Note: Permission is requested in HomePage, so we just start updates here
+    
+    _setupWebSocketForAvatars();
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(locationControllerProvider).startLocationUpdates();
-
-      // ========================================================================
-      // BACKEND INTEGRATION - Load nearby reports from API
-      // ========================================================================
-      _loadNearbyReportsFromBackend();
-
-      // ========================================================================
-      // MOCK DATA - TEMPORARY FOR TESTING
-      // ========================================================================
-      // Load mock data for testing alerts and reports on map
-      // TODO: Replace with real WebSocket data when backend is connected
-      // This will be removed once WebSocket integration is complete
-      // ========================================================================
-      _loadMockData();
+      _initializeMap();
     });
+  }
+
+  Future<void> _initializeMap() async {
+    ref.read(allRiskTypesProvider);
+    
+    final locationController = ref.read(locationControllerProvider);
+    if (locationController.permissionGranted) {
+      locationController.startLocationUpdates();
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+    
+    if (mounted) {
+      _loadNearbyReportsFromBackend();
+    }
+  }
+
+  void _setupWebSocketForAvatars() {
+    final wsService = ref.read(alertWebSocketProvider);
+    
+    wsService.onNearbyUsersReceived = (users) {
+      if (mounted) {
+        ref.read(userAvatarsProvider.notifier).updateNearbyUsers(users);
+      }
+    };
   }
 
   // ============================================================================
@@ -72,47 +90,79 @@ class _MapViewState extends ConsumerState<MapView> {
 
   /// Load nearby reports from backend API
   Future<void> _loadNearbyReportsFromBackend() async {
+    // Prevent duplicate loads
+    if (_isLoadingReports) {
+      log('Already loading reports, skipping...', name: 'MapView');
+      return;
+    }
+
     try {
       final locationController = ref.read(locationControllerProvider);
       final currentPosition = locationController.currentPosition;
 
-      if (currentPosition != null) {
-        log('Loading nearby reports from backend...', name: 'MapView');
-
-        await ref.read(nearbyReportsNotifierProvider.notifier).loadReports(
-              latitude: currentPosition.latitude,
-              longitude: currentPosition.longitude,
-              radius: 10000, // 10km radius
-            );
-
-        final reports = ref.read(nearbyReportsListProvider);
-
-        log('Loaded ${reports.length} reports from backend', name: 'MapView');
-
-        // Add reports to map markers
-        final mapMarkersNotifier = ref.read(mapMarkersProvider.notifier);
-        for (final reportDTO in reports) {
-          // Convert DTO to ReportModel for the map
-          final reportModel = ReportModel(
-            reportId: reportDTO.id,
-            message: reportDTO.description,
-            latitude: reportDTO.latitude,
-            longitude: reportDTO.longitude,
-            riskType: enums.RiskType.fromString(reportDTO.riskType.name),
-            status: _mapReportStatusFromString(reportDTO.status),
-            createdAt: reportDTO.createdAt,
-          );
-
-          mapMarkersNotifier.addReport(reportModel);
-        }
-
-        log('Added ${reports.length} reports to map', name: 'MapView');
-      } else {
+      if (currentPosition == null) {
         log('No current location available, skipping reports load',
             name: 'MapView');
+        return;
       }
+
+      _isLoadingReports = true;
+      log('Loading nearby reports from backend...', name: 'MapView');
+
+      await ref.read(nearbyReportsNotifierProvider.notifier).loadReports(
+            latitude: currentPosition.latitude,
+            longitude: currentPosition.longitude,
+            radius: _currentRadius, // Use current radius setting
+          );
+
+      final reports = ref.read(nearbyReportsListProvider);
+
+      log('Loaded ${reports.length} reports from backend', name: 'MapView');
+
+      // Add reports to map markers with dynamic risk type lookup
+      final mapMarkersNotifier = ref.read(mapMarkersProvider.notifier);
+      for (final reportDTO in reports) {
+        // Fetch risk type name from backend and map to enum
+        enums.RiskType riskType = enums.RiskType.infrastructure; // Default fallback
+        
+        try {
+          final riskTypeAsync = ref.read(riskTypeProvider(reportDTO.riskTypeId));
+          await riskTypeAsync.when(
+            data: (riskTypeDTO) {
+              // Map backend risk type name to enum
+              riskType = _mapRiskTypeNameToEnum(riskTypeDTO.name);
+              log('Mapped risk type "${riskTypeDTO.name}" to ${riskType.name}', name: 'MapView');
+            },
+            loading: () {
+              log('Loading risk type for ${reportDTO.riskTypeId}', name: 'MapView');
+            },
+            error: (err, _) {
+              log('Error loading risk type ${reportDTO.riskTypeId}: $err', name: 'MapView');
+            },
+          );
+        } catch (e) {
+          log('Exception getting risk type for report ${reportDTO.id}: $e', name: 'MapView');
+        }
+
+        // Convert DTO to ReportModel for the map
+        final reportModel = ReportModel(
+          reportId: reportDTO.id,
+          message: reportDTO.description,
+          latitude: reportDTO.latitude,
+          longitude: reportDTO.longitude,
+          riskType: riskType,
+          status: _mapReportStatusFromString(reportDTO.status),
+          createdAt: reportDTO.createdAt,
+        );
+
+        mapMarkersNotifier.addReport(reportModel);
+      }
+
+      log('Added ${reports.length} reports to map', name: 'MapView');
     } catch (e) {
       log('Error loading nearby reports: $e', name: 'MapView');
+    } finally {
+      _isLoadingReports = false;
     }
   }
 
@@ -132,67 +182,145 @@ class _MapViewState extends ConsumerState<MapView> {
     }
   }
 
-  // MOCK used for testing - Load mock alerts and reports into map markers
-  /// Load mock data for testing markers (TEMPORARY - will be replaced by WebSocket)
-  void _loadMockData() {
-    final notifier = ref.read(mapMarkersProvider.notifier);
-    MockMapData.loadMockData(
-      notifier.addAlert,
-      notifier.addReport,
-    );
-    log('Loaded mock alerts and reports (TEMPORARY)', name: 'MapView');
+  /// Map risk type name from backend to RiskType enum
+  /// Uses intelligent fuzzy matching to handle name variations
+  enums.RiskType _mapRiskTypeNameToEnum(String riskTypeName) {
+    final normalized = riskTypeName.toLowerCase().trim();
 
-    // Load mock recent items for home panel
-    _loadMockRecentItems();
+    // Direct matches
+    if (normalized.contains('violence') || normalized.contains('violência')) {
+      return enums.RiskType.violence;
+    }
+    if (normalized.contains('fire') || normalized.contains('fogo') || normalized.contains('incêndio')) {
+      return enums.RiskType.fire;
+    }
+    if (normalized.contains('traffic') || normalized.contains('trânsito') || normalized.contains('transito')) {
+      return enums.RiskType.traffic;
+    }
+    if (normalized.contains('infrastructure') || normalized.contains('infraestrutura')) {
+      return enums.RiskType.infrastructure;
+    }
+    if (normalized.contains('flood') || normalized.contains('inundação') || normalized.contains('cheia') || normalized.contains('natural') || normalized.contains('disaster') || normalized.contains('desastre')) {
+      return enums.RiskType.naturalDisaster;
+    }
+    if (normalized.contains('crime') || normalized.contains('criminal')) {
+      return enums.RiskType.crime;
+    }
+    if (normalized.contains('accident') || normalized.contains('acidente')) {
+      return enums.RiskType.accident;
+    }
+    if (normalized.contains('health') || normalized.contains('saúde') || normalized.contains('medical') || normalized.contains('médic')) {
+      return enums.RiskType.health;
+    }
+    if (normalized.contains('environment') || normalized.contains('ambiente') || normalized.contains('ambiental')) {
+      return enums.RiskType.environment;
+    }
+    if (normalized.contains('public') || normalized.contains('safety') || normalized.contains('segurança') || normalized.contains('pública')) {
+      return enums.RiskType.publicSafety;
+    }
+    if (normalized.contains('urban') || normalized.contains('urbano')) {
+      return enums.RiskType.urbanIssue;
+    }
+
+    return enums.RiskType.infrastructure;
   }
 
-  // MOCK used for testing - Load mock recent items for home panel
-  /// Load mock recent items for demonstration (TEMPORARY)
-  void _loadMockRecentItems() {
-    final panelController = ref.read(homePanelControllerProvider);
+  // MOCK used for testing - DISABLED - Using real backend data now
+  // /// Load mock data for testing markers (TEMPORARY - will be replaced by WebSocket)
+  // void _loadMockData() {
+  //   final notifier = ref.read(mapMarkersProvider.notifier);
+  //   MockMapData.loadMockData(
+  //     notifier.addAlert,
+  //     notifier.addReport,
+  //   );
+  //   log('Loaded mock alerts and reports (TEMPORARY)', name: 'MapView');
 
-    // Set home and work addresses
-    panelController.setHomeAddress('Home');
-    panelController.setWorkAddress('Work');
+  //   // Load mock recent items for home panel
+  //   _loadMockRecentItems();
+  // }
 
-    // Add mock recent items
-    panelController.addRecentItem(RecentItem(
-      id: '1',
-      title: 'Talatona',
-      subtitle: 'Luanda, Angola',
-      icon: Icons.location_city,
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      type: RecentItemType.neighborhood,
-    ));
+  // MOCK used for testing - DISABLED
+  // /// Load mock recent items for demonstration (TEMPORARY)
+  // void _loadMockRecentItems() {
+  //   final panelController = ref.read(homePanelControllerProvider);
 
-    panelController.addRecentItem(RecentItem(
-      id: '2',
-      title: 'Armed Robbery',
-      subtitle: 'Reported 3 hours ago near Kilamba',
-      icon: Icons.warning_amber_rounded,
-      timestamp: DateTime.now().subtract(const Duration(hours: 3)),
-      type: RecentItemType.incident,
-    ));
+  //   // Set home and work addresses
+  //   panelController.setHomeAddress('Home');
+  //   panelController.setWorkAddress('Work');
 
-    panelController.addRecentItem(RecentItem(
-      id: '3',
-      title: 'Safe Route to Miramar',
-      subtitle: 'Via Avenida 4 de Fevereiro',
-      icon: Icons.route,
-      timestamp: DateTime.now().subtract(const Duration(hours: 5)),
-      type: RecentItemType.safeRoute,
-    ));
+  //   // Add mock recent items
+  //   panelController.addRecentItem(RecentItem(
+  //     id: '1',
+  //     title: 'Talatona',
+  //     subtitle: 'Luanda, Angola',
+  //     icon: Icons.location_city,
+  //     timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+  //     type: RecentItemType.neighborhood,
+  //   ));
 
-    panelController.addRecentItem(RecentItem(
-      id: '4',
-      title: 'Shopping Belas',
-      subtitle: 'Belas, Luanda',
-      icon: Icons.shopping_bag,
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      type: RecentItemType.location,
-    ));
+  //   panelController.addRecentItem(RecentItem(
+  //     id: '2',
+  //     title: 'Armed Robbery',
+  //     subtitle: 'Reported 3 hours ago near Kilamba',
+  //     icon: Icons.warning_amber_rounded,
+  //     timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+  //     type: RecentItemType.incident,
+  //   ));
 
-    log('Loaded mock recent items', name: 'MapView');
+  //   panelController.addRecentItem(RecentItem(
+  //     id: '3',
+  //     title: 'Safe Route to Miramar',
+  //     subtitle: 'Via Avenida 4 de Fevereiro',
+  //     icon: Icons.route,
+  //     timestamp: DateTime.now().subtract(const Duration(hours: 5)),
+  //     type: RecentItemType.safeRoute,
+  //   ));
+
+  //   panelController.addRecentItem(RecentItem(
+  //     id: '4',
+  //     title: 'Shopping Belas',
+  //     subtitle: 'Belas, Luanda',
+  //     icon: Icons.shopping_bag,
+  //     timestamp: DateTime.now().subtract(const Duration(days: 1)),
+  //     type: RecentItemType.location,
+  //   ));
+
+  //   log('Loaded mock recent items', name: 'MapView');
+  // }
+
+  /// Adjust map zoom based on radius
+  /// Animates the map to show the search radius area properly
+  void _adjustMapZoomForRadius(int radius) {
+    final locationController = ref.read(locationControllerProvider);
+    final currentPosition = locationController.currentPosition;
+    
+    if (currentPosition == null) return;
+
+    // Calculate appropriate zoom level based on radius
+    // Formula: zoom = log2(earthCircumference / (radius * tileSize * 2))
+    // Simplified mapping for common radius values:
+    double zoomLevel;
+    if (radius <= 500) {
+      zoomLevel = 16.0; // Very close view
+    } else if (radius <= 1000) {
+      zoomLevel = 15.0; // Close view
+    } else if (radius <= 2000) {
+      zoomLevel = 14.0; // Medium-close view
+    } else if (radius <= 5000) {
+      zoomLevel = 13.0; // Medium view
+    } else if (radius <= 10000) {
+      zoomLevel = 12.0; // Far view
+    } else {
+      zoomLevel = 11.0; // Very far view
+    }
+
+    // Animate to new zoom level centered on current position
+    controller.move(
+      LatLng(currentPosition.latitude, currentPosition.longitude),
+      zoomLevel,
+    );
+
+    log('Adjusted map zoom to $zoomLevel for radius ${radius}m', name: 'MapView');
   }
 
   @override
@@ -233,11 +361,7 @@ class _MapViewState extends ConsumerState<MapView> {
     }
   }
 
-  // TODO: Fix search functionality - Screen freezes when navigating to search result
-  // Issue: When moving map to search result location, the screen becomes unresponsive
-  // Possible causes: map controller state, navigation timing, or widget lifecycle issues
   void _handleSearchTap() async {
-    // TEMPORARILY DISABLED - Screen freezing issue needs to be resolved
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Search feature temporarily disabled'),
@@ -245,31 +369,6 @@ class _MapViewState extends ConsumerState<MapView> {
         duration: Duration(seconds: 2),
       ),
     );
-    return;
-
-    /* COMMENTED OUT UNTIL FREEZE ISSUE IS FIXED
-    final currentPosition = ref.read(locationControllerProvider).currentPosition;
-    final initialCenter = currentPosition != null
-        ? LatLng(currentPosition.latitude, currentPosition.longitude)
-        : null;
-
-    final result = await Navigator.push<PlaceSearchResult>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MapSearchScreen(
-          initialCenter: initialCenter,
-          onPlaceSelected: (place) {
-            // Will be handled after navigation returns
-          },
-        ),
-      ),
-    );
-
-    // Check if widget is still mounted before using context or ref
-    if (result != null && mounted) {
-      _handlePlaceSelected(result);
-    }
-    */
   }
 
   // COMMENTED OUT - Related to disabled search functionality
@@ -540,12 +639,10 @@ class _MapViewState extends ConsumerState<MapView> {
   */
 
   void _handleVoiceSearchTap() {
-    // TODO: Implement voice search
     print('Voice search tapped');
   }
 
   void _handleProfileTap() {
-    // Navigate to profile view
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const ProfileView()),
     );
@@ -567,19 +664,10 @@ class _MapViewState extends ConsumerState<MapView> {
       ),
     );
 
-    // If user cancelled, return
     if (selectedLocation == null) {
       return;
     }
 
-    // ============================================================================
-    // BACKEND INTEGRATION - Update Report Location
-    // ============================================================================
-    // Using Clean Architecture with Use Case pattern
-    // Updates backend first, then updates local state on success
-    // ============================================================================
-
-    // Show loading dialog
     if (!mounted) return;
     showDialog(
       context: context,
@@ -612,23 +700,19 @@ class _MapViewState extends ConsumerState<MapView> {
         ),
       );
 
-      // Close loading dialog
       if (mounted) {
         Navigator.of(context).pop();
       }
 
       if (result is UpdateReportLocationSuccess) {
-        // Update local state only after backend confirms
         final updatedReport = report.copyWith(
           latitude: selectedLocation.latitude,
           longitude: selectedLocation.longitude,
         );
 
-        // Remove old report and add updated one
         ref.read(mapMarkersProvider.notifier).removeReport(report.reportId);
         ref.read(mapMarkersProvider.notifier).addReport(updatedReport);
 
-        // Show success message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -639,7 +723,6 @@ class _MapViewState extends ConsumerState<MapView> {
           );
         }
       } else if (result is UpdateReportLocationFailure) {
-        // Show error message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -651,20 +734,12 @@ class _MapViewState extends ConsumerState<MapView> {
         }
       }
     } catch (e) {
-      // Close loading dialog if still open
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
       }
 
-      // Show unexpected error message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro inesperado: $e'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
-        );
+        ErrorHandler.showErrorSnackBar(context, e);
       }
     }
   }
@@ -674,56 +749,33 @@ class _MapViewState extends ConsumerState<MapView> {
         ref.read(locationControllerProvider).currentPosition;
 
     if (currentPosition != null) {
-      final location = LatLng(
-        currentPosition.latitude,
-        currentPosition.longitude,
-      );
-      controller.move(location, 16.0);
+      _adjustMapZoomForRadius(_currentRadius);
     } else {
       _showErrorSnackBar('Localização não disponível. Por favor, ative o GPS.');
     }
   }
 
-  void _handleReportButtonTap() async {
-    // Check if user is logged in
-    final userAsync = ref.read(currentUserProvider);
-    
-    // If still loading, wait for it to complete
-    if (userAsync is AsyncLoading) {
-      try {
-        final user = await ref.read(currentUserProvider.future);
-        if (user == null || user.id == null || user.id!.isEmpty) {
-          _showLoginRequiredDialog();
-          return;
-        }
-        _proceedWithReport();
-      } catch (e) {
-        _showLoginRequiredDialog();
-      }
-      return;
-    }
-    
-    // If already loaded, check the data
-    userAsync.when(
-      data: (user) {
-        if (user == null || user.id == null || user.id!.isEmpty) {
-          _showLoginRequiredDialog();
-          return;
-        }
-        _proceedWithReport();
-      },
-      loading: () {
-        // This shouldn't happen since we checked above, but just in case
-        _showLoginRequiredDialog();
-      },
-      error: (_, __) {
-        _showLoginRequiredDialog();
-      },
-    );
+  void _handleReportButtonTap() {
+    // 🌟 WAZE-STYLE: Allow anonymous users to create reports
+    // No authentication required - anonymous users can report using device_id
+    _proceedWithReport();
+  }
+
+  List<Marker> _buildUserAvatarMarkers(List<NearbyUserModel> users) {
+    return users.map((user) => Marker(
+      width: 48.0,
+      height: 48.0,
+      point: LatLng(user.latitude, user.longitude),
+      child: AnimatedUserAvatarMarker(
+        avatarId: user.avatarId,
+        color: user.color,
+        size: 48,
+        isMoving: user.speed != null && user.speed! > 0.5,
+      ),
+    )).toList();
   }
 
   void _proceedWithReport() {
-    // Hide the home panel when showing report sheet
     ref.read(homePanelControllerProvider).hidePanel();
 
     showModalBottomSheet(
@@ -736,84 +788,8 @@ class _MapViewState extends ConsumerState<MapView> {
         },
       ),
     ).then((_) {
-      // Show panel again when report sheet is closed
       ref.read(homePanelControllerProvider).showPanel();
     });
-  }
-
-  void _showLoginRequiredDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Row(
-          children: const [
-            Icon(
-              Icons.lock_outline,
-              color: Color(0xFFF39C12),
-              size: 28,
-            ),
-            SizedBox(width: 12),
-            Text(
-              'Login Necessário',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        content: const Text(
-          'Você precisa fazer login para criar uma ocorrência. Deseja fazer login agora?',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.black87,
-            height: 1.5,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const LoginPage(),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF39C12),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              'Fazer Login',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _handleReportSelected(
@@ -841,7 +817,10 @@ class _MapViewState extends ConsumerState<MapView> {
         MaterialPageRoute(
           builder: (context) => ReportLocationEditor(
             initialLocation: reportLocation,
-            reportTypeLabel: topic.name,
+            reportTypeLabel: RiskTopicTranslationService.translateTopic(
+              context,
+              topic.name,
+            ),
           ),
         ),
       );
@@ -863,17 +842,21 @@ class _MapViewState extends ConsumerState<MapView> {
       final createReportUseCase =
           await ref.read(createReportUseCaseProvider.future);
 
-      // Prepare parameters
+      final translatedTopicName = RiskTopicTranslationService.translateTopic(
+        context,
+        topic.name,
+      );
+      
       final params = CreateReportParams(
         riskTypeId: riskType.id,
         riskTopicId: topic.id,
-        description: '${topic.name}: ${topic.description}',
+        description: '$translatedTopicName: ${topic.description}',
         latitude: reportLocation.latitude,
         longitude: reportLocation.longitude,
-        address: '', // TODO: Get from reverse geocoding
-        municipality: '', // TODO: Get from reverse geocoding
-        neighborhood: '', // TODO: Get from reverse geocoding
-        province: '', // TODO: Get from reverse geocoding
+        address: '',
+        municipality: '',
+        neighborhood: '',
+        province: '',
       );
 
       // Execute use case
@@ -890,7 +873,7 @@ class _MapViewState extends ConsumerState<MapView> {
         // Add to local map for immediate feedback
         final report = ReportModel(
           reportId: result.report.id,
-          message: '${topic.name}: ${topic.description}',
+          message: '$translatedTopicName: ${topic.description}',
           latitude: reportLocation.latitude,
           longitude: reportLocation.longitude,
           riskType: enums.RiskType.values.firstWhere(
@@ -903,7 +886,7 @@ class _MapViewState extends ConsumerState<MapView> {
 
         ref.read(mapMarkersProvider.notifier).addReport(report);
 
-        _showSuccessSnackBar('${topic.name} reportado com sucesso!');
+        _showSuccessSnackBar('$translatedTopicName reportado com sucesso!');
       } else if (result is CreateReportFailure) {
         log('Report creation failed: ${result.error.message}', name: 'MapView');
         _showErrorSnackBar(result.error.message);
@@ -1038,7 +1021,6 @@ class _MapViewState extends ConsumerState<MapView> {
                   ),
                 ],
               ),
-            // User location marker - highly visible and precise
             if (currentPosition != null)
               MarkerLayer(
                 markers: [
@@ -1051,7 +1033,6 @@ class _MapViewState extends ConsumerState<MapView> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Outer pulsing circle
                         Container(
                           width: 60,
                           height: 60,
@@ -1064,7 +1045,6 @@ class _MapViewState extends ConsumerState<MapView> {
                             ),
                           ),
                         ),
-                        // Middle circle
                         Container(
                           width: 40,
                           height: 40,
@@ -1077,7 +1057,6 @@ class _MapViewState extends ConsumerState<MapView> {
                             ),
                           ),
                         ),
-                        // Inner precise point
                         Container(
                           width: 16,
                           height: 16,
@@ -1102,7 +1081,9 @@ class _MapViewState extends ConsumerState<MapView> {
                   ),
                 ],
               ),
-            // Risk markers (alerts and reports)
+            MarkerLayer(
+              markers: _buildUserAvatarMarkers(ref.watch(userAvatarsProvider).activeUsers),
+            ),
             MarkerLayer(
               markers: riskMarkers,
             ),
@@ -1182,19 +1163,39 @@ class _MapViewState extends ConsumerState<MapView> {
             onTap: _handleProfileTap,
           ),
 
-        // Layer 5: Location Button (Right side, above report button)
+        // Layer 5: Radius Control (Top center)
+        if (!menuController.isOpen)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 16,
+            left: 80,
+            right: 80,
+            child: RadiusControlWidget(
+              currentRadius: _currentRadius,
+              onRadiusChanged: (newRadius) {
+                setState(() {
+                  _currentRadius = newRadius;
+                });
+                // Adjust map zoom to fit the new radius
+                _adjustMapZoomForRadius(newRadius);
+                // Reload reports with new radius
+                _loadNearbyReportsFromBackend();
+              },
+            ),
+          ),
+
+        // Layer 6: Location Button (Right side, above report button)
         if (!menuController.isOpen)
           LocationButton(
             onTap: _handleLocationButtonTap,
           ),
 
-        // Layer 6: Report Button (Right side)
+        // Layer 7: Report Button (Right side)
         if (!menuController.isOpen)
           ReportButton(
             onTap: _handleReportButtonTap,
           ),
 
-        // Layer 7: Home Panel (Draggable Bottom Sheet)
+        // Layer 8: Home Panel (Draggable Bottom Sheet)
         if (!menuController.isOpen)
           RiskPlaceHomePanel(
             onSearchTap: _handleSearchTap,

@@ -1,11 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:rpa/presenter/controllers/home_panel.controller.dart';
+import 'package:rpa/presenter/controllers/location.controller.dart';
+import 'package:rpa/presenter/controllers/safe_route.controller.dart';
 import 'package:rpa/presenter/pages/home_page/widgets/search_bar.widget.dart';
 import 'package:rpa/presenter/pages/home_page/widgets/quick_action_button.widget.dart';
 import 'package:rpa/presenter/pages/home_page/widgets/recent_section.widget.dart';
 import 'package:rpa/presenter/pages/home_page/widgets/more_options_section.widget.dart';
+import 'package:rpa/data/models/safe_place.model.dart';
+import 'package:rpa/data/models/saved_address.dart';
+import 'package:rpa/data/services/safe_places.service.dart';
+import 'package:rpa/data/services/location_sharing.service.dart';
+import 'package:rpa/data/services/profile.service.dart';
+import 'package:rpa/presenter/pages/safe_places/widgets/add_safe_place_dialog.dart';
+import 'package:rpa/presenter/pages/safe_places/saved_places.screen.dart';
+import 'package:rpa/presenter/pages/emergency_services/emergency_services.screen.dart';
+import 'package:rpa/presenter/pages/location_sharing/widgets/share_duration_dialog.dart';
+import 'package:rpa/presenter/pages/location_sharing/share_location.screen.dart';
+import 'package:rpa/presenter/pages/safe_route/safe_route_screen.dart';
+import 'package:rpa/presenter/widgets/set_address_dialog.dart';
 import 'package:unicons/unicons.dart';
+import 'package:rpa/core/error/error_handler.dart';
 
 class RiskPlaceHomePanel extends ConsumerStatefulWidget {
   final VoidCallback? onSearchTap;
@@ -28,11 +44,9 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
   double _dragStartPosition = 0;
   double _currentPanelHeight = 0;
 
-  // Panel heights - Waze-inspired
-  static const double _collapsedHeight = 100.0;  // Only search bar visible
-  static const double _mediumHeight = 240.0;     // Search + quick actions
-  static const double _expandedHeight = 600.0;    // All content
-  static const double _minHeight = 0.0;           // Hidden
+  static const double _collapsedHeight = 100.0;
+  static const double _mediumHeight = 240.0;
+  static const double _expandedHeight = 600.0;
 
   @override
   void initState() {
@@ -65,17 +79,14 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
     final delta = _dragStartPosition - details.globalPosition.dy;
     final newHeight = _currentPanelHeight + delta;
 
-    // Clamp height between min and max
-    if (newHeight >= _minHeight && newHeight <= _expandedHeight) {
+    if (newHeight >= _collapsedHeight && newHeight <= _expandedHeight) {
       setState(() {
         _currentPanelHeight = newHeight;
       });
+      controller.updatePanelHeight(newHeight);
       _dragStartPosition = details.globalPosition.dy;
 
-      // Update controller state based on height thresholds
-      if (_currentPanelHeight < _collapsedHeight / 2) {
-        controller.hidePanel();
-      } else if (_currentPanelHeight < (_collapsedHeight + _mediumHeight) / 2) {
+      if (_currentPanelHeight < (_collapsedHeight + _mediumHeight) / 2) {
         controller.collapsePanel();
       } else if (_currentPanelHeight < (_mediumHeight + _expandedHeight) / 2) {
         controller.setMediumPanel();
@@ -87,12 +98,8 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
 
   void _onPanelDragEnd(DragEndDetails details) {
     final controller = ref.read(homePanelControllerProvider);
-    
-    // Snap to nearest state based on position
-    if (_currentPanelHeight < _collapsedHeight / 2) {
-      _animateToHeight(_minHeight);
-      controller.hidePanel();
-    } else if (_currentPanelHeight < (_collapsedHeight + _mediumHeight) / 2) {
+
+    if (_currentPanelHeight < (_collapsedHeight + _mediumHeight) / 2) {
       _animateToHeight(_collapsedHeight);
       controller.collapsePanel();
     } else if (_currentPanelHeight < (_mediumHeight + _expandedHeight) / 2) {
@@ -105,6 +112,7 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
   }
 
   void _animateToHeight(double targetHeight) {
+    final controller = ref.read(homePanelControllerProvider);
     _animation = Tween<double>(
       begin: _currentPanelHeight,
       end: targetHeight,
@@ -117,22 +125,282 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
       setState(() {
         _currentPanelHeight = targetHeight;
       });
+      controller.updatePanelHeight(targetHeight);
     });
   }
 
-  void _handleQuickAction(String action) {
-    // TODO: Implement quick action handlers
-    print('Quick action tapped: $action');
+  Future<void> _handleQuickAction(String action) async {
+    switch (action) {
+      case 'home':
+        await _handleNavigateHome();
+        break;
+      case 'work':
+        await _handleNavigateWork();
+        break;
+      case 'add_place':
+        await _handleAddSafePlace();
+        break;
+      case 'safe_route':
+        await _handleSafeRoute();
+        break;
+    }
   }
 
-  void _handleRecentItemTap(RecentItem item) {
-    // TODO: Implement recent item handler
-    print('Recent item tapped: ${item.title}');
+  Future<void> _handleNavigateHome() async {
+    final locationController = ref.read(locationControllerProvider);
+    final homePanelController = ref.read(homePanelControllerProvider);
+
+    if (!homePanelController.hasHomeAddress) {
+      await _showSetAddressDialog(AddressType.home);
+      return;
+    }
+
+    final currentPosition = locationController.currentPosition;
+    if (currentPosition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aguardando localização...'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    final profileService = ref.read(profileServiceProvider);
+    final homeAddress = await profileService.getHomeAddress();
+
+    if (homeAddress == null) {
+      await _showSetAddressDialog(AddressType.home);
+      return;
+    }
+
+    final safeRouteController = ref.read(safeRouteControllerProvider);
+    await safeRouteController.calculateSafeRoute(
+      origin: LatLng(currentPosition.latitude, currentPosition.longitude),
+      destination: LatLng(homeAddress.latitude, homeAddress.longitude),
+    );
+
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SafeRouteScreen(),
+        ),
+      );
+    }
   }
 
-  void _handleMoreOptionTap(String option) {
-    // TODO: Implement more options handlers
-    print('More option tapped: $option');
+  Future<void> _handleNavigateWork() async {
+    final locationController = ref.read(locationControllerProvider);
+    final homePanelController = ref.read(homePanelControllerProvider);
+
+    if (!homePanelController.hasWorkAddress) {
+      await _showSetAddressDialog(AddressType.work);
+      return;
+    }
+
+    final currentPosition = locationController.currentPosition;
+    if (currentPosition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aguardando localização...'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    final profileService = ref.read(profileServiceProvider);
+    final workAddress = await profileService.getWorkAddress();
+
+    if (workAddress == null) {
+      await _showSetAddressDialog(AddressType.work);
+      return;
+    }
+
+    final safeRouteController = ref.read(safeRouteControllerProvider);
+    await safeRouteController.calculateSafeRoute(
+      origin: LatLng(currentPosition.latitude, currentPosition.longitude),
+      destination: LatLng(workAddress.latitude, workAddress.longitude),
+    );
+
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SafeRouteScreen(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showSetAddressDialog(AddressType addressType) async {
+    final result = await showDialog<SavedAddress>(
+      context: context,
+      builder: (context) => SetAddressDialog(
+        addressType: addressType,
+      ),
+    );
+
+    if (result != null) {
+      final homePanelController = ref.read(homePanelControllerProvider);
+      if (addressType == AddressType.home) {
+        homePanelController.setHomeAddress(result.address);
+      } else {
+        homePanelController.setWorkAddress(result.address);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            addressType == AddressType.home
+                ? 'Endereço de casa salvo com sucesso!'
+                : 'Endereço de trabalho salvo com sucesso!',
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      if (addressType == AddressType.home) {
+        await _handleNavigateHome();
+      } else {
+        await _handleNavigateWork();
+      }
+    }
+  }
+
+  Future<void> _handleSafeRoute() async {
+    final locationController = ref.read(locationControllerProvider);
+
+    if (locationController.currentPosition == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Aguardando localização GPS...'),
+            backgroundColor: Colors.orange,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SafeRouteScreen(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleAddSafePlace() async {
+    final result = await showDialog<SafePlace>(
+      context: context,
+      builder: (context) => const AddSafePlaceDialog(),
+    );
+
+    if (result != null && mounted) {
+      try {
+        final service = ref.read(safePlacesServiceProvider);
+        await service.initialize();
+        await service.createSafePlace(result);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${result.name} adicionado com sucesso!'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ErrorHandler.showErrorSnackBar(context, e);
+        }
+      }
+    }
+  }
+
+  void _handleRecentItemTap(RecentItem item) {}
+
+  Future<void> _handleShareLocation() async {
+    final duration = await showDialog<int>(
+      context: context,
+      builder: (context) => const ShareDurationDialog(),
+    );
+
+    if (duration != null && mounted) {
+      try {
+        final locationController = ref.read(locationControllerProvider);
+        final position = locationController.currentPosition;
+
+        if (position == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Aguardando localização GPS...'),
+                backgroundColor: Colors.orange,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+          return;
+        }
+
+        final service = ref.read(locationSharingServiceProvider);
+        final session = await service.createSession(
+          durationMinutes: duration,
+          latitude: position.latitude,
+          longitude: position.longitude,
+        );
+
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ShareLocationScreen(
+                session: session,
+                durationMinutes: duration,
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ErrorHandler.showErrorSnackBar(context, e);
+        }
+      }
+    }
+  }
+
+  void _handleMoreOptionTap(String option) async {
+    switch (option) {
+      case 'saved_places':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SavedPlacesScreen(),
+          ),
+        );
+        break;
+      case 'share_location':
+        await _handleShareLocation();
+        break;
+      case 'safe_route':
+        await _handleSafeRoute();
+        break;
+      case 'emergency_services':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const EmergencyServicesScreen(),
+          ),
+        );
+        break;
+    }
   }
 
   @override
@@ -147,11 +415,14 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
 
     // Sync animation with state changes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (panelState == PanelState.collapsed && _currentPanelHeight != _collapsedHeight) {
+      if (panelState == PanelState.collapsed &&
+          _currentPanelHeight != _collapsedHeight) {
         _animateToHeight(_collapsedHeight);
-      } else if (panelState == PanelState.medium && _currentPanelHeight != _mediumHeight) {
+      } else if (panelState == PanelState.medium &&
+          _currentPanelHeight != _mediumHeight) {
         _animateToHeight(_mediumHeight);
-      } else if (panelState == PanelState.expanded && _currentPanelHeight != _expandedHeight) {
+      } else if (panelState == PanelState.expanded &&
+          _currentPanelHeight != _expandedHeight) {
         _animateToHeight(_expandedHeight);
       }
     });
@@ -199,7 +470,7 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
                     children: [
                       // Drag handle
                       _buildDragHandle(),
-                      
+
                       // Search bar - Always visible
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -208,10 +479,10 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
                         ),
                         child: RiskPlaceSearchBar(
                           onTap: widget.onSearchTap,
-                          onMicTap: widget.onVoiceSearchTap,
+                          //onMicTap: widget.onVoiceSearchTap, // Temporarily disabled voice search
                         ),
                       ),
-                      
+
                       // Quick actions - Show in medium and expanded states
                       if (height > _collapsedHeight) ...[
                         const SizedBox(height: 16),
@@ -219,28 +490,28 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
                           actions: _buildQuickActions(context, controller),
                         ),
                       ],
-                      
+
                       // Show more content only when fully expanded
                       if (height > _mediumHeight) ...[
                         const SizedBox(height: 24),
                         const Divider(height: 1),
                         const SizedBox(height: 8),
-                        
+
                         // Recent section
                         RecentSection(
                           recentItems: controller.recentItems,
                           onItemTap: _handleRecentItemTap,
                         ),
-                        
+
                         const SizedBox(height: 8),
                         const Divider(height: 1),
                         const SizedBox(height: 8),
-                        
+
                         // More options
                         MoreOptionsSection(
                           onOptionTap: _handleMoreOptionTap,
                         ),
-                        
+
                         const SizedBox(height: 24),
                       ],
                     ],
@@ -290,10 +561,10 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
         onTap: () => _handleQuickAction('add_place'),
       ),
       QuickActionData(
-        icon: UniconsLine.exclamation_triangle,
-        label: 'Report Incident',
-        iconColor: Colors.red,
-        onTap: () => _handleQuickAction('report'),
+        icon: UniconsLine.map_marker_shield,
+        label: 'Safe Route',
+        iconColor: Colors.teal,
+        onTap: () => _handleQuickAction('safe_route'),
       ),
     ];
   }

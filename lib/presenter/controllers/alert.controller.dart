@@ -50,6 +50,20 @@ class AlertController extends ChangeNotifier {
 
   void toogleRecord(BuildContext context) async {
     var file;
+
+    if (!isRecording) {
+      final hasPermission = await controller.checkPermission();
+      if (!hasPermission) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Microphone permission is required to record audio'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+    }
+
     isRecording = !isRecording;
     isRecording
         ? await controller.record(

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
 import 'package:rpa/presenter/pages/menu/widgets/menu_item.widget.dart';
 import 'package:rpa/presenter/pages/menu/widgets/notification_card.widget.dart';
+import 'package:rpa/presenter/pages/reports/all_reports_screen.dart';
+import 'package:rpa/presenter/pages/emergency_contacts/emergency_contacts_screen.dart';
+import 'package:rpa/presenter/pages/my_alerts/my_alerts_screen.dart';
+import 'package:rpa/presenter/pages/safety_settings/safety_settings_screen.dart';
 import 'package:unicons/unicons.dart';
 
 /// Waze-style slide-out menu drawer
@@ -44,57 +49,49 @@ class SlideOutMenu extends ConsumerWidget {
             // Header Section
             _buildHeader(context, ref, userName, userInitial, isLoggedIn),
             
-            // Menu Items
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.only(top: 8),
                 children: [
                   MenuItem(
                     icon: UniconsLine.exclamation_triangle,
-                    title: 'My Alerts',
-                    subtitle: 'View alerts you posted or subscribed to',
-                    onTap: () => _handleMenuTap('my_alerts'),
+                    title: AppLocalizations.of(context)?.myAlerts ?? 'My Alerts',
+                    subtitle: AppLocalizations.of(context)?.viewAlertsPostedOrSubscribed ?? 'View alerts you posted or subscribed to',
+                    onTap: () => _handleMyAlerts(context),
                     iconColor: Colors.orange,
                   ),
                   MenuItem(
-                    icon: UniconsLine.map_marker,
-                    title: 'Nearby Incidents',
-                    subtitle: 'Real-time danger zones around you',
-                    onTap: () => _handleMenuTap('nearby_incidents'),
-                    iconColor: Colors.red,
-                  ),
-                  MenuItem(
-                    icon: UniconsLine.plus_circle,
-                    title: 'Report an Incident',
-                    subtitle: 'Submit a new safety alert',
-                    onTap: () => _handleMenuTap('report_incident'),
-                    iconColor: Colors.green,
+                    icon: UniconsLine.list_ul,
+                    title: AppLocalizations.of(context)?.allReports ?? 'All Reports',
+                    subtitle: AppLocalizations.of(context)?.viewAllSystemReports ?? 'View all system reports',
+                    onTap: () => _handleAllReports(context),
+                    iconColor: Colors.deepPurple,
                   ),
                   MenuItem(
                     icon: UniconsLine.phone,
-                    title: 'Emergency Contacts',
-                    subtitle: 'Manage trusted contacts',
-                    onTap: () => _handleMenuTap('emergency_contacts'),
+                    title: AppLocalizations.of(context)?.emergencyContactsTitle ?? 'Emergency Contacts',
+                    subtitle: AppLocalizations.of(context)?.manageTrustedContacts ?? 'Manage trusted contacts',
+                    onTap: () => _handleEmergencyContacts(context),
                     iconColor: Colors.blue,
                   ),
                   MenuItem(
                     icon: UniconsLine.shield_check,
-                    title: 'Safety Settings',
-                    subtitle: 'Notifications, tracking, privacy',
-                    onTap: () => _handleMenuTap('safety_settings'),
+                    title: AppLocalizations.of(context)?.safetySettingsTitle ?? 'Safety Settings',
+                    subtitle: AppLocalizations.of(context)?.notificationsTrackingPrivacy ?? 'Notifications, tracking, privacy',
+                    onTap: () => _handleSafetySettings(context),
                     iconColor: Colors.teal,
                   ),
                   MenuItem(
                     icon: UniconsLine.comment_dots,
-                    title: 'Community & Feedback',
-                    subtitle: 'Send feedback or read updates',
+                    title: AppLocalizations.of(context)?.communityFeedback ?? 'Community & Feedback',
+                    subtitle: AppLocalizations.of(context)?.sendFeedbackReadUpdates ?? 'Send feedback or read updates',
                     onTap: () => _handleMenuTap('community'),
                     iconColor: Colors.purple,
                   ),
                   MenuItem(
                     icon: UniconsLine.user,
-                    title: 'My Profile',
-                    subtitle: 'Edit personal info & preferences',
+                    title: AppLocalizations.of(context)?.myProfile ?? 'My Profile',
+                    subtitle: AppLocalizations.of(context)?.editPersonalInfoPreferences ?? 'Edit personal info & preferences',
                     onTap: () => _handleMenuTap('profile'),
                     iconColor: Colors.indigo,
                   ),
@@ -159,7 +156,7 @@ class SlideOutMenu extends ConsumerWidget {
           const SizedBox(height: 16),
           // Greeting
           Text(
-            isLoggedIn ? 'Olá, $userName!' : 'Bem-vindo!',
+            isLoggedIn ? 'Olá, $userName!' : (AppLocalizations.of(context)?.welcome ?? 'Bem-vindo!'),
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -172,7 +169,7 @@ class SlideOutMenu extends ConsumerWidget {
             ElevatedButton.icon(
               onPressed: () => _handleLogin(context),
               icon: const Icon(Icons.login),
-              label: const Text('Entrar / Registrar'),
+              label: Text(AppLocalizations.of(context)?.loginOrRegister ?? 'Login / Register'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
@@ -196,7 +193,7 @@ class SlideOutMenu extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: Text(
-                'Ver perfil',
+                AppLocalizations.of(context)?.viewProfile ?? 'View Profile',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w600,
@@ -239,6 +236,16 @@ class SlideOutMenu extends ConsumerWidget {
     print('Menu action: $action');
   }
 
+  void _handleEmergencyContacts(BuildContext context) {
+    onClose();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EmergencyContactsScreen(),
+      ),
+    );
+  }
+
   void _handleEnableNotifications() {
     print('Enable notifications tapped');
   }
@@ -249,6 +256,36 @@ class SlideOutMenu extends ConsumerWidget {
       context,
       MaterialPageRoute(
         builder: (context) => const LoginPage(),
+      ),
+    );
+  }
+
+  void _handleAllReports(BuildContext context) {
+    onClose();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AllReportsScreen(),
+      ),
+    );
+  }
+
+  void _handleMyAlerts(BuildContext context) {
+    onClose();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MyAlertsScreen(),
+      ),
+    );
+  }
+
+  void _handleSafetySettings(BuildContext context) {
+    onClose();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SafetySettingsScreen(),
       ),
     );
   }

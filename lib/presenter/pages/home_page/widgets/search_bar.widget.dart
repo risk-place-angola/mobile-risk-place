@@ -12,7 +12,7 @@ class RiskPlaceSearchBar extends StatelessWidget {
     this.onTap,
     this.onMicTap,
     this.enabled = true,
-    this.hintText = 'Where are you going?',
+    this.hintText = 'Search Location',
   }) : super(key: key);
 
   @override
@@ -57,7 +57,8 @@ class RiskPlaceSearchBar extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    color:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

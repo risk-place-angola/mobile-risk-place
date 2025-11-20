@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/legacy.dart';
 /// Enum representing the different states of the home panel
 enum PanelState {
   collapsed, // Only search bar visible (Waze-like collapsed state)
-  medium,    // Search bar + quick actions visible
-  expanded,  // Full view with all options
-  hidden,    // Completely hidden (e.g., when viewing marker details)
+  medium, // Search bar + quick actions visible
+  expanded, // Full view with all options
+  hidden, // Completely hidden (e.g., when viewing marker details)
 }
 
 /// Model for recent search items
@@ -42,12 +42,14 @@ class HomePanelController extends ChangeNotifier {
   String? _homeAddress;
   String? _workAddress;
   bool _isSearchFocused = false;
+  double _currentPanelHeight = 100.0;
 
   PanelState get panelState => _panelState;
   List<RecentItem> get recentItems => _recentItems;
   String? get homeAddress => _homeAddress;
   String? get workAddress => _workAddress;
   bool get isSearchFocused => _isSearchFocused;
+  double get currentPanelHeight => _currentPanelHeight;
 
   /// Toggle between panel states
   void togglePanel() {
@@ -60,10 +62,10 @@ class HomePanelController extends ChangeNotifier {
     }
     notifyListeners();
   }
-  
-  /// Set panel to medium state (search + actions)
+
   void setMediumPanel() {
     _panelState = PanelState.medium;
+    _currentPanelHeight = 240.0;
     notifyListeners();
   }
 
@@ -76,24 +78,34 @@ class HomePanelController extends ChangeNotifier {
   /// Hide panel (e.g., when showing marker details)
   void hidePanel() {
     _panelState = PanelState.hidden;
+    _currentPanelHeight = 0;
     notifyListeners();
   }
 
   /// Show panel in collapsed state
   void showPanel() {
     _panelState = PanelState.collapsed;
+    _currentPanelHeight = 100.0;
     notifyListeners();
   }
 
   /// Expand panel
   void expandPanel() {
     _panelState = PanelState.expanded;
+    _currentPanelHeight = 600.0;
     notifyListeners();
   }
 
   /// Collapse panel
   void collapsePanel() {
     _panelState = PanelState.collapsed;
+    _currentPanelHeight = 100.0;
+    notifyListeners();
+  }
+
+  /// Update current panel height
+  void updatePanelHeight(double height) {
+    _currentPanelHeight = height;
     notifyListeners();
   }
 
@@ -128,6 +140,12 @@ class HomePanelController extends ChangeNotifier {
     _isSearchFocused = focused;
     notifyListeners();
   }
+
+  /// Check if home address is configured
+  bool get hasHomeAddress => _homeAddress != null && _homeAddress!.isNotEmpty;
+
+  /// Check if work address is configured
+  bool get hasWorkAddress => _workAddress != null && _workAddress!.isNotEmpty;
 }
 
 /// Provider for home panel controller

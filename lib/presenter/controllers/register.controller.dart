@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:rpa/core/error/error_handler.dart';
 import 'package:rpa/data/models/user.model.dart';
 import 'package:rpa/data/services/user.service.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
@@ -73,11 +74,7 @@ class RegisterController extends ChangeNotifier with RegisterState {
       }
     } catch (e) {
       if (context.mounted) {
-        _showSnackBar(
-          context,
-          "Erro ao fazer registro. Tente novamente.",
-          isError: true,
-        );
+        ErrorHandler.showErrorSnackBar(context, e);
       }
     } finally {
       setLoading(false);

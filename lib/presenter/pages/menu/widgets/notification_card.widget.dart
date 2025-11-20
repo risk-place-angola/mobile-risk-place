@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:unicons/unicons.dart';
 
 /// Notification permission card for the menu footer
@@ -34,10 +35,11 @@ class NotificationPermissionCard extends StatelessWidget {
                 size: 24,
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Enable Notifications',
-                  style: TextStyle(
+                  AppLocalizations.of(context)?.enableNotifications ??
+                      'Enable Notifications',
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -48,7 +50,8 @@ class NotificationPermissionCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Receive urgent safety alerts in real-time',
+            AppLocalizations.of(context)?.receiveUrgentSafetyAlerts ??
+                'Receive urgent safety alerts in real-time',
             style: TextStyle(
               fontSize: 13,
               color: Colors.grey[400],
@@ -67,9 +70,9 @@ class NotificationPermissionCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
-                'Turn on now',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context)?.turnOnNow ?? 'Turn on now',
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),

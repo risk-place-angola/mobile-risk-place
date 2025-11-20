@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rpa/data/models/enums/risk_type.dart';
 import 'package:rpa/data/models/websocket/alert_model.dart';
 import 'package:rpa/data/models/websocket/report_model.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 
 /// Bottom sheet to show alert details
 class AlertDetailsSheet extends StatelessWidget {
@@ -14,6 +15,7 @@ class AlertDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final riskType = alert.riskType ?? RiskType.infrastructure;
     
     return Container(
@@ -61,7 +63,7 @@ class AlertDetailsSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '🚨 ALERTA DE EMERGÊNCIA',
+                      l10n.emergencyAlert,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -71,7 +73,7 @@ class AlertDetailsSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _getRiskTypeLabel(riskType),
+                      _getRiskTypeLabel(context, riskType),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -104,16 +106,16 @@ class AlertDetailsSheet extends StatelessWidget {
           // Details
           _buildDetailRow(
             Icons.location_on_rounded,
-            'Raio de Alcance',
+            l10n.reachRadius,
             '${(alert.radius / 1000).toStringAsFixed(1)} km',
           ),
           const SizedBox(height: 12),
           _buildDetailRow(
             Icons.access_time_rounded,
-            'Horário',
+            l10n.timeLabel,
             alert.createdAt != null 
-                ? _formatDateTime(alert.createdAt!)
-                : 'Agora',
+                ? _formatDateTime(context, alert.createdAt!)
+                : l10n.now,
           ),
           const SizedBox(height: 24),
           
@@ -124,7 +126,7 @@ class AlertDetailsSheet extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close_rounded),
-                  label: const Text('Fechar'),
+                  label: Text(l10n.close),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -138,7 +140,7 @@ class AlertDetailsSheet extends StatelessWidget {
                     Navigator.pop(context);
                   },
                   icon: const Icon(Icons.info_rounded),
-                  label: const Text('Mais Detalhes'),
+                  label: Text(l10n.moreDetails),
                   style: FilledButton.styleFrom(
                     backgroundColor: _getAlertColor(riskType),
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -179,59 +181,64 @@ class AlertDetailsSheet extends StatelessWidget {
 
   Color _getAlertColor(RiskType type) {
     switch (type) {
-      case RiskType.violence:
-        return const Color(0xFFD32F2F);
-      case RiskType.fire:
-        return const Color(0xFFFF6F00);
-      case RiskType.traffic:
-        return const Color(0xFFFFA000);
-      case RiskType.infrastructure:
-        return const Color(0xFF1976D2);
-      case RiskType.flood:
-        return const Color(0xFF0288D1);
+      case RiskType.crime: return const Color(0xFFB71C1C);
+      case RiskType.accident: return const Color(0xFFFF6F00);
+      case RiskType.naturalDisaster: return const Color(0xFF0288D1);
+      case RiskType.fire: return const Color(0xFFFF6F00);
+      case RiskType.health: return const Color(0xFFE53935);
+      case RiskType.infrastructure: return const Color(0xFF1976D2);
+      case RiskType.environment: return const Color(0xFF388E3C);
+      case RiskType.violence: return const Color(0xFFD32F2F);
+      case RiskType.publicSafety: return const Color(0xFF1565C0);
+      case RiskType.traffic: return const Color(0xFFFFA000);
+      case RiskType.urbanIssue: return const Color(0xFF757575);
     }
   }
 
   IconData _getAlertIcon(RiskType type) {
     switch (type) {
-      case RiskType.violence:
-        return Icons.warning_rounded;
-      case RiskType.fire:
-        return Icons.local_fire_department_rounded;
-      case RiskType.traffic:
-        return Icons.traffic_rounded;
-      case RiskType.infrastructure:
-        return Icons.construction_rounded;
-      case RiskType.flood:
-        return Icons.water_damage_rounded;
+      case RiskType.crime: return Icons.gavel_rounded;
+      case RiskType.accident: return Icons.car_crash_rounded;
+      case RiskType.naturalDisaster: return Icons.water_damage_rounded;
+      case RiskType.fire: return Icons.local_fire_department_rounded;
+      case RiskType.health: return Icons.medical_services_rounded;
+      case RiskType.infrastructure: return Icons.construction_rounded;
+      case RiskType.environment: return Icons.eco_rounded;
+      case RiskType.violence: return Icons.warning_rounded;
+      case RiskType.publicSafety: return Icons.shield_rounded;
+      case RiskType.traffic: return Icons.traffic_rounded;
+      case RiskType.urbanIssue: return Icons.location_city_rounded;
     }
   }
 
-  String _getRiskTypeLabel(RiskType type) {
+  String _getRiskTypeLabel(BuildContext context, RiskType type) {
+    final l10n = AppLocalizations.of(context)!;
     switch (type) {
-      case RiskType.violence:
-        return 'Violência';
-      case RiskType.fire:
-        return 'Incêndio';
-      case RiskType.traffic:
-        return 'Trânsito';
-      case RiskType.infrastructure:
-        return 'Infraestrutura';
-      case RiskType.flood:
-        return 'Inundação';
+      case RiskType.crime: return l10n.crime;
+      case RiskType.accident: return l10n.accident;
+      case RiskType.naturalDisaster: return l10n.naturalDisaster;
+      case RiskType.fire: return l10n.fire;
+      case RiskType.health: return l10n.health;
+      case RiskType.infrastructure: return l10n.infrastructure;
+      case RiskType.environment: return l10n.environment;
+      case RiskType.violence: return l10n.violence;
+      case RiskType.publicSafety: return l10n.publicSafety;
+      case RiskType.traffic: return l10n.traffic;
+      case RiskType.urbanIssue: return l10n.urbanIssue;
     }
   }
 
-  String _formatDateTime(DateTime dateTime) {
+  String _formatDateTime(BuildContext context, DateTime dateTime) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final diff = now.difference(dateTime);
 
     if (diff.inMinutes < 1) {
-      return 'Agora';
+      return l10n.now;
     } else if (diff.inHours < 1) {
-      return 'Há ${diff.inMinutes} min';
+      return l10n.minutesAgo(diff.inMinutes);
     } else if (diff.inDays < 1) {
-      return 'Há ${diff.inHours}h';
+      return l10n.hoursAgo(diff.inHours);
     } else {
       return '${dateTime.day}/${dateTime.month} às ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
     }
@@ -251,6 +258,7 @@ class ReportDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final riskType = report.riskType ?? RiskType.infrastructure;
     
     return Container(
@@ -298,7 +306,7 @@ class ReportDetailsSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '📍 REPORT DA COMUNIDADE',
+                      l10n.communityReport,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -308,7 +316,7 @@ class ReportDetailsSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _getRiskTypeLabel(riskType),
+                      _getRiskTypeLabel(context, riskType),
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -325,14 +333,14 @@ class ReportDetailsSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.green, width: 1.5),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.verified_rounded, size: 16, color: Colors.green),
-                      SizedBox(width: 4),
+                      const Icon(Icons.verified_rounded, size: 16, color: Colors.green),
+                      const SizedBox(width: 4),
                       Text(
-                        'Verificado',
-                        style: TextStyle(
+                        l10n.verified,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
@@ -349,14 +357,14 @@ class ReportDetailsSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.grey, width: 1.5),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.check_circle_rounded, size: 16, color: Colors.grey),
-                      SizedBox(width: 4),
+                      const Icon(Icons.check_circle_rounded, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
                       Text(
-                        'Resolvido',
-                        style: TextStyle(
+                        l10n.resolved,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey,
@@ -389,16 +397,16 @@ class ReportDetailsSheet extends StatelessWidget {
           // Details
           _buildDetailRow(
             Icons.access_time_rounded,
-            'Reportado',
+            l10n.reported,
             report.createdAt != null 
-                ? _formatDateTime(report.createdAt!)
-                : 'Agora',
+                ? _formatDateTime(context, report.createdAt!)
+                : l10n.now,
           ),
           const SizedBox(height: 12),
           _buildDetailRow(
             Icons.info_outline_rounded,
-            'Status',
-            _getStatusLabel(report.status),
+            l10n.status,
+            _getStatusLabel(context, report.status),
           ),
           const SizedBox(height: 24),
           
@@ -414,7 +422,7 @@ class ReportDetailsSheet extends StatelessWidget {
                     onEditLocation?.call(report);
                   },
                   icon: const Icon(Icons.edit_location_outlined),
-                  label: const Text('Editar Localização'),
+                  label: Text(l10n.editLocation),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -427,7 +435,7 @@ class ReportDetailsSheet extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close_rounded),
-                  label: const Text('Fechar'),
+                  label: Text(l10n.close),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -441,7 +449,7 @@ class ReportDetailsSheet extends StatelessWidget {
                     Navigator.pop(context);
                   },
                   icon: const Icon(Icons.visibility_rounded),
-                  label: const Text('Ver Detalhes'),
+                  label: Text(l10n.viewDetails),
                   style: FilledButton.styleFrom(
                     backgroundColor: _getReportColor(riskType),
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -482,70 +490,76 @@ class ReportDetailsSheet extends StatelessWidget {
 
   Color _getReportColor(RiskType type) {
     switch (type) {
-      case RiskType.violence:
-        return const Color(0xFFE57373);
-      case RiskType.fire:
-        return const Color(0xFFFFB74D);
-      case RiskType.traffic:
-        return const Color(0xFFFFD54F);
-      case RiskType.infrastructure:
-        return const Color(0xFF64B5F6);
-      case RiskType.flood:
-        return const Color(0xFF4FC3F7);
+      case RiskType.crime: return const Color(0xFFEF5350);
+      case RiskType.accident: return const Color(0xFFFFB74D);
+      case RiskType.naturalDisaster: return const Color(0xFF4FC3F7);
+      case RiskType.fire: return const Color(0xFFFFB74D);
+      case RiskType.health: return const Color(0xFFE57373);
+      case RiskType.infrastructure: return const Color(0xFF64B5F6);
+      case RiskType.environment: return const Color(0xFF81C784);
+      case RiskType.violence: return const Color(0xFFE57373);
+      case RiskType.publicSafety: return const Color(0xFF42A5F5);
+      case RiskType.traffic: return const Color(0xFFFFD54F);
+      case RiskType.urbanIssue: return const Color(0xFF9E9E9E);
     }
   }
 
   IconData _getReportIcon(RiskType type) {
     switch (type) {
-      case RiskType.violence:
-        return Icons.report_problem_outlined;
-      case RiskType.fire:
-        return Icons.local_fire_department_outlined;
-      case RiskType.traffic:
-        return Icons.traffic_outlined;
-      case RiskType.infrastructure:
-        return Icons.construction_outlined;
-      case RiskType.flood:
-        return Icons.water_outlined;
+      case RiskType.crime: return Icons.gavel_outlined;
+      case RiskType.accident: return Icons.car_crash_outlined;
+      case RiskType.naturalDisaster: return Icons.water_outlined;
+      case RiskType.fire: return Icons.local_fire_department_outlined;
+      case RiskType.health: return Icons.medical_services_outlined;
+      case RiskType.infrastructure: return Icons.construction_outlined;
+      case RiskType.environment: return Icons.eco_outlined;
+      case RiskType.violence: return Icons.report_problem_outlined;
+      case RiskType.publicSafety: return Icons.shield_outlined;
+      case RiskType.traffic: return Icons.traffic_outlined;
+      case RiskType.urbanIssue: return Icons.location_city_outlined;
     }
   }
 
-  String _getRiskTypeLabel(RiskType type) {
+  String _getRiskTypeLabel(BuildContext context, RiskType type) {
+    final l10n = AppLocalizations.of(context)!;
     switch (type) {
-      case RiskType.violence:
-        return 'Violência';
-      case RiskType.fire:
-        return 'Incêndio';
-      case RiskType.traffic:
-        return 'Trânsito';
-      case RiskType.infrastructure:
-        return 'Infraestrutura';
-      case RiskType.flood:
-        return 'Inundação';
+      case RiskType.crime: return l10n.crime;
+      case RiskType.accident: return l10n.accident;
+      case RiskType.naturalDisaster: return l10n.naturalDisaster;
+      case RiskType.fire: return l10n.fire;
+      case RiskType.health: return l10n.health;
+      case RiskType.infrastructure: return l10n.infrastructure;
+      case RiskType.environment: return l10n.environment;
+      case RiskType.violence: return l10n.violence;
+      case RiskType.publicSafety: return l10n.publicSafety;
+      case RiskType.traffic: return l10n.traffic;
+      case RiskType.urbanIssue: return l10n.urbanIssue;
     }
   }
 
-  String _getStatusLabel(ReportStatus status) {
+  String _getStatusLabel(BuildContext context, ReportStatus status) {
+    final l10n = AppLocalizations.of(context)!;
     switch (status) {
       case ReportStatus.pending:
-        return 'Pendente';
+        return l10n.pending;
       case ReportStatus.verified:
-        return 'Verificado';
+        return l10n.verified;
       case ReportStatus.resolved:
-        return 'Resolvido';
+        return l10n.resolved;
     }
   }
 
-  String _formatDateTime(DateTime dateTime) {
+  String _formatDateTime(BuildContext context, DateTime dateTime) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final diff = now.difference(dateTime);
 
     if (diff.inMinutes < 1) {
-      return 'Agora';
+      return l10n.now;
     } else if (diff.inHours < 1) {
-      return 'Há ${diff.inMinutes} min';
+      return l10n.minutesAgo(diff.inMinutes);
     } else if (diff.inDays < 1) {
-      return 'Há ${diff.inHours}h';
+      return l10n.hoursAgo(diff.inHours);
     } else {
       return '${dateTime.day}/${dateTime.month} às ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
     }

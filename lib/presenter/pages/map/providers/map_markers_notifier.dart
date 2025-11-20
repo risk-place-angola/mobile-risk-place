@@ -210,8 +210,8 @@ RiskType _inferRiskTypeFromMessage(String message) {
       lowerMessage.contains('chuva') ||
       lowerMessage.contains('água') ||
       lowerMessage.contains('agua')) {
-    return RiskType.flood;
+    return RiskType.naturalDisaster;
   }
 
-  return RiskType.infrastructure; // default
+  return RiskType.infrastructure;
 }

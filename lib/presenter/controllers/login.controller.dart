@@ -3,7 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:rpa/core/http_client/exceptions/http_exceptions.dart';
+import 'package:rpa/core/error/error_handler.dart';
+import 'package:rpa/core/device/device_id_manager.dart';
 import 'package:rpa/data/dtos/auth_request_dto.dart';
 import 'package:rpa/data/providers/user_provider.dart';
 import 'package:rpa/data/services/auth.service.dart';
@@ -32,13 +33,15 @@ class LoginController extends ChangeNotifier {
 
     try {
       final authService = ref.read(authServiceProvider);
+      final deviceIdManager = ref.read(deviceIdManagerProvider);
+      final deviceId = await deviceIdManager.getDeviceId();
 
       final loginRequester = LoginRequestDTO(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      await authService.login(user: loginRequester);
+      await authService.login(user: loginRequester, deviceId: deviceId);
 
       if (!context.mounted) {
         log("Context not mounted", name: "LoginController");
@@ -47,31 +50,34 @@ class LoginController extends ChangeNotifier {
 
       // Update auth state
       ref.read(authControllerProvider).updateUser();
-      
+
       // Refresh user provider to load new user data
       final _ = ref.refresh(currentUserProvider.future);
 
-      log("🔐 [Login] Upgrading to authenticated WebSocket connection...", name: "LoginController");
-      
+      log("🔐 [Login] Upgrading to authenticated WebSocket connection...",
+          name: "LoginController");
+
       final wsService = ref.read(alertWebSocketProvider);
       wsService.disconnect();
-      
+
       wsService.connect(
-        token: '', // Will fetch from AuthTokenManager
+        token: '',
         onAlert: (alertData) {
-          log("🚨 [Login] Alert: ${alertData['message']}", name: "LoginController");
+          log("🚨 [Login] Alert: ${alertData['message']}",
+              name: "LoginController");
         },
         onError: (error) {
           log("❌ [Login] WebSocket error: $error", name: "LoginController");
         },
         onConnected: () {
-          log("✅ [Login] Authenticated WebSocket connected!", name: "LoginController");
+          log("✅ [Login] Authenticated WebSocket connected!",
+              name: "LoginController");
         },
         onDisconnected: () {
           log("🔌 [Login] WebSocket disconnected", name: "LoginController");
         },
       );
-      
+
       // ========================================================================
       // 📍 REQUEST LOCATION PERMISSION
       // ========================================================================
@@ -97,29 +103,10 @@ class LoginController extends ChangeNotifier {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
-    } on UnauthorizedException catch (e) {
-      log("Unauthorized: ${e.message}", name: "LoginController");
-      if (context.mounted) {
-        _showSnackBar(context, "Email ou senha incorretos", isError: true);
-      }
-    } on NetworkException catch (e) {
-      log("Network error: ${e.message}", name: "LoginController");
-      if (context.mounted) {
-        _showSnackBar(context, e.message, isError: true);
-      }
-    } on HttpException catch (e) {
-      log("HTTP error: ${e.message}", name: "LoginController");
-      if (context.mounted) {
-        _showSnackBar(context, e.message, isError: true);
-      }
     } catch (e) {
-      log("Unexpected error during login: $e", name: "LoginController");
+      log("❌ Login error: $e", name: "LoginController");
       if (context.mounted) {
-        _showSnackBar(
-          context,
-          "Erro ao fazer login. Tente novamente.",
-          isError: true,
-        );
+        ErrorHandler.showErrorSnackBar(context, e);
       }
     } finally {
       isLoading = false;

@@ -27,7 +27,7 @@ class MapSearchScreen extends ConsumerStatefulWidget {
 class _MapSearchScreenState extends ConsumerState<MapSearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
-  
+
   List<PlaceSearchResult> _searchResults = [];
   bool _isSearching = false;
   String? _errorMessage;
@@ -89,7 +89,8 @@ class _MapSearchScreenState extends ConsumerState<MapSearchScreen> {
 
   void _selectPlace(PlaceSearchResult place) {
     // Validate coordinates before returning
-    if (place.location.latitude.abs() > 90 || place.location.longitude.abs() > 180) {
+    if (place.location.latitude.abs() > 90 ||
+        place.location.longitude.abs() > 180) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Invalid location coordinates'),

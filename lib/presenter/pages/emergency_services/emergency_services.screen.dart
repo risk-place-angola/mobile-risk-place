@@ -8,7 +8,7 @@ class EmergencyServicesScreen extends StatelessWidget {
 
   Future<void> _makePhoneCall(BuildContext context, String phoneNumber) async {
     final uri = Uri(scheme: 'tel', path: phoneNumber);
-    
+
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
@@ -28,7 +28,7 @@ class EmergencyServicesScreen extends StatelessWidget {
       final position = await Geolocator.getCurrentPosition();
       final message = 'EMERGÊNCIA! Minha localização: '
           'https://www.google.com/maps?q=${position.latitude},${position.longitude}';
-      
+
       final uri = Uri(
         scheme: 'sms',
         path: phoneNumber,
@@ -94,7 +94,8 @@ class EmergencyServicesScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 28),
+          Icon(Icons.warning_amber_rounded,
+              color: Colors.red.shade700, size: 28),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -129,7 +130,7 @@ class EmergencyServicesScreen extends StatelessWidget {
     EmergencyContact contact,
   ) {
     final iconColor = _getColorForType(contact.type);
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(

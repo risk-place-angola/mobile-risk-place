@@ -3,15 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/data/dtos/list_nearby_reports_response_dto.dart';
 import 'package:rpa/domain/usecases/get_nearby_reports_usecase.dart';
 
-// ============================================================================
-// NEARBY REPORTS STATE NOTIFIER
-// ============================================================================
-// Manages the state of nearby reports with WebSocket support
-// Combines initial API load with real-time WebSocket updates
-// Uses Riverpod 3.0+ Notifier pattern
-// ============================================================================
-
-/// State for nearby reports
 class NearbyReportsState {
   final List<NearbyReportDTO> reports;
   final bool isLoading;
@@ -67,11 +58,9 @@ class NearbyReportsNotifier extends Notifier<NearbyReportsState> {
     int radius = 10000,
   }) async {
     log('Loading reports...', name: 'NearbyReportsNotifier');
-    
-    // Set loading state
+
     state = state.copyWith(isLoading: true, errorMessage: null);
 
-    // Create params
     final params = GetNearbyReportsParams(
       latitude: latitude,
       longitude: longitude,
@@ -83,18 +72,18 @@ class NearbyReportsNotifier extends Notifier<NearbyReportsState> {
 
     // Handle result
     if (result is GetNearbyReportsSuccess) {
-      log('Successfully loaded ${result.reports.length} reports', 
+      log('Successfully loaded ${result.reports.length} reports',
           name: 'NearbyReportsNotifier');
-      
+
       state = state.copyWith(
         reports: result.reports,
         isLoading: false,
         lastUpdated: DateTime.now(),
       );
     } else if (result is GetNearbyReportsFailure) {
-      log('Failed to load reports: ${result.error.message}', 
+      log('Failed to load reports: ${result.error.message}',
           name: 'NearbyReportsNotifier');
-      
+
       state = state.copyWith(
         isLoading: false,
         errorMessage: result.error.message,
@@ -104,37 +93,35 @@ class NearbyReportsNotifier extends Notifier<NearbyReportsState> {
 
   /// Add a new report from WebSocket (real-time update)
   void addReportFromWebSocket(NearbyReportDTO newReport) {
-    log('Adding new report from WebSocket: ${newReport.id}', 
+    log('Adding new report from WebSocket: ${newReport.id}',
         name: 'NearbyReportsNotifier');
 
-    // Check if report already exists
     final existingIndex = state.reports.indexWhere((r) => r.id == newReport.id);
-    
+
     if (existingIndex >= 0) {
-      // Update existing report
       final updatedReports = List<NearbyReportDTO>.from(state.reports);
       updatedReports[existingIndex] = newReport;
-      
+
       state = state.copyWith(
         reports: updatedReports,
         lastUpdated: DateTime.now(),
       );
-      
-      log('Updated existing report: ${newReport.id}', name: 'NearbyReportsNotifier');
+
+      log('Updated existing report: ${newReport.id}',
+          name: 'NearbyReportsNotifier');
     } else {
-      // Add new report
       state = state.copyWith(
         reports: [...state.reports, newReport],
         lastUpdated: DateTime.now(),
       );
-      
+
       log('Added new report: ${newReport.id}', name: 'NearbyReportsNotifier');
     }
   }
 
   /// Update an existing report from WebSocket
   void updateReportFromWebSocket(NearbyReportDTO updatedReport) {
-    log('Updating report from WebSocket: ${updatedReport.id}', 
+    log('Updating report from WebSocket: ${updatedReport.id}',
         name: 'NearbyReportsNotifier');
 
     final updatedReports = state.reports.map((report) {
@@ -154,8 +141,9 @@ class NearbyReportsNotifier extends Notifier<NearbyReportsState> {
   void removeReport(String reportId) {
     log('Removing report: $reportId', name: 'NearbyReportsNotifier');
 
-    final updatedReports = state.reports.where((r) => r.id != reportId).toList();
-    
+    final updatedReports =
+        state.reports.where((r) => r.id != reportId).toList();
+
     state = state.copyWith(
       reports: updatedReports,
       lastUpdated: DateTime.now(),

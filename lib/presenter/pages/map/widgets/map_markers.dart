@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rpa/data/models/enums/risk_type.dart';
+import 'package:rpa/core/services/icon_resolver_service.dart';
 
 /// Custom marker widget for alerts on the map
 /// High-priority markers with distinctive styling
@@ -47,10 +48,13 @@ class AlertMarkerWidget extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(
-            _getAlertIcon(riskType),
-            color: Colors.white,
-            size: 20,
+          child: ClipOval(
+            child: IconResolverService.buildIcon(
+              typeName: riskType.name,
+              apiIconPath: null,
+              size: 26,
+              color: Colors.white,
+            ),
           ),
         ),
       ],
@@ -59,31 +63,28 @@ class AlertMarkerWidget extends StatelessWidget {
 
   Color _getAlertColor(RiskType type) {
     switch (type) {
-      case RiskType.violence:
-        return const Color(0xFFD32F2F); // Red
+      case RiskType.crime:
+        return const Color(0xFFB71C1C);
+      case RiskType.accident:
+        return const Color(0xFFFF6F00);
+      case RiskType.naturalDisaster:
+        return const Color(0xFF0288D1);
       case RiskType.fire:
-        return const Color(0xFFFF6F00); // Deep Orange
-      case RiskType.traffic:
-        return const Color(0xFFFFA000); // Amber
+        return const Color(0xFFFF6F00);
+      case RiskType.health:
+        return const Color(0xFFE53935);
       case RiskType.infrastructure:
-        return const Color(0xFF1976D2); // Blue
-      case RiskType.flood:
-        return const Color(0xFF0288D1); // Light Blue
-    }
-  }
-
-  IconData _getAlertIcon(RiskType type) {
-    switch (type) {
+        return const Color(0xFF1976D2);
+      case RiskType.environment:
+        return const Color(0xFF388E3C);
       case RiskType.violence:
-        return Icons.warning_rounded;
-      case RiskType.fire:
-        return Icons.local_fire_department_rounded;
+        return const Color(0xFFD32F2F);
+      case RiskType.publicSafety:
+        return const Color(0xFF1565C0);
       case RiskType.traffic:
-        return Icons.traffic_rounded;
-      case RiskType.infrastructure:
-        return Icons.construction_rounded;
-      case RiskType.flood:
-        return Icons.water_damage_rounded;
+        return const Color(0xFFFFA000);
+      case RiskType.urbanIssue:
+        return const Color(0xFF757575);
     }
   }
 }
@@ -128,10 +129,13 @@ class ReportMarkerWidget extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(
-            _getReportIcon(riskType ?? RiskType.infrastructure),
-            color: Colors.white,
-            size: 16,
+          child: ClipOval(
+            child: IconResolverService.buildIcon(
+              typeName: (riskType ?? RiskType.infrastructure).name,
+              apiIconPath: null,
+              size: 20,
+              color: Colors.white,
+            ),
           ),
         ),
         // Verified badge
@@ -173,31 +177,28 @@ class ReportMarkerWidget extends StatelessWidget {
 
   Color _getReportColor(RiskType type) {
     switch (type) {
-      case RiskType.violence:
-        return const Color(0xFFE57373); // Light Red
+      case RiskType.crime:
+        return const Color(0xFFEF5350);
+      case RiskType.accident:
+        return const Color(0xFFFFB74D);
+      case RiskType.naturalDisaster:
+        return const Color(0xFF4FC3F7);
       case RiskType.fire:
-        return const Color(0xFFFFB74D); // Light Orange
-      case RiskType.traffic:
-        return const Color(0xFFFFD54F); // Light Amber
+        return const Color(0xFFFFB74D);
+      case RiskType.health:
+        return const Color(0xFFE57373);
       case RiskType.infrastructure:
-        return const Color(0xFF64B5F6); // Light Blue
-      case RiskType.flood:
-        return const Color(0xFF4FC3F7); // Light Cyan
-    }
-  }
-
-  IconData _getReportIcon(RiskType type) {
-    switch (type) {
+        return const Color(0xFF64B5F6);
+      case RiskType.environment:
+        return const Color(0xFF81C784);
       case RiskType.violence:
-        return Icons.report_problem_outlined;
-      case RiskType.fire:
-        return Icons.local_fire_department_outlined;
+        return const Color(0xFFE57373);
+      case RiskType.publicSafety:
+        return const Color(0xFF42A5F5);
       case RiskType.traffic:
-        return Icons.traffic_outlined;
-      case RiskType.infrastructure:
-        return Icons.construction_outlined;
-      case RiskType.flood:
-        return Icons.water_outlined;
+        return const Color(0xFFFFD54F);
+      case RiskType.urbanIssue:
+        return const Color(0xFF9E9E9E);
     }
   }
 }
@@ -205,24 +206,29 @@ class ReportMarkerWidget extends StatelessWidget {
 /// Helper class to get radius circle color for alerts
 class AlertRadiusHelper {
   static Color getRadiusColor(RiskType riskType, {double opacity = 0.2}) {
-    final Color baseColor;
     switch (riskType) {
-      case RiskType.violence:
-        baseColor = const Color(0xFFD32F2F);
-        break;
+      case RiskType.crime:
+        return const Color(0xFFB71C1C).withOpacity(opacity);
+      case RiskType.accident:
+        return const Color(0xFFFF6F00).withOpacity(opacity);
+      case RiskType.naturalDisaster:
+        return const Color(0xFF0288D1).withOpacity(opacity);
       case RiskType.fire:
-        baseColor = const Color(0xFFFF6F00);
-        break;
-      case RiskType.traffic:
-        baseColor = const Color(0xFFFFA000);
-        break;
+        return const Color(0xFFFF6F00).withOpacity(opacity);
+      case RiskType.health:
+        return const Color(0xFFE53935).withOpacity(opacity);
       case RiskType.infrastructure:
-        baseColor = const Color(0xFF1976D2);
-        break;
-      case RiskType.flood:
-        baseColor = const Color(0xFF0288D1);
-        break;
+        return const Color(0xFF1976D2).withOpacity(opacity);
+      case RiskType.environment:
+        return const Color(0xFF388E3C).withOpacity(opacity);
+      case RiskType.violence:
+        return const Color(0xFFD32F2F).withOpacity(opacity);
+      case RiskType.publicSafety:
+        return const Color(0xFF1565C0).withOpacity(opacity);
+      case RiskType.traffic:
+        return const Color(0xFFFFA000).withOpacity(opacity);
+      case RiskType.urbanIssue:
+        return const Color(0xFF757575).withOpacity(opacity);
     }
-    return baseColor.withOpacity(opacity);
   }
 }

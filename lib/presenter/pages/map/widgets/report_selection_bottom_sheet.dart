@@ -31,7 +31,7 @@ class ReportSelectionBottomSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            
+
             // Header
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -53,7 +53,7 @@ class ReportSelectionBottomSheet extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Grid of report options
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
@@ -84,7 +84,7 @@ class ReportSelectionBottomSheet extends StatelessWidget {
 
   void _showReportOptions(BuildContext context, ReportTypeModel reportType) {
     Navigator.pop(context);
-    
+
     // Show options: Report Now or Edit Location
     showModalBottomSheet(
       context: context,
@@ -108,7 +108,7 @@ class ReportSelectionBottomSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              
+
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -141,7 +141,7 @@ class ReportSelectionBottomSheet extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    
+
                     // Report at current location button
                     SizedBox(
                       width: double.infinity,
@@ -170,7 +170,7 @@ class ReportSelectionBottomSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Edit location button
                     SizedBox(
                       width: double.infinity,
@@ -198,7 +198,7 @@ class ReportSelectionBottomSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Cancel button
                     TextButton(
                       onPressed: () => Navigator.pop(context),

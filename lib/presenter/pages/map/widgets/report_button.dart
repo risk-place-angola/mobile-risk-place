@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rpa/l10n/app_localizations.dart';
+import 'package:rpa/presenter/controllers/home_panel.controller.dart';
 
-/// Botão flutuante para reportar incidentes no mapa
-class ReportButton extends StatelessWidget {
+class ReportButton extends ConsumerWidget {
   final VoidCallback onTap;
 
   const ReportButton({
@@ -10,10 +12,15 @@ class ReportButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final panelController = ref.watch(homePanelControllerProvider);
+    final panelHeight = panelController.currentPanelHeight;
+    final bottomPosition = panelHeight + 16;
+
     return Positioned(
       right: 16,
-      bottom: 180, // Acima do painel inicial
+      bottom: bottomPosition,
       child: Material(
         elevation: 8,
         borderRadius: BorderRadius.circular(32),
@@ -36,16 +43,16 @@ class ReportButton extends StatelessWidget {
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(
+              children: [
+                const Icon(
                   Icons.report_problem,
                   color: Colors.white,
                   size: 24,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'Reportar',
-                  style: TextStyle(
+                  l10n?.report ?? 'Report',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

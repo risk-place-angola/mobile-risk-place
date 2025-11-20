@@ -23,12 +23,12 @@ class EmergencyContactTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: contact.isPriority
-              ? Colors.red.shade100
-              : Colors.grey.shade200,
+          backgroundColor:
+              contact.isPriority ? Colors.red.shade100 : Colors.grey.shade200,
           child: Icon(
             _getRelationIcon(),
-            color: contact.isPriority ? Colors.red.shade700 : Colors.grey.shade700,
+            color:
+                contact.isPriority ? Colors.red.shade700 : Colors.grey.shade700,
           ),
         ),
         title: Row(

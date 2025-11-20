@@ -1,9 +1,6 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/pages/home_page/home.page.dart';
 import 'package:rpa/core/utils/navigator_handler.dart';
@@ -16,15 +13,8 @@ class SplashPage extends ConsumerStatefulWidget {
 }
 
 class _SplashPageState extends ConsumerState<SplashPage> {
-  void _requestPermissionIfNecessary() async {
-    await Permission.microphone.status;
-    await Geolocator.requestPermission();
-    await RecorderController().checkPermission();
-  }
-
   @override
   void initState() {
-    _requestPermissionIfNecessary();
     super.initState();
   }
 
@@ -32,14 +22,20 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   Widget build(BuildContext context) {
     final authController = ref.watch(authControllerProvider.notifier);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Image.asset(
-              'assets/rpa_logo.png',
-            ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/maka_splash.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Image.asset(
+            'assets/maka_logo.png',
+            width: 200,
+            height: 200,
           ).animate(
             effects: [
               const ScaleEffect(
@@ -56,8 +52,8 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                 context.navigateToAndReplace(const HomePage());
               });
             },
-          )
-        ],
+          ),
+        ),
       ),
     );
   }

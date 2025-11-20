@@ -1,10 +1,14 @@
 import 'dart:developer' show log;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/data/models/risk_type.dart';
 import 'package:rpa/data/providers/api_providers.dart';
 import 'package:rpa/data/dtos/risk_type_response_dto.dart';
 import 'package:rpa/data/dtos/risk_topic_response_dto.dart';
+import 'package:rpa/core/services/risk_topic_translation_service.dart';
+import 'package:rpa/core/services/risk_type_translation_service.dart';
+import 'package:rpa/core/services/icon_resolver_service.dart';
 
 // ============================================================================
 // BACKEND INTEGRATION
@@ -81,8 +85,8 @@ class _ReportSelectionBottomSheetState
                   Expanded(
                     child: Text(
                       _selectedRiskType == null
-                          ? 'O que você vê?'
-                          : 'Selecione o tipo específico',
+                          ? (AppLocalizations.of(context)?.whatDoYouSee ?? 'What do you see?')
+                          : (AppLocalizations.of(context)?.selectSpecificType ?? 'Select specific type'),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -100,54 +104,61 @@ class _ReportSelectionBottomSheetState
             ),
 
             // Conteúdo baseado nos dados da API
-            riskTypesAsync.when(
-              data: (riskTypes) {
-                return riskTopicsAsync.when(
-                  data: (riskTopics) {
-                    log('Loaded ${riskTypes.length} risk types and ${riskTopics.length} topics from backend',
-                        name: 'ReportSelection');
-
-                    if (_selectedRiskType == null) {
-                      return _buildRiskTypesGrid(riskTypes);
-                    } else {
-                      // Filter topics for selected type
-                      final filteredTopics = riskTopics
-                          .where((topic) =>
-                              topic.riskTypeId == _selectedRiskType!.id)
-                          .toList();
-                      return _buildTopicsGrid(
-                          _selectedRiskType!, filteredTopics);
-                    }
-                  },
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(40.0),
-                    child: Column(
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Carregando tópicos de risco...'),
-                      ],
-                    ),
-                  ),
-                  error: (error, stack) =>
-                      _buildErrorWidget('Erro ao carregar tópicos', error),
-                );
-              },
-              loading: () => const Padding(
-                padding: EdgeInsets.all(40.0),
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text('Carregando tipos de risco...'),
+                    riskTypesAsync.when(
+                      data: (riskTypes) {
+                        return riskTopicsAsync.when(
+                          data: (riskTopics) {
+                            log('Loaded ${riskTypes.length} risk types and ${riskTopics.length} topics from backend',
+                                name: 'ReportSelection');
+
+                            if (_selectedRiskType == null) {
+                              return _buildRiskTypesGrid(riskTypes);
+                            } else {
+                              // Filter topics for selected type
+                              final filteredTopics = riskTopics
+                                  .where((topic) =>
+                                      topic.riskTypeId == _selectedRiskType!.id)
+                                  .toList();
+                              return _buildTopicsGrid(
+                                  _selectedRiskType!, filteredTopics);
+                            }
+                          },
+                          loading: () => Padding(
+                            padding: const EdgeInsets.all(40.0),
+                            child: Column(
+                              children: [
+                                const CircularProgressIndicator(),
+                                const SizedBox(height: 16),
+                                Text(AppLocalizations.of(context)?.loading ?? 'Loading...'),
+                              ],
+                            ),
+                          ),
+                          error: (error, stack) =>
+                              _buildErrorWidget(AppLocalizations.of(context)?.error ?? 'Error', error),
+                        );
+                      },
+                      loading: () => Padding(
+                        padding: const EdgeInsets.all(40.0),
+                        child: Column(
+                          children: [
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 16),
+                            Text(AppLocalizations.of(context)?.loading ?? 'Loading...'),
+                          ],
+                        ),
+                      ),
+                      error: (error, stack) =>
+                          _buildErrorWidget(AppLocalizations.of(context)?.error ?? 'Error', error),
+                    ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-              error: (error, stack) =>
-                  _buildErrorWidget('Erro ao carregar tipos', error),
             ),
-
-            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -175,11 +186,10 @@ class _ReportSelectionBottomSheetState
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              // Trigger provider refresh
               ref.invalidate(riskTypesProvider);
               ref.invalidate(riskTopicsProvider);
             },
-            child: const Text('Tentar Novamente'),
+            child: Text(AppLocalizations.of(context)?.tryAgain ?? 'Try Again'),
           ),
         ],
       ),
@@ -391,8 +401,8 @@ class _ReportSelectionBottomSheetState
               ListTile(
                 leading:
                     const Icon(Icons.my_location, color: Color(0xFFF39C12)),
-                title: const Text('Reportar na minha localização'),
-                subtitle: const Text('Usar localização atual do GPS'),
+                title: Text(AppLocalizations.of(context)?.reportAtMyLocation ?? 'Report at my location'),
+                subtitle: Text(AppLocalizations.of(context)?.useCurrentGpsLocation ?? 'Use current GPS location'),
                 onTap: () {
                   Navigator.pop(context);
                   widget.onReportSelected(riskTypeModel, topicModel,
@@ -403,8 +413,8 @@ class _ReportSelectionBottomSheetState
               ListTile(
                 leading:
                     const Icon(Icons.edit_location, color: Color(0xFF3498DB)),
-                title: const Text('Escolher localização no mapa'),
-                subtitle: const Text('Ajustar manualmente no mapa'),
+                title: Text(AppLocalizations.of(context)?.chooseLocationOnMap ?? 'Choose location on map'),
+                subtitle: Text(AppLocalizations.of(context)?.adjustManuallyOnMap ?? 'Adjust manually on map'),
                 onTap: () {
                   Navigator.pop(context);
                   widget.onReportSelected(riskTypeModel, topicModel,
@@ -537,31 +547,13 @@ class _RiskTypeCardFromAPI extends StatelessWidget {
     }
   }
 
-  IconData _getIcon() {
-    final lowerName = riskType.name.toLowerCase();
-    if (lowerName.contains('crime') || lowerName.contains('criminal')) {
-      return Icons.warning_amber_rounded;
-    } else if (lowerName.contains('acidente') ||
-        lowerName.contains('accident')) {
-      return Icons.car_crash;
-    } else if (lowerName.contains('desastre') ||
-        lowerName.contains('disaster')) {
-      return Icons.thunderstorm;
-    } else if (lowerName.contains('incêndio') ||
-        lowerName.contains('fogo') ||
-        lowerName.contains('fire')) {
-      return Icons.local_fire_department;
-    } else if (lowerName.contains('saúde') || lowerName.contains('health')) {
-      return Icons.medical_services;
-    } else if (lowerName.contains('infraestrutura') ||
-        lowerName.contains('infrastructure')) {
-      return Icons.construction;
-    } else if (lowerName.contains('ambiente') ||
-        lowerName.contains('environment')) {
-      return Icons.eco;
-    } else {
-      return Icons.report_problem;
-    }
+  Widget _buildIcon() {
+    return IconResolverService.buildIcon(
+      typeName: riskType.name,
+      apiIconPath: riskType.iconUrl,
+      size: 40,
+      color: _getColor(),
+    );
   }
 
   @override
@@ -584,14 +576,14 @@ class _RiskTypeCardFromAPI extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                _getIcon(),
-                size: 40,
-                color: color,
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: _buildIcon(),
               ),
               const SizedBox(height: 8),
               Text(
-                riskType.name,
+                RiskTypeTranslationService.translateType(context, riskType.name),
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -621,34 +613,14 @@ class _TopicCardFromAPI extends StatelessWidget {
     required this.onTap,
   });
 
-  IconData _getIcon() {
-    final lowerName = topic.name.toLowerCase();
-
-    // Crime topics
-    if (lowerName.contains('roubo') || lowerName.contains('robbery')) {
-      return Icons.house_siding;
-    } else if (lowerName.contains('assalto') || lowerName.contains('assault')) {
-      return Icons.person_remove;
-    } else if (lowerName.contains('furto') || lowerName.contains('theft')) {
-      return Icons.phone_android;
-    } else if (lowerName.contains('vandalismo') ||
-        lowerName.contains('vandalism')) {
-      return Icons.broken_image;
-    }
-
-    // Accident topics
-    else if (lowerName.contains('trânsito') || lowerName.contains('traffic')) {
-      return Icons.car_crash;
-    } else if (lowerName.contains('trabalho') || lowerName.contains('work')) {
-      return Icons.engineering;
-    } else if (lowerName.contains('queda') || lowerName.contains('fall')) {
-      return Icons.person_off;
-    }
-
-    // Default
-    else {
-      return Icons.info_outline;
-    }
+  Widget _buildIcon() {
+    return IconResolverService.buildIcon(
+      typeName: topic.name,
+      apiIconPath: topic.iconUrl,
+      size: 32,
+      color: Colors.grey[700],
+      isTopic: true,
+    );
   }
 
   @override
@@ -671,14 +643,17 @@ class _TopicCardFromAPI extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                _getIcon(),
-                size: 32,
-                color: color,
+              SizedBox(
+                width: 32,
+                height: 32,
+                child: _buildIcon(),
               ),
               const SizedBox(height: 8),
               Text(
-                topic.name,
+                RiskTopicTranslationService.translateTopic(
+                  context,
+                  topic.name,
+                ),
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

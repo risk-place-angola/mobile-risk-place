@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rpa/presenter/controllers/home_panel.controller.dart';
 
-/// Botão para centralizar o mapa na localização atual do usuário
-class LocationButton extends StatelessWidget {
+class LocationButton extends ConsumerWidget {
   final VoidCallback onTap;
 
   const LocationButton({
@@ -10,10 +11,14 @@ class LocationButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final panelController = ref.watch(homePanelControllerProvider);
+    final panelHeight = panelController.currentPanelHeight;
+    final bottomPosition = panelHeight + 88;
+
     return Positioned(
       right: 16,
-      bottom: 250, // Acima do botão de reportar
+      bottom: bottomPosition,
       child: Material(
         elevation: 8,
         borderRadius: BorderRadius.circular(28),

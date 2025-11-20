@@ -18,8 +18,10 @@ class QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveIconColor = iconColor ?? Theme.of(context).colorScheme.primary;
-    final effectiveBgColor = backgroundColor ?? effectiveIconColor.withOpacity(0.1);
+    final effectiveIconColor =
+        iconColor ?? Theme.of(context).colorScheme.primary;
+    final effectiveBgColor =
+        backgroundColor ?? effectiveIconColor.withOpacity(0.1);
 
     return GestureDetector(
       onTap: onTap,

@@ -33,13 +33,6 @@ class MoreOptionsSection extends StatelessWidget {
           onTap: () => onOptionTap('saved_places'),
         ),
         _OptionTile(
-          icon: UniconsLine.users_alt,
-          iconColor: Colors.blue,
-          title: 'Emergency Contacts',
-          subtitle: 'Manage trusted contacts',
-          onTap: () => onOptionTap('emergency_contacts'),
-        ),
-        _OptionTile(
           icon: UniconsLine.location_arrow,
           iconColor: Colors.green,
           title: 'Share My Location',
@@ -54,25 +47,11 @@ class MoreOptionsSection extends StatelessWidget {
           onTap: () => onOptionTap('safe_route'),
         ),
         _OptionTile(
-          icon: UniconsLine.history_alt,
-          iconColor: Colors.orange,
-          title: 'Incident History',
-          subtitle: 'View past reports',
-          onTap: () => onOptionTap('incident_history'),
-        ),
-        _OptionTile(
           icon: UniconsLine.phone_volume,
           iconColor: Colors.red,
           title: 'Emergency Services',
           subtitle: 'Call 112 / Police / Firefighters',
           onTap: () => onOptionTap('emergency_services'),
-        ),
-        _OptionTile(
-          icon: UniconsLine.calendar_alt,
-          iconColor: Colors.indigo,
-          title: 'Connect Calendar',
-          subtitle: 'Check event safety',
-          onTap: () => onOptionTap('calendar'),
         ),
       ],
     );

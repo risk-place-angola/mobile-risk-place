@@ -1,43 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:rpa/domain/entities/emergency_contact.dart';
+import 'package:rpa/domain/entities/user_alert.dart';
 
-class AddEmergencyContactDialog extends StatefulWidget {
-  final EmergencyContact? contact;
+class EditAlertDialog extends StatefulWidget {
+  final UserAlert alert;
 
-  const AddEmergencyContactDialog({super.key, this.contact});
+  const EditAlertDialog({super.key, required this.alert});
 
   @override
-  State<AddEmergencyContactDialog> createState() =>
-      _AddEmergencyContactDialogState();
+  State<EditAlertDialog> createState() => _EditAlertDialogState();
 }
 
-class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
+class _EditAlertDialogState extends State<EditAlertDialog> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _phoneController;
-  late ContactRelation _selectedRelation;
-  late bool _isPriority;
+  late TextEditingController _messageController;
+  late TextEditingController _radiusController;
+  late AlertSeverity _selectedSeverity;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.contact?.name);
-    _phoneController = TextEditingController(text: widget.contact?.phone);
-    _selectedRelation = widget.contact?.relation ?? ContactRelation.family;
-    _isPriority = widget.contact?.isPriority ?? false;
+    _messageController = TextEditingController(text: widget.alert.message);
+    _radiusController = TextEditingController(
+      text: widget.alert.radiusMeters.toString(),
+    );
+    _selectedSeverity = widget.alert.severity;
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _phoneController.dispose();
+    _messageController.dispose();
+    _radiusController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.contact != null;
-
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: SingleChildScrollView(
@@ -50,7 +47,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isEditing ? 'Editar Contato' : 'Adicionar Contato',
+                  'Editar Alerta',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -58,7 +55,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Configure um contato de emergência para ser notificado em situações críticas.',
+                  'Atualize a mensagem, gravidade ou raio do alerta.',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -66,57 +63,76 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
-                  controller: _nameController,
+                  controller: _messageController,
+                  maxLines: 3,
                   decoration: const InputDecoration(
-                    labelText: 'Nome *',
-                    hintText: 'Ex: Maria Silva',
-                    prefixIcon: Icon(Icons.person),
+                    labelText: 'Mensagem *',
+                    hintText: 'Descreva o alerta',
+                    prefixIcon: Icon(Icons.message),
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Nome é obrigatório';
+                      return 'Mensagem é obrigatória';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
+                DropdownButtonFormField<AlertSeverity>(
+                  value: _selectedSeverity,
                   decoration: const InputDecoration(
-                    labelText: 'Telefone *',
-                    hintText: '+244 923 456 789',
-                    prefixIcon: Icon(Icons.phone),
+                    labelText: 'Gravidade',
+                    prefixIcon: Icon(Icons.warning),
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Telefone é obrigatório';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<ContactRelation>(
-                  value: _selectedRelation,
-                  decoration: const InputDecoration(
-                    labelText: 'Relação',
-                    prefixIcon: Icon(Icons.people),
-                    border: OutlineInputBorder(),
-                  ),
-                  items: ContactRelation.values.map((relation) {
+                  items: AlertSeverity.values.map((severity) {
                     return DropdownMenuItem(
-                      value: relation,
-                      child: Text(relation.displayName),
+                      value: severity,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            size: 12,
+                            color: _getSeverityColor(severity),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(severity.displayName),
+                        ],
+                      ),
                     );
                   }).toList(),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() {
-                        _selectedRelation = value;
+                        _selectedSeverity = value;
                       });
                     }
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _radiusController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Raio (metros) *',
+                    hintText: '100 - 10000',
+                    prefixIcon: Icon(Icons.radio_button_unchecked),
+                    border: OutlineInputBorder(),
+                    suffixText: 'm',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Raio é obrigatório';
+                    }
+                    final radius = int.tryParse(value);
+                    if (radius == null) {
+                      return 'Valor inválido';
+                    }
+                    if (radius < 100 || radius > 10000) {
+                      return 'Raio deve estar entre 100 e 10.000m';
+                    }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 16),
@@ -134,7 +150,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Contatos prioritários receberão alertas de emergência (máximo 5)',
+                          'As alterações serão aplicadas imediatamente e os inscritos serão notificados.',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.blue.shade900,
@@ -143,20 +159,6 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 12),
-                CheckboxListTile(
-                  value: _isPriority,
-                  onChanged: (value) {
-                    setState(() {
-                      _isPriority = value ?? false;
-                    });
-                  },
-                  title: const Text('Marcar como prioritário'),
-                  subtitle:
-                      const Text('Receberá alertas de emergência automáticos'),
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -175,7 +177,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                           vertical: 12,
                         ),
                       ),
-                      child: Text(isEditing ? 'Salvar' : 'Adicionar'),
+                      child: const Text('Salvar'),
                     ),
                   ],
                 ),
@@ -187,14 +189,25 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
     );
   }
 
+  Color _getSeverityColor(AlertSeverity severity) {
+    switch (severity) {
+      case AlertSeverity.low:
+        return Colors.green;
+      case AlertSeverity.medium:
+        return Colors.orange;
+      case AlertSeverity.high:
+        return Colors.deepOrange;
+      case AlertSeverity.critical:
+        return Colors.red;
+    }
+  }
+
   void _handleSave() {
     if (_formKey.currentState!.validate()) {
       final result = {
-        'name': _nameController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'relation': _selectedRelation,
-        'isPriority': _isPriority,
-        if (widget.contact != null) 'id': widget.contact!.id,
+        'message': _messageController.text.trim(),
+        'severity': _selectedSeverity,
+        'radiusMeters': int.parse(_radiusController.text.trim()),
       };
       Navigator.of(context).pop(result);
     }

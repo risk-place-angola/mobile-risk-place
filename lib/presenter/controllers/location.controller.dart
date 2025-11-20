@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rpa/data/services/location.service.dart';
 import 'package:rpa/data/services/alert_websocket_service.dart';
+import 'package:rpa/core/error/error_handler.dart';
 
 /// Location controller using ChangeNotifier
 class LocationController extends ChangeNotifier {
@@ -25,7 +26,8 @@ class LocationController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get permissionGranted => _permissionGranted;
 
-  LocationController(this._locationService, {AlertWebSocketService? webSocketService})
+  LocationController(this._locationService,
+      {AlertWebSocketService? webSocketService})
       : _webSocketService = webSocketService;
 
   /// Request location permission and get current position
@@ -53,7 +55,7 @@ class LocationController extends ChangeNotifier {
       return true;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = 'Erro ao solicitar permissão: $e';
+      _errorMessage = ErrorHandler.getUserFriendlyMessage(e);
       notifyListeners();
       log('Error requesting permission: $e', name: 'LocationController');
       return false;
@@ -83,7 +85,7 @@ class LocationController extends ChangeNotifier {
       }
     } catch (e) {
       _isLoading = false;
-      _errorMessage = 'Erro ao obter localização: $e';
+      _errorMessage = ErrorHandler.getUserFriendlyMessage(e);
       notifyListeners();
       log('Error getting position: $e', name: 'LocationController');
     }
@@ -106,12 +108,18 @@ class LocationController extends ChangeNotifier {
         notifyListeners();
         log('[LocationController] Position stream updated: ${position.latitude}, ${position.longitude}',
             name: 'LocationController');
-        
+
         // 🌐 Send location update to WebSocket for real-time alerts (like Waze)
         // This ensures the backend knows the user's current position to send relevant alerts
         if (_webSocketService != null && _webSocketService!.isConnected) {
-          _webSocketService!.updateLocation(position.latitude, position.longitude);
-          log('[LocationController] Location sent to WebSocket', name: 'LocationController');
+          _webSocketService!.updateLocation(
+            position.latitude, 
+            position.longitude,
+            speed: position.speed,
+            heading: position.heading,
+          );
+          log('[LocationController] Location sent to WebSocket',
+              name: 'LocationController');
         }
       },
       onError: (error) {
@@ -150,5 +158,6 @@ final locationControllerProvider =
     ChangeNotifierProvider<LocationController>((ref) {
   final locationService = ref.read(locationServiceProvider);
   final webSocketService = ref.read(alertWebSocketProvider);
-  return LocationController(locationService, webSocketService: webSocketService);
+  return LocationController(locationService,
+      webSocketService: webSocketService);
 });

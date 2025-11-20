@@ -13,10 +13,12 @@ class EmergencyContactsScreen extends ConsumerStatefulWidget {
   const EmergencyContactsScreen({super.key});
 
   @override
-  ConsumerState<EmergencyContactsScreen> createState() => _EmergencyContactsScreenState();
+  ConsumerState<EmergencyContactsScreen> createState() =>
+      _EmergencyContactsScreenState();
 }
 
-class _EmergencyContactsScreenState extends ConsumerState<EmergencyContactsScreen> {
+class _EmergencyContactsScreenState
+    extends ConsumerState<EmergencyContactsScreen> {
   bool _isLoading = false;
   List<EmergencyContact> _contacts = [];
   String? _errorMessage;
@@ -52,7 +54,8 @@ class _EmergencyContactsScreenState extends ConsumerState<EmergencyContactsScree
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)?.emergencyContacts ?? 'Emergency Contacts'),
+        title: Text(AppLocalizations.of(context)?.emergencyContacts ??
+            'Emergency Contacts'),
         backgroundColor: Colors.red.shade700,
         foregroundColor: Colors.white,
       ),
@@ -101,7 +104,8 @@ class _EmergencyContactsScreenState extends ConsumerState<EmergencyContactsScree
                 icon: const Icon(Icons.refresh),
                 label: const Text('Tentar Novamente'),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
               ),
             ],

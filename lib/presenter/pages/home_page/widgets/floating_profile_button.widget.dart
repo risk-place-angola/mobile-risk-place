@@ -16,8 +16,8 @@ class FloatingProfileButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).userStored;
-    final userName = user?.name?.isNotEmpty == true 
-        ? user!.name!.substring(0, 1).toUpperCase() 
+    final userName = user?.name?.isNotEmpty == true
+        ? user!.name!.substring(0, 1).toUpperCase()
         : 'U';
 
     return Positioned(
