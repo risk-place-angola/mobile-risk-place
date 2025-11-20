@@ -1,0 +1,53 @@
+<svg width="200" height="300" viewBox="0 0 200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Robot Body -->
+  <g id="robot">
+    <!-- Main Body (Torso) -->
+    <rect x="60" y="180" width="80" height="90" rx="8" fill="#8B0000" stroke="#4A0000" stroke-width="3"/>
+    <rect x="70" y="195" width="25" height="30" rx="3" fill="#A52A2A"/>
+    <rect x="105" y="195" width="25" height="30" rx="3" fill="#A52A2A"/>
+    <rect x="75" y="235" width="50" height="8" rx="2" fill="#4A0000"/>
+    
+    <!-- Neck -->
+    <rect x="85" y="160" width="30" height="25" rx="4" fill="#6B1010" stroke="#4A0000" stroke-width="2"/>
+    <ellipse cx="100" cy="170" rx="8" ry="6" fill="#4A0000"/>
+    
+    <!-- Head -->
+    <rect x="60" y="60" width="80" height="100" rx="10" fill="#DC143C" stroke="#8B0000" stroke-width="3"/>
+    
+    <!-- Head Details -->
+    <!-- Mohawk/Antenna -->
+    <rect x="95" y="45" width="10" height="20" rx="2" fill="#8B0000"/>
+    <rect x="92" y="55" width="16" height="8" rx="2" fill="#A52A2A"/>
+    
+    <!-- Eyes -->
+    <rect x="70" y="90" width="25" height="20" rx="3" fill="#4A0000" opacity="0.8"/>
+    <rect x="105" y="90" width="25" height="20" rx="3" fill="#4A0000" opacity="0.8"/>
+    
+    <!-- Nose/Vent -->
+    <rect x="90" y="120" width="20" height="15" rx="2" fill="#8B0000"/>
+    <line x1="92" y1="125" x2="108" y2="125" stroke="#4A0000" stroke-width="1.5"/>
+    <line x1="92" y1="130" x2="108" y2="130" stroke="#4A0000" stroke-width="1.5"/>
+    
+    <!-- Mouth area -->
+    <rect x="75" y="140" width="50" height="8" rx="2" fill="#6B1010"/>
+    
+    <!-- Head shine/highlight -->
+    <ellipse cx="80" cy="75" rx="12" ry="15" fill="#FF6B6B" opacity="0.4"/>
+    
+    <!-- Arms -->
+    <!-- Left Arm -->
+    <rect x="40" y="190" width="22" height="50" rx="6" fill="#8B0000" stroke="#4A0000" stroke-width="2"/>
+    <circle cx="51" cy="250" r="12" fill="#B22222" stroke="#4A0000" stroke-width="2"/>
+    
+    <!-- Right Arm -->
+    <rect x="138" y="190" width="22" height="50" rx="6" fill="#8B0000" stroke="#4A0000" stroke-width="2"/>
+    <circle cx="149" cy="250" r="12" fill="#B22222" stroke="#4A0000" stroke-width="2"/>
+    
+    <!-- Legs -->
+    <!-- Left Leg -->
+    <rect x="70" y="270" width="22" height="20" rx="3" fill="#6B1010" stroke="#4A0000" stroke-width="2"/>
+    
+    <!-- Right Leg -->
+    <rect x="108" y="270" width="22" height="20" rx="3" fill="#6B1010" stroke="#4A0000" stroke-width="2"/>
+  </g>
+</svg>
