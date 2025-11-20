@@ -16,10 +16,19 @@ final authServiceProvider = Provider<IAuthService>((ref) {
 });
 
 abstract class IAuthService {
-  Future<UserProfile> login({required LoginRequestDTO user});
+  Future<UserProfile> login({required LoginRequestDTO user, String? deviceId});
   Future<bool> logout();
-  Future<bool> register({required RegisterRequestDTO registerDto});
+  Future<bool> register(
+      {required RegisterRequestDTO registerDto, String? deviceId});
   Future<bool> resetPassword({required String email});
+  Future<bool> confirmPasswordReset(
+      {required String email,
+      required String code,
+      required String newPassword});
+  Future<bool> resendVerificationCode({required String email});
+  Future<bool> confirmRegistration(
+      {required String email, required String code});
+  Future<AuthTokenResponseDTO> refreshToken({required String refreshToken});
 }
 
 class AuthService implements IAuthService {
@@ -31,59 +40,55 @@ class AuthService implements IAuthService {
         _dbHelper = dbHelper;
 
   @override
-  Future<UserProfile> login({required LoginRequestDTO user}) async {
+  Future<UserProfile> login(
+      {required LoginRequestDTO user, String? deviceId}) async {
     try {
       log('Attempting login for: ${user.email}', name: 'AuthService');
-      
+
+      final data = user.toJson();
+      if (deviceId != null) {
+        data['device_id'] = deviceId;
+      }
+
       final response = await _httpClient.post(
         '/auth/login',
-        data: user.toJson(),
+        data: data,
       );
 
-      log('Login response status: ${response.statusCode}', name: 'AuthService');
-      log('Login response data type: ${response.data.runtimeType}', name: 'AuthService');
-
-      if (response.statusCode == 200 && response.data != null) {
-        log('Parsing login response...', name: 'AuthService');
-        
-        final loggedInUser = AuthTokenResponseDTO.fromJson(response.data);
-
-        log('Login parsed successfully, saving to DB...', name: 'AuthService');
-        
-        await _dbHelper.setData(
-          collection: BDCollections.USERS,
-          key: 'user',
-          value: loggedInUser.toJson(),
-        );
-
-        // 🔑 CRITICAL: Configurar token no AuthTokenManager para repositórios usarem
-        log('🔑 [AuthService] Setting auth token in AuthTokenManager...', name: 'AuthService');
-        log('🔑 [AuthService] Token received from backend (${loggedInUser.accessToken.length} chars)', 
-            name: 'AuthService');
-        log('🔑 [AuthService] Token format will be: Authorization: Bearer ${loggedInUser.accessToken.substring(0, 20)}...', 
-            name: 'AuthService');
-        
-        AuthTokenManager().setToken(loggedInUser.accessToken);
-        
-        log('✅ [AuthService] Auth token configured successfully', name: 'AuthService');
-        log('✅ [AuthService] Login successful for user: ${loggedInUser.user.email}', 
-            name: 'AuthService');
-        
-        return UserProfile.fromAuthUserSummaryDTO(loggedInUser.user);
-      } else {
-        log('Login failed with status: ${response.statusCode}', name: 'AuthService');
+      if (response.statusCode != 200 || response.data == null) {
         throw ServerException(
           message: 'Falha ao fazer login',
           statusCode: response.statusCode,
         );
       }
-    } on HttpException catch (e) {
-      log('HTTP Exception during login: ${e.message}', name: 'AuthService');
+
+      final loggedInUser = AuthTokenResponseDTO.fromJson(response.data);
+
+      await _dbHelper.setData(
+        collection: BDCollections.USERS,
+        key: 'user',
+        value: loggedInUser.toJson(),
+      );
+
+      AuthTokenManager().setToken(
+        loggedInUser.accessToken,
+        refreshToken: loggedInUser.refreshToken,
+        expiresIn: loggedInUser.expiresIn,
+      );
+
+      log('✅ Login successful for user: ${loggedInUser.user.email}',
+          name: 'AuthService');
+
+      return UserProfile.fromAuthUserSummaryDTO(loggedInUser.user);
+    } on HttpException {
       rethrow;
+    } on FormatException catch (e) {
+      log('❌ Format error during login: ${e.message}', name: 'AuthService');
+      throw HttpException(message: 'Erro ao processar resposta do servidor');
     } catch (e, stackTrace) {
-      log('Unexpected error during login: $e', name: 'AuthService');
-      log('Stack trace: $stackTrace', name: 'AuthService');
-      throw ServerException(message: 'Erro inesperado ao fazer login: $e');
+      log('❌ Unexpected error during login',
+          name: 'AuthService', error: e, stackTrace: stackTrace);
+      throw HttpException(message: 'Erro ao realizar login');
     }
   }
 
@@ -91,11 +96,11 @@ class AuthService implements IAuthService {
   Future<bool> logout() async {
     try {
       await _dbHelper.deleteData(collection: BDCollections.USERS, key: '');
-      
+
       // 🔑 Limpar token do AuthTokenManager
       log('Clearing auth token from AuthTokenManager...', name: 'AuthService');
       AuthTokenManager().clearToken();
-      
+
       log('User logged out successfully', name: 'AuthService');
       return true;
     } catch (e) {
@@ -105,27 +110,34 @@ class AuthService implements IAuthService {
   }
 
   @override
-  Future<bool> register({required RegisterRequestDTO registerDto}) async {
+  Future<bool> register(
+      {required RegisterRequestDTO registerDto, String? deviceId}) async {
     try {
+      final data = registerDto.toJson();
+      if (deviceId != null) {
+        data['device_id'] = deviceId;
+      }
+
       final response = await _httpClient.post(
         '/auth/signup',
-        data: registerDto.toJson(),
+        data: data,
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        log('Registration successful - user ID: ${response.data?['id']}', name: 'AuthService');
+        log('✅ Registration successful', name: 'AuthService');
         return true;
-      } else {
-        throw ServerException(
-          message: 'Falha ao registrar usuário',
-          statusCode: response.statusCode,
-        );
       }
+
+      throw ServerException(
+        message: 'Falha ao registrar usuário',
+        statusCode: response.statusCode,
+      );
     } on HttpException {
       rethrow;
-    } catch (e) {
-      log('Unexpected error during registration: $e', name: 'AuthService');
-      throw ServerException(message: 'Erro inesperado ao registrar');
+    } catch (e, stackTrace) {
+      log('❌ Unexpected error during registration',
+          name: 'AuthService', error: e, stackTrace: stackTrace);
+      throw HttpException(message: 'Erro ao registrar usuário');
     }
   }
 
@@ -138,19 +150,20 @@ class AuthService implements IAuthService {
       );
 
       if (response.statusCode == 200) {
-        log('Password reset code sent successfully', name: 'AuthService');
+        log('✅ Password reset code sent successfully', name: 'AuthService');
         return true;
-      } else {
-        throw ServerException(
-          message: 'Falha ao enviar código de recuperação',
-          statusCode: response.statusCode,
-        );
       }
+
+      throw ServerException(
+        message: 'Falha ao enviar código de recuperação',
+        statusCode: response.statusCode,
+      );
     } on HttpException {
       rethrow;
-    } catch (e) {
-      log('Unexpected error during password reset: $e', name: 'AuthService');
-      throw ServerException(message: 'Erro inesperado ao resetar senha');
+    } catch (e, stackTrace) {
+      log('❌ Unexpected error during password reset',
+          name: 'AuthService', error: e, stackTrace: stackTrace);
+      throw HttpException(message: 'Erro ao resetar senha');
     }
   }
 
@@ -180,22 +193,25 @@ class AuthService implements IAuthService {
     } on HttpException {
       rethrow;
     } catch (e) {
-      log('Unexpected error during registration confirmation: $e', name: 'AuthService');
+      log('Unexpected error during registration confirmation: $e',
+          name: 'AuthService');
       throw ServerException(message: 'Erro inesperado ao confirmar cadastro');
     }
   }
 
-  /// Reset password with code and new password
+  @override
   Future<bool> confirmPasswordReset({
     required String email,
-    required String password,
+    required String code,
+    required String newPassword,
   }) async {
     try {
       final response = await _httpClient.post(
         '/auth/password/reset',
         data: {
           'email': email,
-          'password': password,
+          'code': code,
+          'new_password': newPassword,
         },
       );
 
@@ -211,8 +227,78 @@ class AuthService implements IAuthService {
     } on HttpException {
       rethrow;
     } catch (e) {
-      log('Unexpected error during password reset confirmation: $e', name: 'AuthService');
+      log('Unexpected error during password reset confirmation: $e',
+          name: 'AuthService');
       throw ServerException(message: 'Erro inesperado ao resetar senha');
+    }
+  }
+
+  @override
+  Future<bool> resendVerificationCode({required String email}) async {
+    try {
+      final response = await _httpClient.post(
+        '/auth/resend-code',
+        data: {'email': email},
+      );
+
+      if (response.statusCode == 204 || response.statusCode == 200) {
+        log('✅ Verification code resent successfully', name: 'AuthService');
+        return true;
+      }
+
+      throw ServerException(
+        message: 'Falha ao reenviar código de verificação',
+        statusCode: response.statusCode,
+      );
+    } on HttpException {
+      rethrow;
+    } catch (e) {
+      log('❌ Error resending verification code: $e', name: 'AuthService');
+      throw ServerException(message: 'Erro ao reenviar código de verificação');
+    }
+  }
+
+  @override
+  Future<AuthTokenResponseDTO> refreshToken(
+      {required String refreshToken}) async {
+    try {
+      log('Attempting token refresh', name: 'AuthService');
+
+      final response = await _httpClient.post(
+        '/auth/refresh',
+        data: {'refresh_token': refreshToken},
+      );
+
+      if (response.statusCode != 200 || response.data == null) {
+        throw ServerException(
+          message: 'Failed to refresh token',
+          statusCode: response.statusCode,
+        );
+      }
+
+      final tokenResponse = AuthTokenResponseDTO.fromJson(response.data);
+
+      await _dbHelper.setData(
+        collection: BDCollections.USERS,
+        key: 'user',
+        value: tokenResponse.toJson(),
+      );
+
+      AuthTokenManager().setToken(
+        tokenResponse.accessToken,
+        refreshToken: tokenResponse.refreshToken,
+        expiresIn: tokenResponse.expiresIn,
+      );
+
+      log('✅ Token refreshed successfully', name: 'AuthService');
+
+      return tokenResponse;
+    } on HttpException {
+      rethrow;
+    } catch (e, stackTrace) {
+      log('❌ Unexpected error during token refresh',
+          name: 'AuthService', error: e, stackTrace: stackTrace);
+      throw HttpException(message: 'Failed to refresh authentication token');
     }
   }
 }

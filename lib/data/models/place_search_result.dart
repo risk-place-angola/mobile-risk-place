@@ -30,7 +30,7 @@ class PlaceSearchResult {
 
   factory PlaceSearchResult.fromNominatimJson(Map<String, dynamic> json) {
     final address = json['address'] as Map<String, dynamic>?;
-    
+
     return PlaceSearchResult(
       placeId: json['place_id'].toString(),
       displayName: json['display_name'] ?? '',

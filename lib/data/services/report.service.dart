@@ -5,6 +5,7 @@ import 'package:rpa/core/http_client/dio_http_client.dart';
 import 'package:rpa/core/http_client/exceptions/http_exceptions.dart';
 import 'package:rpa/data/dtos/create_report_request_dto.dart';
 import 'package:rpa/data/dtos/list_nearby_reports_response_dto.dart';
+import 'package:rpa/data/dtos/list_reports_response_dto.dart';
 import 'package:rpa/data/dtos/update_report_location_dto.dart';
 
 final reportServiceProvider = Provider<ReportService>((ref) {
@@ -24,14 +25,15 @@ class ReportService {
   }) async {
     try {
       log('Creating report...', name: 'ReportService');
-      
+
       final response = await _httpClient.post(
         '/reports',
         data: reportData.toJson(),
       );
 
       if (response.statusCode == 201 && response.data != null) {
-        log('Report created successfully: ${response.data['id']}', name: 'ReportService');
+        log('Report created successfully: ${response.data['id']}',
+            name: 'ReportService');
         return ReportResponseDTO.fromJson(response.data);
       } else {
         throw ServerException(
@@ -54,26 +56,27 @@ class ReportService {
     int radius = 500,
   }) async {
     try {
-      log('Fetching nearby reports at ($latitude, $longitude) with radius $radius m...', 
+      log('Fetching nearby reports at ($latitude, $longitude) with radius $radius m...',
           name: 'ReportService');
-      
+
       final response = await _httpClient.get(
         '/reports/nearby',
         queryParameters: {
-          'lat': latitude,
-          'lon': longitude,
+          'latitude': latitude,
+          'longitude': longitude,
           'radius': radius,
         },
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final List<dynamic> dataList = response.data is List 
-            ? response.data 
-            : response.data['data'] ?? [];
-        
-        final reports = dataList.map((json) => NearbyReportDTO.fromJson(json)).toList();
-        
-        log('Successfully fetched ${reports.length} nearby reports', name: 'ReportService');
+        final List<dynamic> dataList =
+            response.data is List ? response.data : response.data['data'] ?? [];
+
+        final reports =
+            dataList.map((json) => NearbyReportDTO.fromJson(json)).toList();
+
+        log('Successfully fetched ${reports.length} nearby reports',
+            name: 'ReportService');
         return reports;
       } else {
         throw ServerException(
@@ -84,7 +87,53 @@ class ReportService {
     } on HttpException {
       rethrow;
     } catch (e) {
-      log('Unexpected error fetching nearby reports: $e', name: 'ReportService');
+      log('Unexpected error fetching nearby reports: $e',
+          name: 'ReportService');
+      throw ServerException(message: 'Erro inesperado ao buscar relatórios');
+    }
+  }
+
+  /// List all reports with pagination - GET /reports
+  ///
+  /// This is the proper endpoint for listing ALL reports in the system.
+  /// Use this for admin screens, dashboards, and global report listings.
+  Future<ListReportsResponseDTO> listAllReports({
+    int page = 1,
+    int limit = 20,
+    String? status,
+    String sort = 'created_at',
+    String order = 'desc',
+  }) async {
+    try {
+      log('Fetching all reports (page: $page, limit: $limit, status: $status)...',
+          name: 'ReportService');
+
+      final response = await _httpClient.get(
+        '/reports',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (status != null && status.isNotEmpty) 'status': status,
+          'sort': sort,
+          'order': order,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final result = ListReportsResponseDTO.fromJson(response.data);
+        log('Successfully fetched ${result.data.length} reports (total: ${result.pagination.total})',
+            name: 'ReportService');
+        return result;
+      } else {
+        throw ServerException(
+          message: 'Falha ao buscar relatórios',
+          statusCode: response.statusCode,
+        );
+      }
+    } on HttpException {
+      rethrow;
+    } catch (e) {
+      log('Unexpected error fetching all reports: $e', name: 'ReportService');
       throw ServerException(message: 'Erro inesperado ao buscar relatórios');
     }
   }
@@ -96,7 +145,7 @@ class ReportService {
   }) async {
     try {
       log('Verifying report: $reportId', name: 'ReportService');
-      
+
       final response = await _httpClient.post(
         '/reports/$reportId/verify',
         data: {'moderator_id': moderatorId},
@@ -126,7 +175,7 @@ class ReportService {
   }) async {
     try {
       log('Resolving report: $reportId', name: 'ReportService');
-      
+
       final response = await _httpClient.post(
         '/reports/$reportId/resolve',
         data: {'moderator_id': moderatorId},
@@ -156,7 +205,7 @@ class ReportService {
   }) async {
     try {
       log('Updating location for report: $reportId', name: 'ReportService');
-      
+
       final response = await _httpClient.put(
         '/reports/$reportId/location',
         data: locationData.toJson(),
@@ -174,8 +223,10 @@ class ReportService {
     } on HttpException {
       rethrow;
     } catch (e) {
-      log('Unexpected error updating report location: $e', name: 'ReportService');
-      throw ServerException(message: 'Erro inesperado ao atualizar localização');
+      log('Unexpected error updating report location: $e',
+          name: 'ReportService');
+      throw ServerException(
+          message: 'Erro inesperado ao atualizar localização');
     }
   }
 }

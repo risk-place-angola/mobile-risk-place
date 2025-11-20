@@ -1,11 +1,3 @@
-// ============================================================================
-// UPDATE REPORT LOCATION DTOs
-// ============================================================================
-// Data Transfer Objects for updating report location
-// Used when user drags a marker to update report coordinates
-// ============================================================================
-
-/// Request DTO for updating report location
 class UpdateReportLocationRequestDTO {
   final double latitude;
   final double longitude;
@@ -23,14 +15,15 @@ class UpdateReportLocationRequestDTO {
     this.province,
   });
 
-  /// Convert to JSON for API request
   Map<String, dynamic> toJson() {
     return {
       'latitude': latitude,
       'longitude': longitude,
       if (address != null && address!.isNotEmpty) 'address': address,
-      if (neighborhood != null && neighborhood!.isNotEmpty) 'neighborhood': neighborhood,
-      if (municipality != null && municipality!.isNotEmpty) 'municipality': municipality,
+      if (neighborhood != null && neighborhood!.isNotEmpty)
+        'neighborhood': neighborhood,
+      if (municipality != null && municipality!.isNotEmpty)
+        'municipality': municipality,
       if (province != null && province!.isNotEmpty) 'province': province,
     };
   }

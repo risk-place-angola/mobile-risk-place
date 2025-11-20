@@ -37,16 +37,22 @@ class WebSocketMessage<T> {
 class LocationUpdateData {
   final double latitude;
   final double longitude;
+  final double? speed;
+  final double? heading;
 
   LocationUpdateData({
     required this.latitude,
     required this.longitude,
+    this.speed,
+    this.heading,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'latitude': latitude,
       'longitude': longitude,
+      if (speed != null) 'speed': speed,
+      if (heading != null) 'heading': heading,
     };
   }
 
@@ -54,6 +60,8 @@ class LocationUpdateData {
     return LocationUpdateData(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
+      speed: json['speed'] != null ? (json['speed'] as num).toDouble() : null,
+      heading: json['heading'] != null ? (json['heading'] as num).toDouble() : null,
     );
   }
 }

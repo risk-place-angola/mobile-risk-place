@@ -8,7 +8,7 @@ import 'package:rpa/data/models/user.model.dart';
 // ============================================================================
 // Provides current logged-in user information from local storage
 // Uses Riverpod 2.0+ AsyncNotifier pattern for reactive state management
-// 
+//
 // IMPLEMENTATION NOTES:
 // - Reads user data from the 'users' collection saved during login
 // - This is where AuthService stores the AuthTokenResponseDTO
@@ -27,14 +27,15 @@ final dbHelperAuthProvider = Provider<IDBHelper>((ref) {
 });
 
 /// Provider for current user from auth data
-final currentUserFromAuthProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
+final currentUserFromAuthProvider =
+    FutureProvider<Map<String, dynamic>?>((ref) async {
   final dbHelper = ref.watch(dbHelperAuthProvider);
   try {
     final authData = await dbHelper.getData(
       collection: BDCollections.USERS,
       key: 'user',
     );
-    
+
     if (authData != null && authData is Map) {
       // Extract the user object from the auth response
       final userData = authData['user'];
@@ -52,7 +53,7 @@ final currentUserFromAuthProvider = FutureProvider<Map<String, dynamic>?>((ref) 
 final currentUserProvider = FutureProvider<User?>((ref) async {
   // Try to get user from auth data first (more reliable)
   final authUser = await ref.watch(currentUserFromAuthProvider.future);
-  
+
   if (authUser != null && authUser['id'] != null) {
     // Convert auth user data to User model
     return User(
@@ -62,7 +63,7 @@ final currentUserProvider = FutureProvider<User?>((ref) async {
       phoneNumber: authUser['phone'] as String?,
     );
   }
-  
+
   // Fallback to UserBox (legacy)
   final userBox = ref.watch(userBoxProvider);
   return await userBox.getUser();

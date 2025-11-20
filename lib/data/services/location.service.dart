@@ -17,34 +17,22 @@ class LocationService {
     return await Geolocator.requestPermission();
   }
 
-  /// Get current position with error handling
-  /// Returns null if permission denied or service disabled
   Future<Position?> getCurrentPosition() async {
     try {
-      // Check if location services are enabled
       bool serviceEnabled = await isLocationServiceEnabled();
       if (!serviceEnabled) {
         log('Location services are disabled', name: 'LocationService');
         return null;
       }
 
-      // Check permission
       LocationPermission permission = await checkPermission();
 
-      if (permission == LocationPermission.denied) {
-        permission = await requestPermission();
-        if (permission == LocationPermission.denied) {
-          log('Location permission denied', name: 'LocationService');
-          return null;
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        log('Location permission denied forever', name: 'LocationService');
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        log('Location permission not granted', name: 'LocationService');
         return null;
       }
 
-      // Get position
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.bestForNavigation,
       );

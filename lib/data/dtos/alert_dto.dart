@@ -29,18 +29,21 @@ class CreateAlertRequestDTO {
       };
 }
 
-/// DTO para resposta de criação de Alert
 class AlertResponseDTO {
   final String id;
   final String userId;
   final String riskTypeId;
+  final String? riskTypeName;
+  final String? riskTypeIconUrl;
   final String riskTopicId;
+  final String? riskTopicName;
+  final String? riskTopicIconUrl;
   final String message;
   final double latitude;
   final double longitude;
   final double radius;
   final String severity;
-  final String status; // active, resolved
+  final String status;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? resolvedAt;
@@ -49,7 +52,11 @@ class AlertResponseDTO {
     required this.id,
     required this.userId,
     required this.riskTypeId,
+    this.riskTypeName,
+    this.riskTypeIconUrl,
     required this.riskTopicId,
+    this.riskTopicName,
+    this.riskTopicIconUrl,
     required this.message,
     required this.latitude,
     required this.longitude,
@@ -66,16 +73,22 @@ class AlertResponseDTO {
       id: json['id'] as String,
       userId: json['user_id'] as String,
       riskTypeId: json['risk_type_id'] as String,
+      riskTypeName: json['risk_type_name'] as String?,
+      riskTypeIconUrl: json['risk_type_icon_url'] as String?,
       riskTopicId: json['risk_topic_id'] as String,
+      riskTopicName: json['risk_topic_name'] as String?,
+      riskTopicIconUrl: json['risk_topic_icon_url'] as String?,
       message: json['message'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       radius: (json['radius'] as num).toDouble(),
       severity: json['severity'] as String,
       status: json['status'] as String,
-      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ?? DateTime.now(),
-      resolvedAt: json['resolved_at'] != null 
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ??
+          DateTime.now(),
+      resolvedAt: json['resolved_at'] != null
           ? DateTime.tryParse(json['resolved_at'] as String)
           : null,
     );
@@ -85,7 +98,11 @@ class AlertResponseDTO {
         'id': id,
         'user_id': userId,
         'risk_type_id': riskTypeId,
+        'risk_type_name': riskTypeName,
+        'risk_type_icon_url': riskTypeIconUrl,
         'risk_topic_id': riskTopicId,
+        'risk_topic_name': riskTopicName,
+        'risk_topic_icon_url': riskTopicIconUrl,
         'message': message,
         'latitude': latitude,
         'longitude': longitude,

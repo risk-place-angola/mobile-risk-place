@@ -62,7 +62,8 @@ class RiskTypes {
   static const naturalDisaster = RiskTypeModel(
     id: 'natural_disaster',
     name: 'Desastre Natural',
-    description: 'Desastres naturais como enchentes, deslizamentos, tempestades',
+    description:
+        'Desastres naturais como enchentes, deslizamentos, tempestades',
     defaultRadius: 2000,
     color: Color(0xFF9B59B6),
     icon: Icons.thunderstorm,
@@ -182,7 +183,11 @@ class AccidentTopics {
     icon: Icons.person_off,
   );
 
-  static const List<RiskTopicModel> all = [acidenteTransito, acidenteTrabalho, queda];
+  static const List<RiskTopicModel> all = [
+    acidenteTransito,
+    acidenteTrabalho,
+    queda
+  ];
 }
 
 /// Topics de Desastres Naturais

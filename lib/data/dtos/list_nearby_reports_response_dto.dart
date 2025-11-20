@@ -1,73 +1,29 @@
-/// DTO para informações aninhadas de Risk Type na resposta de reports
-class RiskTypeInfoDTO {
-  final String id;
-  final String name;
-  final String description;
-
-  const RiskTypeInfoDTO({
-    required this.id,
-    required this.name,
-    required this.description,
-  });
-
-  factory RiskTypeInfoDTO.fromJson(Map<String, dynamic> json) {
-    return RiskTypeInfoDTO(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String? ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'description': description,
-      };
-}
-
-/// DTO para informações aninhadas de Risk Topic na resposta de reports
-class RiskTopicInfoDTO {
-  final String id;
-  final String name;
-  final String description;
-
-  const RiskTopicInfoDTO({
-    required this.id,
-    required this.name,
-    required this.description,
-  });
-
-  factory RiskTopicInfoDTO.fromJson(Map<String, dynamic> json) {
-    return RiskTopicInfoDTO(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String? ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'description': description,
-      };
-}
-
-/// DTO para um report individual na listagem nearby
 class NearbyReportDTO {
   final String id;
   final String userId;
-  final RiskTypeInfoDTO riskType;
-  final RiskTopicInfoDTO riskTopic;
+  final String riskTypeId;
+  final String? riskTypeName;
+  final String? riskTypeIconUrl;
+  final String riskTopicId;
+  final String? riskTopicName;
+  final String? riskTopicIconUrl;
   final String status;
   final String description;
   final String imageUrl;
   final double latitude;
   final double longitude;
-  final double distance; // Distância em metros
+  final double distance;
   final String province;
   final String municipality;
   final String neighborhood;
   final String address;
+  final String? reviewedBy;
+  final int upvotes;
+  final int downvotes;
+  final int netVotes;
+  final String? userVote;
+  final bool verified;
+  final DateTime? verifiedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? resolvedAt;
@@ -75,8 +31,12 @@ class NearbyReportDTO {
   const NearbyReportDTO({
     required this.id,
     required this.userId,
-    required this.riskType,
-    required this.riskTopic,
+    required this.riskTypeId,
+    this.riskTypeName,
+    this.riskTypeIconUrl,
+    required this.riskTopicId,
+    this.riskTopicName,
+    this.riskTopicIconUrl,
     required this.status,
     required this.description,
     required this.imageUrl,
@@ -87,6 +47,13 @@ class NearbyReportDTO {
     required this.municipality,
     required this.neighborhood,
     required this.address,
+    this.reviewedBy,
+    this.upvotes = 0,
+    this.downvotes = 0,
+    this.netVotes = 0,
+    this.userVote,
+    this.verified = false,
+    this.verifiedAt,
     required this.createdAt,
     required this.updatedAt,
     this.resolvedAt,
@@ -96,21 +63,36 @@ class NearbyReportDTO {
     return NearbyReportDTO(
       id: json['id'] as String,
       userId: json['user_id'] as String,
-      riskType: RiskTypeInfoDTO.fromJson(json['risk_type'] as Map<String, dynamic>),
-      riskTopic: RiskTopicInfoDTO.fromJson(json['risk_topic'] as Map<String, dynamic>),
+      riskTypeId: json['risk_type_id'] as String,
+      riskTypeName: json['risk_type_name'] as String?,
+      riskTypeIconUrl: json['risk_type_icon_url'] as String?,
+      riskTopicId: json['risk_topic_id'] as String,
+      riskTopicName: json['risk_topic_name'] as String?,
+      riskTopicIconUrl: json['risk_topic_icon_url'] as String?,
       status: json['status'] as String,
       description: json['description'] as String? ?? '',
       imageUrl: json['image_url'] as String? ?? '',
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
-      distance: (json['distance'] as num).toDouble(),
+      distance: (json['distance'] as num?)?.toDouble() ?? 0.0,
       province: json['province'] as String? ?? '',
       municipality: json['municipality'] as String? ?? '',
       neighborhood: json['neighborhood'] as String? ?? '',
       address: json['address'] as String? ?? '',
-      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ?? DateTime.now(),
-      resolvedAt: json['resolved_at'] != null 
+      reviewedBy: json['reviewed_by'] as String?,
+      upvotes: json['upvotes'] as int? ?? 0,
+      downvotes: json['downvotes'] as int? ?? 0,
+      netVotes: json['net_votes'] as int? ?? 0,
+      userVote: json['user_vote'] as String?,
+      verified: json['verified'] as bool? ?? false,
+      verifiedAt: json['verified_at'] != null
+          ? DateTime.tryParse(json['verified_at'] as String)
+          : null,
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ??
+          DateTime.now(),
+      resolvedAt: json['resolved_at'] != null
           ? DateTime.tryParse(json['resolved_at'] as String)
           : null,
     );
@@ -119,8 +101,12 @@ class NearbyReportDTO {
   Map<String, dynamic> toJson() => {
         'id': id,
         'user_id': userId,
-        'risk_type': riskType.toJson(),
-        'risk_topic': riskTopic.toJson(),
+        'risk_type_id': riskTypeId,
+        'risk_type_name': riskTypeName,
+        'risk_type_icon_url': riskTypeIconUrl,
+        'risk_topic_id': riskTopicId,
+        'risk_topic_name': riskTopicName,
+        'risk_topic_icon_url': riskTopicIconUrl,
         'status': status,
         'description': description,
         'image_url': imageUrl,
@@ -131,51 +117,26 @@ class NearbyReportDTO {
         'municipality': municipality,
         'neighborhood': neighborhood,
         'address': address,
+        'reviewed_by': reviewedBy,
+        'upvotes': upvotes,
+        'downvotes': downvotes,
+        'net_votes': netVotes,
+        'user_vote': userVote,
+        'verified': verified,
+        'verified_at': verifiedAt?.toIso8601String(),
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
         'resolved_at': resolvedAt?.toIso8601String(),
       };
 }
 
-/// DTO para metadata de paginação
-class PaginationMetaDTO {
-  final int total;
-  final int limit;
-  final int offset;
-  final bool hasMore;
-
-  const PaginationMetaDTO({
-    required this.total,
-    required this.limit,
-    required this.offset,
-    required this.hasMore,
-  });
-
-  factory PaginationMetaDTO.fromJson(Map<String, dynamic> json) {
-    return PaginationMetaDTO(
-      total: json['total'] as int,
-      limit: json['limit'] as int,
-      offset: json['offset'] as int,
-      hasMore: json['has_more'] as bool,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'total': total,
-        'limit': limit,
-        'offset': offset,
-        'has_more': hasMore,
-      };
-}
-
 /// DTO para resposta de listagem de reports nearby
+/// Backend retorna apenas array de data, sem objeto meta
 class ListNearbyReportsResponseDTO {
   final List<NearbyReportDTO> data;
-  final PaginationMetaDTO meta;
 
   const ListNearbyReportsResponseDTO({
     required this.data,
-    required this.meta,
   });
 
   factory ListNearbyReportsResponseDTO.fromJson(Map<String, dynamic> json) {
@@ -184,12 +145,10 @@ class ListNearbyReportsResponseDTO {
       data: dataList
           .map((item) => NearbyReportDTO.fromJson(item as Map<String, dynamic>))
           .toList(),
-      meta: PaginationMetaDTO.fromJson(json['meta'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() => {
         'data': data.map((item) => item.toJson()).toList(),
-        'meta': meta.toJson(),
       };
 }

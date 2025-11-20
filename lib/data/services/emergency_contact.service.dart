@@ -7,7 +7,8 @@ import 'package:rpa/domain/usecases/update_emergency_contact_usecase.dart';
 import 'package:rpa/domain/usecases/delete_emergency_contact_usecase.dart';
 import 'package:rpa/domain/usecases/send_emergency_alert_usecase.dart';
 
-final emergencyContactServiceProvider = Provider<EmergencyContactService>((ref) {
+final emergencyContactServiceProvider =
+    Provider<EmergencyContactService>((ref) {
   return EmergencyContactService(
     getContactsUseCase: ref.watch(getEmergencyContactsUseCaseProvider),
     createContactUseCase: ref.watch(createEmergencyContactUseCaseProvider),
@@ -38,7 +39,8 @@ class EmergencyContactService {
         _deleteContactUseCase = deleteContactUseCase,
         _sendAlertUseCase = sendAlertUseCase;
 
-  Future<List<EmergencyContact>> getContacts({bool forceRefresh = false}) async {
+  Future<List<EmergencyContact>> getContacts(
+      {bool forceRefresh = false}) async {
     try {
       if (_cachedContacts != null && !forceRefresh) {
         log('Returning cached contacts', name: 'EmergencyContactService');
@@ -118,7 +120,8 @@ class EmergencyContactService {
     String? message,
   }) async {
     try {
-      log('Sending emergency alert via service', name: 'EmergencyContactService');
+      log('Sending emergency alert via service',
+          name: 'EmergencyContactService');
       await _sendAlertUseCase.execute(
         latitude: latitude,
         longitude: longitude,

@@ -1,18 +1,21 @@
-/// Risk types as defined in the WebSocket documentation
-/// See: https://github.com/risk-place-angola/backend-risk-place/blob/develop/docs/MOBILE_WEBSOCKET_INTEGRATION.md#d-notification-radius
 enum RiskType {
-  violence('Violence', 5000),
-  fire('Fire', 3000),
-  traffic('Traffic', 2000),
-  infrastructure('Infrastructure', 1000),
-  flood('Flood', 10000);
+  crime('Crime', 1000),
+  accident('Accident', 500),
+  naturalDisaster('Natural Disaster', 2000),
+  fire('Fire', 1500),
+  health('Health', 1000),
+  infrastructure('Infrastructure', 800),
+  environment('Environment', 1000),
+  violence('Violence', 1200),
+  publicSafety('Public Safety', 1000),
+  traffic('Traffic', 600),
+  urbanIssue('Urban Issue', 500);
 
   const RiskType(this.label, this.defaultRadius);
 
   final String label;
-  final double defaultRadius; // in meters
+  final double defaultRadius;
 
-  /// Get RiskType from string
   static RiskType fromString(String value) {
     return RiskType.values.firstWhere(
       (e) => e.name.toLowerCase() == value.toLowerCase(),

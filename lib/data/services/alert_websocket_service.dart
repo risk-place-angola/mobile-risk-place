@@ -7,6 +7,7 @@ import 'package:web_socket_channel/io.dart';
 import 'package:rpa/constants.dart';
 import 'package:rpa/data/models/enums/websocket_event_type.dart';
 import 'package:rpa/data/models/websocket/websocket_message.dart';
+import 'package:rpa/data/models/websocket/nearby_user_model.dart';
 import 'package:rpa/data/providers/repository_providers.dart';
 
 final alertWebSocketProvider = Provider((ref) => AlertWebSocketService());
@@ -21,17 +22,17 @@ class AlertWebSocketService {
   String? _currentToken;
   Timer? _locationUpdateTimer;
   
-  // Callback for received alerts
   Function(Map<String, dynamic>)? onAlertReceived;
+  Function(List<NearbyUserModel>)? onNearbyUsersReceived;
   Function(String)? onError;
   Function()? onConnected;
   Function()? onDisconnected;
 
-  /// Waze-style connection: JWT for authenticated users OR device_id for anonymous users
   void connect({
     String? token,
     String? deviceId,
     Function(Map<String, dynamic>)? onAlert,
+    Function(List<NearbyUserModel>)? onNearbyUsers,
     Function(String)? onError,
     Function()? onConnected,
     Function()? onDisconnected,
@@ -53,6 +54,7 @@ class AlertWebSocketService {
       deviceId,
       0, 
       onAlert: onAlert,
+      onNearbyUsers: onNearbyUsers,
       onError: onError,
       onConnected: onConnected,
       onDisconnected: onDisconnected,
@@ -64,6 +66,7 @@ class AlertWebSocketService {
     String? deviceId,
     int attempt, {
     Function(Map<String, dynamic>)? onAlert,
+    Function(List<NearbyUserModel>)? onNearbyUsers,
     Function(String)? onError,
     Function()? onConnected,
     Function()? onDisconnected,
@@ -82,20 +85,15 @@ class AlertWebSocketService {
 
       disconnect();
 
-      // Set callbacks
-      this.onAlertReceived = onAlert;
-      this.onError = onError;
-      this.onConnected = onConnected;
-      this.onDisconnected = onDisconnected;
+      // Only update callbacks if they are provided (don't overwrite with null)
+      if (onAlert != null) this.onAlertReceived = onAlert;
+      if (onNearbyUsers != null) this.onNearbyUsersReceived = onNearbyUsers;
+      if (onError != null) this.onError = onError;
+      if (onConnected != null) this.onConnected = onConnected;
+      if (onDisconnected != null) this.onDisconnected = onDisconnected;
 
-      // Get WebSocket URL from base URL
-      final wsUrl = BASE_URL
-          .replaceFirst('https://', 'wss://')
-          .replaceFirst('http://', 'ws://');
-      
-      // 🎯 IMPORTANT: WebSocket connection WITHOUT query parameter
-      // Authorization is sent via header (like HTTP REST)
-      final fullUrl = '$wsUrl/ws/alerts';
+      // 🎯 Use WS_URL directly from environment variables
+      final fullUrl = WS_URL;
 
       log('📡 [WebSocket] Connecting to: $fullUrl', name: 'AlertWebSocketService');
       
@@ -134,6 +132,7 @@ class AlertWebSocketService {
       log('❌ [WebSocket] Failed to connect: $e', name: 'AlertWebSocketService');
       await _handleReconnect(token, deviceId, attempt, 
         onAlert: onAlert,
+        onNearbyUsers: onNearbyUsers,
         onError: onError,
         onConnected: onConnected,
         onDisconnected: onDisconnected,
@@ -145,18 +144,24 @@ class AlertWebSocketService {
 
   /// Update user location for proximity alerts
   /// Call this periodically to receive alerts near the user
-  /// Uses the format: { "event": "update_location", "data": { "latitude": -8.842560, "longitude": 13.300120 } }
-  void updateLocation(double latitude, double longitude) {
+  /// Uses the format: { "event": "update_location", "data": { "latitude": -8.842560, "longitude": 13.300120, "speed": 0, "heading": 0 } }
+  void updateLocation(
+    double latitude, 
+    double longitude, {
+    double? speed,
+    double? heading,
+  }) {
     try {
       if (_channel == null) {
         log('⚠️ [WebSocket] Cannot update location: WebSocket not connected', name: 'AlertWebSocketService');
         return;
       }
 
-      // Create location update message using WebSocket standard format
       final locationUpdateData = LocationUpdateData(
         latitude: latitude,
         longitude: longitude,
+        speed: speed,
+        heading: heading,
       );
 
       final locationMessage = WebSocketMessage(
@@ -167,7 +172,7 @@ class AlertWebSocketService {
       final jsonMessage = jsonEncode(locationMessage.toJson((data) => data.toJson()));
       
       _channel?.sink.add(jsonMessage);
-      log('📍 [WebSocket] Location update sent: ($latitude, $longitude)', name: 'AlertWebSocketService');
+      log('📍 [WebSocket] Location update sent: ($latitude, $longitude, speed: $speed, heading: $heading)', name: 'AlertWebSocketService');
       log('📤 [WebSocket] Message: $jsonMessage', name: 'AlertWebSocketService');
     } catch (e) {
       log('❌ [WebSocket] Error updating location: $e', name: 'AlertWebSocketService');
@@ -217,25 +222,40 @@ class AlertWebSocketService {
       log('📩 [WebSocket] Raw message received: $message', name: 'AlertWebSocketService');
       
       final decodedMessage = jsonDecode(message);
-      log('📨 [WebSocket] Decoded message type: ${decodedMessage['type']}', 
-          name: 'AlertWebSocketService');
+      final event = decodedMessage['event'] as String?;
+      final type = decodedMessage['type'] as String?;
+      
+      log('📨 [WebSocket] Message event: $event, type: $type', name: 'AlertWebSocketService');
 
-      if (decodedMessage['type'] == 'alert') {
-        // Alert received
+      if (event == 'nearby_users') {
+        _handleNearbyUsers(decodedMessage['data'] as Map<String, dynamic>);
+      } else if (type == 'alert' || event == 'alert') {
         final alertData = decodedMessage['data'] as Map<String, dynamic>;
         log('🚨 [WebSocket] Alert received: ${alertData['message']}', name: 'AlertWebSocketService');
         onAlertReceived?.call(alertData);
-      } else if (decodedMessage['type'] == 'error') {
-        // Error from server
+      } else if (type == 'error') {
         final errorMessage = decodedMessage['message'] as String;
         log('❌ [WebSocket] Error from server: $errorMessage', name: 'AlertWebSocketService');
         onError?.call(errorMessage);
       } else {
-        log('ℹ️ [WebSocket] Unknown message type: ${decodedMessage['type']}', name: 'AlertWebSocketService');
+        log('ℹ️ [WebSocket] Unknown message event: $event, type: $type', name: 'AlertWebSocketService');
       }
     } catch (e) {
       log('❌ [WebSocket] Error handling message: $e', name: 'AlertWebSocketService');
       onError?.call('Error processing message: $e');
+    }
+  }
+
+  void _handleNearbyUsers(Map<String, dynamic> data) {
+    try {
+      final usersJson = data['users'] as List<dynamic>;
+      final users = usersJson
+          .map((json) => NearbyUserModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+      
+      onNearbyUsersReceived?.call(users);
+    } catch (e) {
+      log('❌ [WebSocket] Error parsing nearby users: $e', name: 'AlertWebSocketService');
     }
   }
 
@@ -256,6 +276,7 @@ class AlertWebSocketService {
     String? deviceId,
     int attempt, {
     Function(Map<String, dynamic>)? onAlert,
+    Function(List<NearbyUserModel>)? onNearbyUsers,
     Function(String)? onError,
     Function()? onConnected,
     Function()? onDisconnected,
@@ -267,6 +288,7 @@ class AlertWebSocketService {
       await Future.delayed(Duration(seconds: delay));
       _tryConnect(token, deviceId, attempt + 1,
         onAlert: onAlert,
+        onNearbyUsers: onNearbyUsers,
         onError: onError,
         onConnected: onConnected,
         onDisconnected: onDisconnected,

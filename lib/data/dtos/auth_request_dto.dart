@@ -1,10 +1,22 @@
 class LoginRequestDTO {
   final String email;
   final String password;
+  final String? deviceFcmToken;
+  final String? deviceLanguage;
 
-  const LoginRequestDTO({required this.email, required this.password});
+  const LoginRequestDTO({
+    required this.email,
+    required this.password,
+    this.deviceFcmToken,
+    this.deviceLanguage,
+  });
 
-  Map<String, dynamic> toJson() => {'email': email, 'password': password};
+  Map<String, dynamic> toJson() => {
+        'email': email,
+        'password': password,
+        if (deviceFcmToken != null) 'device_fcm_token': deviceFcmToken,
+        if (deviceLanguage != null) 'device_language': deviceLanguage,
+      };
 }
 
 class RegisterRequestDTO {
@@ -12,12 +24,16 @@ class RegisterRequestDTO {
   final String email;
   final String password;
   final String phone;
+  final String? deviceFcmToken;
+  final String? deviceLanguage;
 
   const RegisterRequestDTO({
     required this.name,
     required this.email,
     required this.password,
     required this.phone,
+    this.deviceFcmToken,
+    this.deviceLanguage,
   });
 
   Map<String, dynamic> toJson() => {
@@ -25,6 +41,8 @@ class RegisterRequestDTO {
         'email': email,
         'password': password,
         'phone': phone,
+        if (deviceFcmToken != null) 'device_fcm_token': deviceFcmToken,
+        if (deviceLanguage != null) 'device_language': deviceLanguage,
       };
 }
 

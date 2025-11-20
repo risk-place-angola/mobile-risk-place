@@ -2,10 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/data/services/alert_websocket_service.dart';
 import 'package:rpa/data/services/risk_types.service.dart';
 import 'package:rpa/data/services/report.service.dart';
+import 'package:rpa/data/services/report_vote_service.dart';
 import 'package:rpa/data/dtos/risk_type_response_dto.dart';
 import 'package:rpa/data/dtos/risk_topic_response_dto.dart';
 import 'package:rpa/data/dtos/list_nearby_reports_response_dto.dart';
+import 'package:rpa/data/dtos/list_reports_response_dto.dart';
 import 'package:rpa/core/services/notification_service.dart';
+import 'package:rpa/core/http_client/dio_http_client.dart';
 
 // ============================================================================
 // NOTIFICATION SERVICE PROVIDER
@@ -21,24 +24,33 @@ final alertWebSocketServiceProvider = Provider<AlertWebSocketService>((ref) {
   return ref.watch(alertWebSocketProvider);
 });
 
+/// Provider for ReportVoteService
+final reportVoteServiceProvider = Provider<ReportVoteService>((ref) {
+  final httpClient = ref.read(httpClientProvider);
+  return ReportVoteService(httpClient);
+});
+
 // ============================================================================
 // RISK TYPES & TOPICS PROVIDERS
 // ============================================================================
 
 /// Provider for risk types list
-final riskTypesProvider = FutureProvider<List<RiskTypeResponseDTO>>((ref) async {
+final riskTypesProvider =
+    FutureProvider<List<RiskTypeResponseDTO>>((ref) async {
   final service = ref.read(riskTypesServiceProvider);
   return await service.getRiskTypes();
 });
 
 /// Provider for risk topics list (all topics)
-final riskTopicsProvider = FutureProvider<List<RiskTopicResponseDTO>>((ref) async {
+final riskTopicsProvider =
+    FutureProvider<List<RiskTopicResponseDTO>>((ref) async {
   final service = ref.read(riskTypesServiceProvider);
   return await service.getRiskTopics();
 });
 
 /// Provider for risk topics filtered by type
-final riskTopicsByTypeProvider = FutureProvider.family<List<RiskTopicResponseDTO>, String>(
+final riskTopicsByTypeProvider =
+    FutureProvider.family<List<RiskTopicResponseDTO>, String>(
   (ref, riskTypeId) async {
     final service = ref.read(riskTypesServiceProvider);
     return await service.getRiskTopics(riskTypeId: riskTypeId);
@@ -50,13 +62,30 @@ final riskTopicsByTypeProvider = FutureProvider.family<List<RiskTopicResponseDTO
 // ============================================================================
 
 /// Provider for nearby reports
-final nearbyReportsProvider = FutureProvider.family<List<NearbyReportDTO>, NearbyReportsParams>(
+final nearbyReportsProvider =
+    FutureProvider.family<List<NearbyReportDTO>, NearbyReportsParams>(
   (ref, params) async {
     final service = ref.read(reportServiceProvider);
     return await service.listNearbyReports(
       latitude: params.latitude,
       longitude: params.longitude,
       radius: params.radius,
+    );
+  },
+);
+
+/// Provider for all reports with pagination - GET /reports
+/// Use this for admin screens, dashboards, and global listings
+final allReportsProvider = FutureProvider.autoDispose
+    .family<ListReportsResponseDTO, ReportsQueryParams>(
+  (ref, params) async {
+    final service = ref.read(reportServiceProvider);
+    return await service.listAllReports(
+      page: params.page,
+      limit: params.limit,
+      status: params.status,
+      sort: params.sort,
+      order: params.order,
     );
   },
 );
@@ -103,20 +132,21 @@ class ReceivedAlertsNotifier extends Notifier<List<Map<String, dynamic>>> {
   }
 }
 
-final receivedAlertsProvider = NotifierProvider<ReceivedAlertsNotifier, List<Map<String, dynamic>>>(
+final receivedAlertsProvider =
+    NotifierProvider<ReceivedAlertsNotifier, List<Map<String, dynamic>>>(
   () => ReceivedAlertsNotifier(),
 );
 
 /// Provider to manage WebSocket connection lifecycle
 final alertWebSocketConnectionProvider = Provider<AlertWebSocketService>((ref) {
   final wsService = ref.read(alertWebSocketProvider);
-  
+
   // Setup callbacks
   wsService.onAlertReceived = (alertData) {
     // Add alert to state
     ref.read(receivedAlertsProvider.notifier).addAlert(alertData);
   };
-  
+
   return wsService;
 });
 

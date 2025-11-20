@@ -8,7 +8,7 @@ import 'package:rpa/data/models/place_search_result.dart';
 class GeocodingService {
   static const String _baseUrl = 'https://nominatim.openstreetmap.org';
   static const Duration _debounceDuration = Duration(milliseconds: 500);
-  
+
   // Cache for search results
   final Map<String, List<PlaceSearchResult>> _searchCache = {};
   Timer? _debounceTimer;
@@ -39,10 +39,11 @@ class GeocodingService {
         params['countrycodes'] = countryCode;
       }
 
-      final uri = Uri.parse('$_baseUrl/search').replace(queryParameters: params);
-      
+      final uri =
+          Uri.parse('$_baseUrl/search').replace(queryParameters: params);
+
       log('Searching: $query', name: 'GeocodingService');
-      
+
       final response = await http.get(
         uri,
         headers: {
@@ -61,8 +62,9 @@ class GeocodingService {
 
         // Cache results
         _searchCache[query] = results;
-        
-        log('Found ${results.length} results for: $query', name: 'GeocodingService');
+
+        log('Found ${results.length} results for: $query',
+            name: 'GeocodingService');
         return results;
       } else if (response.statusCode == 429) {
         throw Exception('Rate limit exceeded. Please try again later.');
@@ -116,8 +118,9 @@ class GeocodingService {
         'accept-language': 'pt,en',
       };
 
-      final uri = Uri.parse('$_baseUrl/reverse').replace(queryParameters: params);
-      
+      final uri =
+          Uri.parse('$_baseUrl/reverse').replace(queryParameters: params);
+
       final response = await http.get(
         uri,
         headers: {

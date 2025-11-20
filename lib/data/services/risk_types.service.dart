@@ -15,20 +15,23 @@ final riskTypesServiceProvider = Provider<RiskTypesService>((ref) {
 class RiskTypesService {
   final IHttpClient _httpClient;
 
-  RiskTypesService({required IHttpClient httpClient}) : _httpClient = httpClient;
+  RiskTypesService({required IHttpClient httpClient})
+      : _httpClient = httpClient;
 
   /// Fetch all risk types
   Future<List<RiskTypeResponseDTO>> getRiskTypes() async {
     try {
       log('Fetching risk types...', name: 'RiskTypesService');
-      
+
       final response = await _httpClient.get('/risks/types');
 
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data['data'] as List;
-        final riskTypes = data.map((json) => RiskTypeResponseDTO.fromJson(json)).toList();
-        
-        log('Successfully fetched ${riskTypes.length} risk types', name: 'RiskTypesService');
+        final riskTypes =
+            data.map((json) => RiskTypeResponseDTO.fromJson(json)).toList();
+
+        log('Successfully fetched ${riskTypes.length} risk types',
+            name: 'RiskTypesService');
         return riskTypes;
       } else {
         throw ServerException(
@@ -40,24 +43,29 @@ class RiskTypesService {
       rethrow;
     } catch (e) {
       log('Unexpected error fetching risk types: $e', name: 'RiskTypesService');
-      throw ServerException(message: 'Erro inesperado ao buscar tipos de risco');
+      throw ServerException(
+          message: 'Erro inesperado ao buscar tipos de risco');
     }
   }
 
   /// Fetch all risk topics (optionally filtered by risk type)
   Future<List<RiskTopicResponseDTO>> getRiskTopics({String? riskTypeId}) async {
     try {
-      log('Fetching risk topics${riskTypeId != null ? ' for type $riskTypeId' : ''}...', 
+      log('Fetching risk topics${riskTypeId != null ? ' for type $riskTypeId' : ''}...',
           name: 'RiskTypesService');
-      
-      final queryParams = riskTypeId != null ? {'risk_type_id': riskTypeId} : null;
-      final response = await _httpClient.get('/risks/topics', queryParameters: queryParams);
+
+      final queryParams =
+          riskTypeId != null ? {'risk_type_id': riskTypeId} : null;
+      final response =
+          await _httpClient.get('/risks/topics', queryParameters: queryParams);
 
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data['data'] as List;
-        final riskTopics = data.map((json) => RiskTopicResponseDTO.fromJson(json)).toList();
-        
-        log('Successfully fetched ${riskTopics.length} risk topics', name: 'RiskTypesService');
+        final riskTopics =
+            data.map((json) => RiskTopicResponseDTO.fromJson(json)).toList();
+
+        log('Successfully fetched ${riskTopics.length} risk topics',
+            name: 'RiskTypesService');
         return riskTopics;
       } else {
         throw ServerException(
@@ -68,8 +76,10 @@ class RiskTypesService {
     } on HttpException {
       rethrow;
     } catch (e) {
-      log('Unexpected error fetching risk topics: $e', name: 'RiskTypesService');
-      throw ServerException(message: 'Erro inesperado ao buscar tópicos de risco');
+      log('Unexpected error fetching risk topics: $e',
+          name: 'RiskTypesService');
+      throw ServerException(
+          message: 'Erro inesperado ao buscar tópicos de risco');
     }
   }
 }

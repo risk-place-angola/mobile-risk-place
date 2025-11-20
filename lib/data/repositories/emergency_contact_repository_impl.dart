@@ -7,7 +7,8 @@ import 'package:rpa/domain/entities/emergency_contact.dart';
 import 'package:rpa/domain/repositories/emergency_contact_repository.dart';
 import 'package:rpa/data/models/emergency_contact_dto.dart';
 
-final emergencyContactRepositoryProvider = Provider<IEmergencyContactRepository>((ref) {
+final emergencyContactRepositoryProvider =
+    Provider<IEmergencyContactRepository>((ref) {
   final httpClient = ref.watch(httpClientProvider);
   return EmergencyContactRepositoryImpl(httpClient: httpClient);
 });
@@ -21,7 +22,8 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
   @override
   Future<List<EmergencyContact>> getContacts() async {
     try {
-      log('Fetching emergency contacts from API...', name: 'EmergencyContactRepository');
+      log('Fetching emergency contacts from API...',
+          name: 'EmergencyContactRepository');
 
       final response = await _httpClient.get('/users/me/emergency-contacts');
 
@@ -31,7 +33,8 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
             .map((json) => EmergencyContactDto.fromJson(json).toEntity())
             .toList();
 
-        log('Retrieved ${contacts.length} contacts', name: 'EmergencyContactRepository');
+        log('Retrieved ${contacts.length} contacts',
+            name: 'EmergencyContactRepository');
         return contacts;
       } else {
         throw ServerException(
@@ -53,7 +56,8 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
     required bool isPriority,
   }) async {
     try {
-      log('Creating emergency contact: $name', name: 'EmergencyContactRepository');
+      log('Creating emergency contact: $name',
+          name: 'EmergencyContactRepository');
 
       final dto = EmergencyContactDto(
         name: name,
@@ -69,7 +73,8 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
 
       if (response.statusCode == 201 && response.data != null) {
         final contact = EmergencyContactDto.fromJson(response.data).toEntity();
-        log('Contact created successfully: ${contact.id}', name: 'EmergencyContactRepository');
+        log('Contact created successfully: ${contact.id}',
+            name: 'EmergencyContactRepository');
         return contact;
       } else {
         throw ServerException(
@@ -92,7 +97,8 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
     required bool isPriority,
   }) async {
     try {
-      log('Updating emergency contact: $id', name: 'EmergencyContactRepository');
+      log('Updating emergency contact: $id',
+          name: 'EmergencyContactRepository');
 
       final dto = EmergencyContactDto(
         id: id,
@@ -126,9 +132,11 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
   @override
   Future<void> deleteContact(String id) async {
     try {
-      log('Deleting emergency contact: $id', name: 'EmergencyContactRepository');
+      log('Deleting emergency contact: $id',
+          name: 'EmergencyContactRepository');
 
-      final response = await _httpClient.delete('/users/me/emergency-contacts/$id');
+      final response =
+          await _httpClient.delete('/users/me/emergency-contacts/$id');
 
       if (response.statusCode == 204 || response.statusCode == 200) {
         log('Contact deleted successfully', name: 'EmergencyContactRepository');
@@ -151,7 +159,8 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
     String? message,
   }) async {
     try {
-      log('Sending emergency alert to contacts', name: 'EmergencyContactRepository');
+      log('Sending emergency alert to contacts',
+          name: 'EmergencyContactRepository');
 
       final data = {
         'latitude': latitude,
@@ -162,7 +171,8 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
       final response = await _httpClient.post('/emergency/alert', data: data);
 
       if (response.statusCode == 200) {
-        log('Emergency alert sent successfully', name: 'EmergencyContactRepository');
+        log('Emergency alert sent successfully',
+            name: 'EmergencyContactRepository');
       } else {
         throw ServerException(
           message: response.data?['error'] ?? 'Falha ao enviar alerta',
@@ -170,7 +180,8 @@ class EmergencyContactRepositoryImpl implements IEmergencyContactRepository {
         );
       }
     } catch (e) {
-      log('Error sending emergency alert: $e', name: 'EmergencyContactRepository');
+      log('Error sending emergency alert: $e',
+          name: 'EmergencyContactRepository');
       rethrow;
     }
   }

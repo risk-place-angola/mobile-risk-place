@@ -111,7 +111,8 @@ class RiskTypesRepository implements IRiskTypesRepository {
   @override
   String? getRiskTypeId(String name) {
     if (!_initialized) {
-      throw Exception('RiskTypesRepository not initialized. Call initialize() first.');
+      throw Exception(
+          'RiskTypesRepository not initialized. Call initialize() first.');
     }
     return _typeNameToId[name];
   }
@@ -119,7 +120,8 @@ class RiskTypesRepository implements IRiskTypesRepository {
   @override
   String? getRiskTopicId(String name) {
     if (!_initialized) {
-      throw Exception('RiskTypesRepository not initialized. Call initialize() first.');
+      throw Exception(
+          'RiskTypesRepository not initialized. Call initialize() first.');
     }
     return _topicNameToId[name];
   }

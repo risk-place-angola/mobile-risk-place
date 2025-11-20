@@ -1,8 +1,8 @@
-/// DTO para resposta de Risk Types da API
 class RiskTypeResponseDTO {
   final String id;
   final String name;
   final String description;
+  final String? iconUrl;
   final int defaultRadius;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -11,6 +11,7 @@ class RiskTypeResponseDTO {
     required this.id,
     required this.name,
     required this.description,
+    this.iconUrl,
     required this.defaultRadius,
     required this.createdAt,
     required this.updatedAt,
@@ -21,9 +22,12 @@ class RiskTypeResponseDTO {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String? ?? '',
+      iconUrl: json['icon_url'] as String?,
       defaultRadius: json['default_radius'] as int? ?? 1000,
-      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -31,6 +35,7 @@ class RiskTypeResponseDTO {
         'id': id,
         'name': name,
         'description': description,
+        'icon_url': iconUrl,
         'default_radius': defaultRadius,
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
@@ -47,7 +52,8 @@ class ListRiskTypesResponseDTO {
     final dataList = json['data'] as List<dynamic>? ?? [];
     return ListRiskTypesResponseDTO(
       data: dataList
-          .map((item) => RiskTypeResponseDTO.fromJson(item as Map<String, dynamic>))
+          .map((item) =>
+              RiskTypeResponseDTO.fromJson(item as Map<String, dynamic>))
           .toList(),
     );
   }

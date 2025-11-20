@@ -32,25 +32,21 @@ class WarnService implements IWarnService {
 
   @override
   Future<Warning> deleteWarn(String id) {
-    // TODO: implement deleteWarn
     throw UnimplementedError();
   }
 
   @override
   Future<Warning> getWarn(String id) {
-    // TODO: implement getWarn
     throw UnimplementedError();
   }
 
   @override
   Future<List<Warning>> getWarnings() {
-    // TODO: implement getWarnings
     throw UnimplementedError();
   }
 
   @override
   Future<Warning> updateWarning(Warning warning) {
-    // TODO: implement updateWarning
     throw UnimplementedError();
   }
 }
