@@ -1,5 +1,6 @@
-# 🚨 Risk Place Angola - Mobile App
+# 🚨 MakaNetu - Mobile App
 
+> **MakaNetu** (Kimbundu: "Resolver problemas juntos" - maka = problema, netu = nosso)  
 > Aplicativo mobile para reportar e receber alertas de incidentes de segurança em tempo real.
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev/)
@@ -22,7 +23,7 @@
 
 ## 🎯 Sobre o Projeto
 
-Risk Place Angola é um aplicativo mobile que permite aos cidadãos:
+**MakaNetu** (conhecido como **Maka**) é um aplicativo mobile que permite aos cidadãos:
 - **Reportar incidentes** de segurança em tempo real
 - **Receber alertas** de perigos próximos (estilo Waze)
 - **Visualizar no mapa** relatórios e alertas da comunidade
