@@ -18,32 +18,27 @@ class Storage implements IStorage {
 
   @override
   Future<void> deleteFile({File? file}) {
-    // TODO: implement deleteFile
     throw UnimplementedError();
   }
 
   @override
   Future getFile({File? file}) {
-    // TODO: implement getFile
     throw UnimplementedError();
   }
 
   @override
   Future<List> getFiles({File? file}) {
-    // TODO: implement getFiles
     throw UnimplementedError();
   }
 
   @override
   Future<String> sendFile({File? file}) async {
     final ref = bucket.child(file!.path);
-
     return await ref.putFile(file).then((value) => value.ref.getDownloadURL());
   }
 
   @override
   Future<void> updateFile({File? file}) {
-    // TODO: implement updateFile
     throw UnimplementedError();
   }
 }

@@ -19,7 +19,7 @@ class UserBox extends IUserBox {
   Future<void> deleteUserInfo() async {
     await Hive.openBox(BDCollections.USERS);
     await Hive.box(BDCollections.USERS).delete("user");
-    
+
     // 🔑 Limpar token do AuthTokenManager
     log('Clearing auth token on user delete...', name: 'UserBox');
     AuthTokenManager().clearToken();
@@ -35,14 +35,14 @@ class UserBox extends IUserBox {
       log(result.toString(), name: "UserBox - getUser()");
 
       final userData = AuthTokenResponseDTO.fromJson(result);
-      
+
       // 🔑 Restaurar token no AuthTokenManager quando carregar usuário
       if (userData.accessToken.isNotEmpty) {
         log('Restoring auth token from storage...', name: 'UserBox');
         AuthTokenManager().setToken(userData.accessToken);
         log('Auth token restored successfully', name: 'UserBox');
       }
-      
+
       return User(
         id: userData.user.id,
         name: userData.user.name,
@@ -55,7 +55,6 @@ class UserBox extends IUserBox {
 
   @override
   Future<List<User>> getUsers({required User user}) {
-    // TODO: implement getUsers
     throw UnimplementedError();
   }
 
@@ -68,7 +67,6 @@ class UserBox extends IUserBox {
 
   @override
   Future<void> updateUser({required User user}) {
-    // TODO: implement updateUser
     throw UnimplementedError();
   }
 }

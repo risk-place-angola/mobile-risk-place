@@ -34,21 +34,24 @@ class HttpClient implements IHttpClient {
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
       sendTimeout: const Duration(seconds: 30),
-      validateStatus: (status) => status != null && status < 600, // Accept all status codes to handle them properly
+      validateStatus: (status) =>
+          status != null &&
+          status < 600, // Accept all status codes to handle them properly
     );
   }
 
   /// Setup interceptors for logging and error handling
   void _setupInterceptors() {
     _dio.interceptors.addAll([
-      AuthInterceptor(_dbHelper),
+      AuthInterceptor(_dbHelper, _dio),
       ErrorInterceptor(),
       LoggingInterceptor(),
     ]);
   }
 
   @override
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+  Future<Response> get(String path,
+      {Map<String, dynamic>? queryParameters}) async {
     try {
       return await _dio.get(path, queryParameters: queryParameters);
     } on DioException catch (e) {

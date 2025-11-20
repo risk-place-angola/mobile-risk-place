@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rpa/data/models/user.model.dart';
+import 'package:rpa/data/models/safe_place.model.dart';
 
 class HiveConfig {
   static Future<void> initialize() async {
@@ -11,7 +12,10 @@ class HiveConfig {
       final appDocumentDir = await getApplicationDocumentsDirectory();
       await Hive.initFlutter(appDocumentDir.path);
     }
+
     Hive.registerAdapter(UserAdapter());
+    Hive.registerAdapter(SafePlaceAdapter());
+    Hive.registerAdapter(SafePlaceCategoryAdapter());
 
     await Hive.openBox(HiveBoxs.USERBOX);
   }
@@ -24,4 +28,5 @@ class HiveConfig {
 abstract class HiveBoxs {
   static const String USERBOX = "user_box";
   static const String WARNINGSBOX = "warnings_box";
+  static const String SAFEPLACESBOX = "safe_places";
 }
