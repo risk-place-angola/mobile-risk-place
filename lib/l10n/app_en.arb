@@ -1,0 +1,405 @@
+{
+  "@@locale": "en",
+  
+  "appName": "Risk Place",
+  "@appName": {
+    "description": "Application name"
+  },
+
+  "login": "Login",
+  "register": "Register",
+  "email": "Email",
+  "phone": "Phone",
+  "password": "Password",
+  "confirmPassword": "Confirm password",
+  "name": "Name",
+  "forgotPassword": "Forgot password?",
+  "dontHaveAccount": "Don't have an account? ",
+  "signUp": "Sign up",
+  "alreadyHaveAccount": "Already have an account? ",
+  "signIn": "Sign in",
+  "or": "or",
+  
+  "emailOrPhone": "Email or Phone",
+  "enterEmailOrPhone": "Enter your email or phone",
+  "enterEmail": "Enter your email",
+  "enterPassword": "Enter your password",
+  "enterName": "Enter your name",
+  "enterPhone": "Enter your phone",
+  
+  "invalidEmail": "Invalid email",
+  "passwordTooShort": "Password must have at least 6 characters",
+  "passwordsDontMatch": "Passwords don't match",
+  "fieldRequired": "This field is required",
+  
+  "verificationCode": "Verification Code",
+  "verificationCodeSent": "We sent a code to\n{email}",
+  "@verificationCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "enterCode": "000000",
+  "confirm": "Confirm",
+  "resendCode": "Resend code",
+  "accountConfirmed": "Account confirmed successfully!",
+  "errorConfirmingCode": "Error confirming code",
+  "codeResentSuccess": "Code resent successfully!",
+  "errorResendingCode": "Error resending code",
+  
+  "forgotPasswordTitle": "Forgot your password?",
+  "forgotPasswordSubtitle": "Enter your email to receive\nthe recovery code",
+  "sendCode": "Send code",
+  "codeSentSuccess": "Code sent to your email!",
+  "errorSendingCode": "Error sending code",
+  
+  "newPassword": "New Password",
+  "newPasswordSubtitle": "Enter the code received and\nyour new password",
+  "verificationCodeLabel": "Verification code",
+  "newPasswordLabel": "New password",
+  "confirmPasswordLabel": "Confirm password",
+  "resetPassword": "Reset password",
+  "passwordChangedSuccess": "Password changed successfully!",
+  "errorResettingPassword": "Error resetting password",
+  "enterVerificationCode": "Enter the code",
+  "codeMustBe6Digits": "Code must have 6 digits",
+  "enterNewPassword": "Enter the new password",
+  
+  "profile": "Profile",
+  "logout": "Logout",
+  "edit": "Edit",
+  "personalInfo": "Personal Information",
+  "contactInfo": "Contact Information",
+  
+  "loading": "Loading...",
+  "error": "Error",
+  "success": "Success",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "yes": "Yes",
+  "no": "No",
+  
+  "myLocation": "My Location",
+  "search": "Search",
+  "home": "Home",
+  "work": "Work",
+  "safeRoute": "Safe Route",
+  "shareLocation": "Share Location",
+  "emergencyContacts": "Emergency Contacts",
+  "myAlerts": "My Alerts",
+  "reportRisk": "Report Risk",
+  
+  "riskTypes": "Risk Types",
+  "crime": "Crime",
+  "@crime": {
+    "description": "Criminal occurrences"
+  },
+  "accident": "Accident",
+  "@accident": {
+    "description": "Traffic accidents"
+  },
+  "naturalDisaster": "Natural Disaster",
+  "@naturalDisaster": {
+    "description": "Natural disasters"
+  },
+  "fire": "Fire",
+  "@fire": {
+    "description": "Fire incidents"
+  },
+  "health": "Health",
+  "@health": {
+    "description": "Medical emergencies"
+  },
+  "infrastructure": "Infrastructure",
+  "@infrastructure": {
+    "description": "Infrastructure failures"
+  },
+  "environment": "Environment",
+  "@environment": {
+    "description": "Environmental risks"
+  },
+  "violence": "Violence",
+  "@violence": {
+    "description": "Violence and aggression"
+  },
+  "publicSafety": "Public Safety",
+  "@publicSafety": {
+    "description": "Public safety issues"
+  },
+  "traffic": "Traffic",
+  "@traffic": {
+    "description": "Traffic problems"
+  },
+  "urbanIssue": "Urban Issue",
+  "@urbanIssue": {
+    "description": "Urban problems"
+  },
+  
+  "riskTopicRobber": "Theft",
+  "@riskTopicRobber": {
+    "description": "Theft in residences, commerce or public"
+  },
+  "riskTopicAssault": "Assault",
+  "@riskTopicAssault": {
+    "description": "Assault with violence, kidnapping or aggression"
+  },
+  "riskTopicTheft": "Pickpocketing",
+  "@riskTopicTheft": {
+    "description": "Theft without violence, such as bags or cell phones"
+  },
+  "riskTopicVandalism": "Vandalism",
+  "@riskTopicVandalism": {
+    "description": "Destruction of public or private property"
+  },
+  "riskTopicTrafficAccident": "Traffic Accident",
+  "@riskTopicTrafficAccident": {
+    "description": "Traffic accident involving vehicles or pedestrians"
+  },
+  "riskTopicWorkAccident": "Work Accident",
+  "@riskTopicWorkAccident": {
+    "description": "Accident in work environment or construction site"
+  },
+  "riskTopicFall": "Fall",
+  "@riskTopicFall": {
+    "description": "Falls of people in public or private places"
+  },
+  "riskTopicFlood": "Flood",
+  "@riskTopicFlood": {
+    "description": "Urban or rural floods and inundations"
+  },
+  "riskTopicLandslide": "Landslide",
+  "@riskTopicLandslide": {
+    "description": "Landslides or cliff collapses"
+  },
+  "riskTopicStorm": "Storm",
+  "@riskTopicStorm": {
+    "description": "Strong storms, winds and lightning"
+  },
+  "riskTopicForestFire": "Forest Fire",
+  "@riskTopicForestFire": {
+    "description": "Fires in forest areas or savannas"
+  },
+  "riskTopicInfectiousDisease": "Infectious Disease",
+  "@riskTopicInfectiousDisease": {
+    "description": "Outbreaks of transmissible diseases"
+  },
+  "riskTopicMedicalEmergency": "Medical Emergency",
+  "@riskTopicMedicalEmergency": {
+    "description": "Serious medical situations such as cardiac arrest"
+  },
+  "riskTopicBridgeCollapse": "Bridge Collapse",
+  "@riskTopicBridgeCollapse": {
+    "description": "Collapse or problems on bridges and viaducts"
+  },
+  "riskTopicPowerOutage": "Power Outage",
+  "@riskTopicPowerOutage": {
+    "description": "Failures or interruption of electrical supply"
+  },
+  "riskTopicPollution": "Pollution",
+  "@riskTopicPollution": {
+    "description": "Air, water or soil pollution"
+  },
+  "riskTopicChemicalLeak": "Chemical Leak",
+  "@riskTopicChemicalLeak": {
+    "description": "Leak of chemical or toxic products"
+  },
+
+  "assalto_mao_armada": "Armed Robbery",
+  "roubo_residencia": "Residential Theft",
+  "roubo_veiculo": "Vehicle Theft",
+  "furto_carteira": "Wallet Theft",
+  "furto_telemovel": "Phone Theft",
+  "vandalismo": "Vandalism",
+  "sequestro": "Kidnapping",
+  "violencia_domestica": "Domestic Violence",
+  "agressao_fisica": "Physical Assault",
+  "tiroteio": "Shooting",
+  "acidente_viacao": "Car Accident",
+  "colisao_transito": "Collision",
+  "atropelamento": "Pedestrian Hit",
+  "capotamento": "Vehicle Rollover",
+  "inundacao": "Flooding",
+  "deslizamento_terra": "Landslide",
+  "tempestade": "Storm",
+  "raio": "Lightning Strike",
+  "incendio_residencial": "Residential Fire",
+  "incendio_comercial": "Commercial Fire",
+  "incendio_mercado": "Market Fire",
+  "incendio_veiculo": "Vehicle Fire",
+  "emergencia_medica": "Medical Emergency",
+  "surto_doenca": "Disease Outbreak",
+  "acidente_trabalho": "Work Accident",
+  "queda_energia": "Power Outage",
+  "queda_agua": "Water Outage",
+  "buraco_via": "Pothole",
+  "semaforo_avariado": "Broken Traffic Light",
+  "cabo_solto": "Loose Cable",
+  "estrutura_risco": "Structure at Risk",
+  "lixo_acumulado": "Garbage Accumulation",
+  "esgoto_aberto": "Open Sewage",
+  "poluicao_ar": "Air Pollution",
+  "vazamento_agua": "Water Leak",
+  "rua_escura": "Dark Street",
+  "zona_assalto": "Robbery Zone",
+  "vigilancia_necessaria": "Police Needed",
+  "operacao_policial": "Police Operation",
+  "congestionamento": "Traffic Jam",
+  "via_bloqueada": "Blocked Road",
+  "manifestacao": "Protest",
+  "animal_solto": "Loose Animal",
+  "obra_sinalizacao": "Unsigned Construction",
+  "assalto": "Robbery",
+  "furtos": "Thefts",
+  "roubo": "Theft",
+  "queda": "Fall",
+  "enchente": "Flood",
+  "deslizamento": "Landslide",
+  "incendio_florestal": "Forest Fire",
+  "doenca_infecciosa": "Infectious Disease",
+  "queda_ponte": "Bridge Collapse",
+  "poluicao": "Pollution",
+  "vazamento_quimico": "Chemical Leak",
+  "acidente_transito": "Traffic Accident",
+  
+  "searchRadius": "Search Radius",
+  "reportAtMyLocation": "Report at my location",
+  "useCurrentGpsLocation": "Use current GPS location",
+  "chooseLocationOnMap": "Choose location on map",
+  "adjustManuallyOnMap": "Adjust manually on map",
+  "report": "Report",
+  "tryAgain": "Try Again",
+  "createdByMe": "Created by Me",
+  "subscribed": "Subscribed",
+  "confirmDeletion": "Confirm Deletion",
+  "confirmCancellation": "Confirm Cancellation",
+  "areYouSureDelete": "Are you sure you want to delete this alert?",
+  "areYouSureCancelSubscription": "Are you sure you want to cancel subscription to this alert?",
+  "unsubscribe": "Unsubscribe",
+  "alertRadius": "Alert Radius",
+  "reportRadius": "Report Radius",
+  "safeRoute": "Safe Route",
+  "allReports": "All Reports",
+  "errorLoadingReports": "Error loading reports",
+  "selectDestination": "Select Destination",
+  "selectOnMap": "Select on Map",
+  "confirmDestination": "Confirm Destination",
+  "emergencyContacts": "Emergency Contacts",
+  "add": "Add",
+  "removeContact": "Remove Contact",
+  "remove": "Remove",
+  "safetySettings": "Safety Settings",
+  "notificationsEnabled": "Notifications Enabled",
+  "receiveAllNotifications": "Receive all notifications",
+  "alertTypes": "Alert Types",
+  "reportTypes": "Report Types",
+  "locationSharing": "Location Sharing",
+  "shareLocationEmergencies": "Share location in emergencies",
+  "locationHistory": "Location History",
+  "saveLocationHistory": "Save history of where you've been",
+  "profileVisibility": "Profile Visibility",
+  "anonymousReports": "Anonymous Reports",
+  "dontShowNameReports": "Don't show your name on reports",
+  "showOnlineStatus": "Show Online Status",
+  "othersCanSeeOnline": "Others can see if you're online",
+  "automaticAlerts": "Automatic Alerts",
+  "enableSmartAutomaticAlerts": "Enable smart automatic alerts",
+  "dangerZones": "Danger Zones",
+  "alertWhenEnteringRiskAreas": "Alert when entering risk areas",
+  "timeBasedAlerts": "Time-based Alerts",
+  "specialAlertsRiskTimes": "Special alerts during risk times",
+  "startTime": "Start Time",
+  "endTime": "End Time",
+  "automaticNightMode": "Automatic Night Mode",
+  "enableAutomaticallyAtNight": "Enable automatically at night",
+  "nightModeStart": "Night Mode Start",
+  "nightModeEnd": "Night Mode End",
+  "close": "Close",
+  "moreDetails": "More Details",
+  "viewDetails": "View Details",
+  "editLocation": "Edit Location",
+  "deletePlace": "Delete Place",
+  "sharingLocation": "Sharing Location",
+  "stopSharing": "Stop Sharing",
+  "stopSharingConfirm": "Stop Sharing",
+  "share": "Share",
+  "copyLink": "Copy Link",
+  "placeName": "Place Name",
+  "category": "Category",
+  "describeAlert": "Describe the alert",
+  "severity": "Severity",
+  "radiusMustBeBetween": "Radius must be between 100 and 10,000m",
+  "fullName": "Full Name",
+  "enterFullName": "Enter your full name",
+  "relation": "Relation",
+  "markAsPriority": "Mark as priority",
+  "receiveAutomaticEmergencyAlerts": "Receive automatic emergency alerts",
+  "rangeOfReach": "Range of Reach",
+  "emergencyAlert": "🚨 EMERGENCY ALERT",
+  "reachRadius": "Reach Radius",
+  "timeLabel": "Time",
+  "now": "Now",
+  "minutesAgo": "{minutes}m ago",
+  "hoursAgo": "{hours}h ago",
+  "communityReport": "📍 COMMUNITY REPORT",
+  "verified": "Verified",
+  "resolved": "Resolved",
+  "reported": "Reported",
+  "status": "Status",
+  "pending": "Pending",
+  "editLocation": "Edit Location",
+  
+  "tracking": "Tracking",
+  "privacy": "Privacy",
+  "automaticAlertsSettings": "Automatic Alerts",
+  "nightMode": "Night Mode",
+  "notifications": "Notifications",
+  "noneSelected": "None selected",
+  
+  "createAccount": "Create Account",
+  "fillDataBelow": "Fill in the data below",
+  "fullNameLabel": "Full Name",
+  "enterFullNamePlaceholder": "Enter your full name",
+  "enterEmailPlaceholder": "Enter your email",
+  "enterPhonePlaceholder": "Enter your phone",
+  "enterPasswordPlaceholder": "Enter your password",
+  "iAmRFCE": "I am RFCE",
+  "registerButton": "Register",
+  "alreadyHaveAccountQuestion": "Already have an account? ",
+  "verificationCodeTitle": "Verification Code",
+  "sentCodeTo": "We sent a code to\n{email}",
+  "editProfile": "Edit Profile",
+  "whatDoYouSee": "What do you see?",
+  "selectSpecificType": "Select specific type",
+  "helloUser": "Hello, {name}!",
+  "welcome": "Welcome!",
+  "loginOrRegister": "Login / Register",
+  "viewProfile": "View Profile",
+  "myAlerts": "My Alerts",
+  "viewAlertsPostedOrSubscribed": "View alerts you posted or subscribed to",
+  "allReports": "All Reports",
+  "viewAllSystemReports": "View all system reports",
+  "emergencyContactsTitle": "Emergency Contacts",
+  "manageTrustedContacts": "Manage trusted contacts",
+  "safetySettingsTitle": "Safety Settings",
+  "notificationsTrackingPrivacy": "Notifications, tracking, privacy",
+  "communityFeedback": "Community & Feedback",
+  "sendFeedbackReadUpdates": "Send feedback or read updates",
+  "myProfile": "My Profile",
+  "editPersonalInfoPreferences": "Edit personal info & preferences",
+  "enableNotifications": "Enable Notifications",
+  "receiveUrgentSafetyAlerts": "Receive urgent safety alerts in real-time",
+  "turnOnNow": "Turn on now",
+  "copyLink": "Copy Link",
+  "notInformed": "Not informed",
+  
+  "voteConfirmed": "Thanks for confirming!",
+  "voteFeedbackReceived": "Feedback received",
+  "voteErrorTitle": "Unable to vote",
+  "voteErrorMessage": "We couldn't process your vote. Please try again.",
+  "voteErrorNetwork": "Connection error. Check your internet and try again.",
+  "voteErrorServer": "Server error. Please try again later.",
+  "voteErrorUnauthorized": "You must be logged in to vote."
+}

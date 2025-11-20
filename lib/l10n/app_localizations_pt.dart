@@ -1,0 +1,890 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Portuguese (`pt`).
+class AppLocalizationsPt extends AppLocalizations {
+  AppLocalizationsPt([String locale = 'pt']) : super(locale);
+
+  @override
+  String get appName => 'Risk Place';
+
+  @override
+  String get login => 'Entrar';
+
+  @override
+  String get register => 'Cadastrar';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get phone => 'Telefone';
+
+  @override
+  String get password => 'Senha';
+
+  @override
+  String get confirmPassword => 'Confirmar senha';
+
+  @override
+  String get name => 'Nome';
+
+  @override
+  String get forgotPassword => 'Esqueceu a senha?';
+
+  @override
+  String get dontHaveAccount => 'Não tem uma conta? ';
+
+  @override
+  String get signUp => 'Cadastre-se';
+
+  @override
+  String get alreadyHaveAccount => 'Já tem uma conta? ';
+
+  @override
+  String get signIn => 'Entre';
+
+  @override
+  String get or => 'ou';
+
+  @override
+  String get emailOrPhone => 'Email ou Telefone';
+
+  @override
+  String get enterEmailOrPhone => 'Digite seu email ou telefone';
+
+  @override
+  String get enterEmail => 'Digite seu email';
+
+  @override
+  String get enterPassword => 'Digite sua senha';
+
+  @override
+  String get enterName => 'Digite seu nome';
+
+  @override
+  String get enterPhone => 'Digite seu telefone';
+
+  @override
+  String get invalidEmail => 'Email inválido';
+
+  @override
+  String get passwordTooShort => 'Senha deve ter no mínimo 6 caracteres';
+
+  @override
+  String get passwordsDontMatch => 'Senhas não conferem';
+
+  @override
+  String get fieldRequired => 'Este campo é obrigatório';
+
+  @override
+  String get verificationCode => 'Código de Verificação';
+
+  @override
+  String verificationCodeSent(String email) {
+    return 'Enviamos um código para\n$email';
+  }
+
+  @override
+  String get enterCode => '000000';
+
+  @override
+  String get confirm => 'Confirmar';
+
+  @override
+  String get resendCode => 'Reenviar código';
+
+  @override
+  String get accountConfirmed => 'Conta confirmada com sucesso!';
+
+  @override
+  String get errorConfirmingCode => 'Erro ao confirmar código';
+
+  @override
+  String get codeResentSuccess => 'Código reenviado com sucesso!';
+
+  @override
+  String get errorResendingCode => 'Erro ao reenviar código';
+
+  @override
+  String get forgotPasswordTitle => 'Esqueceu sua senha?';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'Digite seu email para receber\no código de recuperação';
+
+  @override
+  String get sendCode => 'Enviar código';
+
+  @override
+  String get codeSentSuccess => 'Código enviado para seu email!';
+
+  @override
+  String get errorSendingCode => 'Erro ao enviar código';
+
+  @override
+  String get newPassword => 'Nova Senha';
+
+  @override
+  String get newPasswordSubtitle =>
+      'Digite o código recebido e\nsua nova senha';
+
+  @override
+  String get verificationCodeLabel => 'Código de verificação';
+
+  @override
+  String get newPasswordLabel => 'Nova senha';
+
+  @override
+  String get confirmPasswordLabel => 'Confirmar senha';
+
+  @override
+  String get resetPassword => 'Redefinir senha';
+
+  @override
+  String get passwordChangedSuccess => 'Senha alterada com sucesso!';
+
+  @override
+  String get errorResettingPassword => 'Erro ao redefinir senha';
+
+  @override
+  String get enterVerificationCode => 'Digite o código';
+
+  @override
+  String get codeMustBe6Digits => 'Código deve ter 6 dígitos';
+
+  @override
+  String get enterNewPassword => 'Digite a nova senha';
+
+  @override
+  String get profile => 'Perfil';
+
+  @override
+  String get logout => 'Sair';
+
+  @override
+  String get edit => 'Editar';
+
+  @override
+  String get personalInfo => 'Informações Pessoais';
+
+  @override
+  String get contactInfo => 'Informações de Contato';
+
+  @override
+  String get loading => 'Carregando...';
+
+  @override
+  String get error => 'Erro';
+
+  @override
+  String get success => 'Sucesso';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get save => 'Salvar';
+
+  @override
+  String get delete => 'Excluir';
+
+  @override
+  String get yes => 'Sim';
+
+  @override
+  String get no => 'Não';
+
+  @override
+  String get myLocation => 'Minha Localização';
+
+  @override
+  String get search => 'Buscar';
+
+  @override
+  String get home => 'Casa';
+
+  @override
+  String get work => 'Trabalho';
+
+  @override
+  String get safeRoute => 'Rota Segura';
+
+  @override
+  String get shareLocation => 'Compartilhar Localização';
+
+  @override
+  String get emergencyContacts => 'Contatos de Emergência';
+
+  @override
+  String get myAlerts => 'Meus Alertas';
+
+  @override
+  String get reportRisk => 'Reportar Risco';
+
+  @override
+  String get riskTypes => 'Tipos de Risco';
+
+  @override
+  String get crime => 'Crime';
+
+  @override
+  String get accident => 'Acidente';
+
+  @override
+  String get naturalDisaster => 'Desastre Natural';
+
+  @override
+  String get fire => 'Incêndio';
+
+  @override
+  String get health => 'Saúde';
+
+  @override
+  String get infrastructure => 'Infraestrutura';
+
+  @override
+  String get environment => 'Meio Ambiente';
+
+  @override
+  String get violence => 'Violência';
+
+  @override
+  String get publicSafety => 'Segurança Pública';
+
+  @override
+  String get traffic => 'Trânsito';
+
+  @override
+  String get urbanIssue => 'Problema Urbano';
+
+  @override
+  String get riskTopicRobber => 'Roubo';
+
+  @override
+  String get riskTopicAssault => 'Assalto';
+
+  @override
+  String get riskTopicTheft => 'Furtos';
+
+  @override
+  String get riskTopicVandalism => 'Vandalismo';
+
+  @override
+  String get riskTopicTrafficAccident => 'Acidente de Trânsito';
+
+  @override
+  String get riskTopicWorkAccident => 'Acidente de Trabalho';
+
+  @override
+  String get riskTopicFall => 'Queda';
+
+  @override
+  String get riskTopicFlood => 'Enchente';
+
+  @override
+  String get riskTopicLandslide => 'Deslizamento';
+
+  @override
+  String get riskTopicStorm => 'Tempestade';
+
+  @override
+  String get riskTopicForestFire => 'Incêndio Florestal';
+
+  @override
+  String get riskTopicInfectiousDisease => 'Doença Infecciosa';
+
+  @override
+  String get riskTopicMedicalEmergency => 'Emergência Médica';
+
+  @override
+  String get riskTopicBridgeCollapse => 'Queda de Ponte';
+
+  @override
+  String get riskTopicPowerOutage => 'Queda de Energia';
+
+  @override
+  String get riskTopicPollution => 'Poluição';
+
+  @override
+  String get riskTopicChemicalLeak => 'Vazamento Químico';
+
+  @override
+  String get assalto_mao_armada => 'Assalto à Mão Armada';
+
+  @override
+  String get roubo_residencia => 'Roubo em Residência';
+
+  @override
+  String get roubo_veiculo => 'Roubo de Veículo';
+
+  @override
+  String get furto_carteira => 'Furto de Carteira';
+
+  @override
+  String get furto_telemovel => 'Furto de Telemóvel';
+
+  @override
+  String get vandalismo => 'Vandalismo';
+
+  @override
+  String get sequestro => 'Sequestro';
+
+  @override
+  String get violencia_domestica => 'Violência Doméstica';
+
+  @override
+  String get agressao_fisica => 'Agressão Física';
+
+  @override
+  String get tiroteio => 'Tiroteio';
+
+  @override
+  String get acidente_viacao => 'Acidente de Viação';
+
+  @override
+  String get colisao_transito => 'Colisão';
+
+  @override
+  String get atropelamento => 'Atropelamento';
+
+  @override
+  String get capotamento => 'Capotamento';
+
+  @override
+  String get inundacao => 'Inundação';
+
+  @override
+  String get deslizamento_terra => 'Deslizamento de Terra';
+
+  @override
+  String get tempestade => 'Tempestade';
+
+  @override
+  String get raio => 'Queda de Raio';
+
+  @override
+  String get incendio_residencial => 'Incêndio Residencial';
+
+  @override
+  String get incendio_comercial => 'Incêndio Comercial';
+
+  @override
+  String get incendio_mercado => 'Incêndio em Mercado';
+
+  @override
+  String get incendio_veiculo => 'Veículo em Chamas';
+
+  @override
+  String get emergencia_medica => 'Emergência Médica';
+
+  @override
+  String get surto_doenca => 'Surto de Doença';
+
+  @override
+  String get acidente_trabalho => 'Acidente de Trabalho';
+
+  @override
+  String get queda_energia => 'Falta de Energia';
+
+  @override
+  String get queda_agua => 'Falta de Água';
+
+  @override
+  String get buraco_via => 'Buraco na Via';
+
+  @override
+  String get semaforo_avariado => 'Semáforo Avariado';
+
+  @override
+  String get cabo_solto => 'Cabo Elétrico Solto';
+
+  @override
+  String get estrutura_risco => 'Estrutura em Risco';
+
+  @override
+  String get lixo_acumulado => 'Lixo Acumulado';
+
+  @override
+  String get esgoto_aberto => 'Esgoto Aberto';
+
+  @override
+  String get poluicao_ar => 'Poluição do Ar';
+
+  @override
+  String get vazamento_agua => 'Vazamento de Água';
+
+  @override
+  String get rua_escura => 'Rua Escura';
+
+  @override
+  String get zona_assalto => 'Zona de Assalto';
+
+  @override
+  String get vigilancia_necessaria => 'Vigilância Necessária';
+
+  @override
+  String get operacao_policial => 'Operação Policial';
+
+  @override
+  String get congestionamento => 'Congestionamento';
+
+  @override
+  String get via_bloqueada => 'Via Bloqueada';
+
+  @override
+  String get manifestacao => 'Manifestação';
+
+  @override
+  String get animal_solto => 'Animal Solto';
+
+  @override
+  String get obra_sinalizacao => 'Obra Sem Sinalização';
+
+  @override
+  String get assalto => 'Assalto';
+
+  @override
+  String get furtos => 'Furtos';
+
+  @override
+  String get roubo => 'Roubo';
+
+  @override
+  String get queda => 'Queda';
+
+  @override
+  String get enchente => 'Enchente';
+
+  @override
+  String get deslizamento => 'Deslizamento';
+
+  @override
+  String get incendio_florestal => 'Incêndio Florestal';
+
+  @override
+  String get doenca_infecciosa => 'Doença Infecciosa';
+
+  @override
+  String get queda_ponte => 'Queda de Ponte';
+
+  @override
+  String get poluicao => 'Poluição';
+
+  @override
+  String get vazamento_quimico => 'Vazamento Químico';
+
+  @override
+  String get acidente_transito => 'Acidente de Trânsito';
+
+  @override
+  String get searchRadius => 'Raio de Busca';
+
+  @override
+  String get reportAtMyLocation => 'Reportar na minha localização';
+
+  @override
+  String get useCurrentGpsLocation => 'Usar localização atual do GPS';
+
+  @override
+  String get chooseLocationOnMap => 'Escolher localização no mapa';
+
+  @override
+  String get adjustManuallyOnMap => 'Ajustar manualmente no mapa';
+
+  @override
+  String get report => 'Reportar';
+
+  @override
+  String get tryAgain => 'Tentar Novamente';
+
+  @override
+  String get createdByMe => 'Criados por Mim';
+
+  @override
+  String get subscribed => 'Inscritos';
+
+  @override
+  String get confirmDeletion => 'Confirmar Exclusão';
+
+  @override
+  String get confirmCancellation => 'Confirmar Cancelamento';
+
+  @override
+  String get areYouSureDelete => 'Tem certeza que deseja excluir este alerta?';
+
+  @override
+  String get areYouSureCancelSubscription =>
+      'Tem certeza que deseja cancelar a inscrição neste alerta?';
+
+  @override
+  String get unsubscribe => 'Cancelar Inscrição';
+
+  @override
+  String get alertRadius => 'Raio de Alertas';
+
+  @override
+  String get reportRadius => 'Raio de Relatórios';
+
+  @override
+  String get allReports => 'Todos os Relatórios';
+
+  @override
+  String get errorLoadingReports => 'Erro ao carregar relatórios';
+
+  @override
+  String get selectDestination => 'Selecionar Destino';
+
+  @override
+  String get selectOnMap => 'Selecionar no Mapa';
+
+  @override
+  String get confirmDestination => 'Confirmar Destino';
+
+  @override
+  String get add => 'Adicionar';
+
+  @override
+  String get removeContact => 'Remover Contato';
+
+  @override
+  String get remove => 'Remover';
+
+  @override
+  String get safetySettings => 'Configurações de Segurança';
+
+  @override
+  String get notificationsEnabled => 'Notificações Ativadas';
+
+  @override
+  String get receiveAllNotifications => 'Receber todas as notificações';
+
+  @override
+  String get alertTypes => 'Tipos de Alerta';
+
+  @override
+  String get reportTypes => 'Tipos de Relatório';
+
+  @override
+  String get locationSharing => 'Compartilhamento de Localização';
+
+  @override
+  String get shareLocationEmergencies =>
+      'Compartilhar localização em emergências';
+
+  @override
+  String get locationHistory => 'Histórico de Localizações';
+
+  @override
+  String get saveLocationHistory => 'Salvar histórico de onde você esteve';
+
+  @override
+  String get profileVisibility => 'Visibilidade do Perfil';
+
+  @override
+  String get anonymousReports => 'Relatórios Anônimos';
+
+  @override
+  String get dontShowNameReports => 'Não mostrar seu nome nos relatórios';
+
+  @override
+  String get showOnlineStatus => 'Mostrar Status Online';
+
+  @override
+  String get othersCanSeeOnline =>
+      'Outros usuários podem ver se você está online';
+
+  @override
+  String get automaticAlerts => 'Alertas Automáticos';
+
+  @override
+  String get enableSmartAutomaticAlerts =>
+      'Ativar alertas automáticos inteligentes';
+
+  @override
+  String get dangerZones => 'Zonas de Perigo';
+
+  @override
+  String get alertWhenEnteringRiskAreas =>
+      'Alertar ao entrar em áreas de risco';
+
+  @override
+  String get timeBasedAlerts => 'Alertas por Horário';
+
+  @override
+  String get specialAlertsRiskTimes => 'Alertas especiais em horários de risco';
+
+  @override
+  String get startTime => 'Horário de Início';
+
+  @override
+  String get endTime => 'Horário de Término';
+
+  @override
+  String get automaticNightMode => 'Modo Noturno Automático';
+
+  @override
+  String get enableAutomaticallyAtNight => 'Ativar automaticamente à noite';
+
+  @override
+  String get nightModeStart => 'Início do Modo Noturno';
+
+  @override
+  String get nightModeEnd => 'Término do Modo Noturno';
+
+  @override
+  String get close => 'Fechar';
+
+  @override
+  String get moreDetails => 'Mais Detalhes';
+
+  @override
+  String get viewDetails => 'Ver Detalhes';
+
+  @override
+  String get editLocation => 'Editar Localização';
+
+  @override
+  String get deletePlace => 'Excluir Local';
+
+  @override
+  String get sharingLocation => 'Compartilhando Localização';
+
+  @override
+  String get stopSharing => 'Parar Compartilhamento';
+
+  @override
+  String get stopSharingConfirm => 'Parar';
+
+  @override
+  String get share => 'Compartilhar';
+
+  @override
+  String get copyLink => 'Copiar Link';
+
+  @override
+  String get placeName => 'Nome do Local';
+
+  @override
+  String get category => 'Categoria';
+
+  @override
+  String get describeAlert => 'Descreva o alerta';
+
+  @override
+  String get severity => 'Gravidade';
+
+  @override
+  String get radiusMustBeBetween => 'Raio deve estar entre 100 e 10.000m';
+
+  @override
+  String get fullName => 'Nome Completo';
+
+  @override
+  String get enterFullName => 'Digite seu nome completo';
+
+  @override
+  String get relation => 'Relação';
+
+  @override
+  String get markAsPriority => 'Marcar como prioritário';
+
+  @override
+  String get receiveAutomaticEmergencyAlerts =>
+      'Receberá alertas de emergência automáticos';
+
+  @override
+  String get rangeOfReach => 'Raio de Alcance';
+
+  @override
+  String get emergencyAlert => '🚨 ALERTA DE EMERGÊNCIA';
+
+  @override
+  String get reachRadius => 'Raio de Alcance';
+
+  @override
+  String get timeLabel => 'Horário';
+
+  @override
+  String get now => 'Agora';
+
+  @override
+  String minutesAgo(Object minutes) {
+    return 'Há $minutes min';
+  }
+
+  @override
+  String hoursAgo(Object hours) {
+    return 'Há ${hours}h';
+  }
+
+  @override
+  String get communityReport => '📍 REPORT DA COMUNIDADE';
+
+  @override
+  String get verified => 'Verificado';
+
+  @override
+  String get resolved => 'Resolvido';
+
+  @override
+  String get reported => 'Reportado';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get pending => 'Pendente';
+
+  @override
+  String get tracking => 'Rastreamento';
+
+  @override
+  String get privacy => 'Privacidade';
+
+  @override
+  String get automaticAlertsSettings => 'Alertas Automáticos';
+
+  @override
+  String get nightMode => 'Modo Noturno';
+
+  @override
+  String get notifications => 'Notificações';
+
+  @override
+  String get noneSelected => 'Nenhum selecionado';
+
+  @override
+  String get createAccount => 'Criar Conta';
+
+  @override
+  String get fillDataBelow => 'Preencha os dados abaixo';
+
+  @override
+  String get fullNameLabel => 'Nome Completo';
+
+  @override
+  String get enterFullNamePlaceholder => 'Digite seu nome completo';
+
+  @override
+  String get enterEmailPlaceholder => 'Digite seu email';
+
+  @override
+  String get enterPhonePlaceholder => 'Digite seu telefone';
+
+  @override
+  String get enterPasswordPlaceholder => 'Digite sua senha';
+
+  @override
+  String get iAmRFCE => 'Sou RFCE';
+
+  @override
+  String get registerButton => 'Registrar-se';
+
+  @override
+  String get alreadyHaveAccountQuestion => 'Já tem uma conta? ';
+
+  @override
+  String get verificationCodeTitle => 'Verificação de Código';
+
+  @override
+  String sentCodeTo(Object email) {
+    return 'Enviamos um código para\n$email';
+  }
+
+  @override
+  String get editProfile => 'Editar Perfil';
+
+  @override
+  String get whatDoYouSee => 'O que você vê?';
+
+  @override
+  String get selectSpecificType => 'Selecione o tipo específico';
+
+  @override
+  String helloUser(Object name) {
+    return 'Olá, $name!';
+  }
+
+  @override
+  String get welcome => 'Bem-vindo!';
+
+  @override
+  String get loginOrRegister => 'Entrar / Registrar';
+
+  @override
+  String get viewProfile => 'Ver perfil';
+
+  @override
+  String get viewAlertsPostedOrSubscribed =>
+      'Ver alertas que você publicou ou inscreveu';
+
+  @override
+  String get viewAllSystemReports => 'Ver todos os relatórios do sistema';
+
+  @override
+  String get emergencyContactsTitle => 'Contatos de Emergência';
+
+  @override
+  String get manageTrustedContacts => 'Gerenciar contatos confiáveis';
+
+  @override
+  String get safetySettingsTitle => 'Configurações de Segurança';
+
+  @override
+  String get notificationsTrackingPrivacy =>
+      'Notificações, rastreamento, privacidade';
+
+  @override
+  String get communityFeedback => 'Comunidade & Feedback';
+
+  @override
+  String get sendFeedbackReadUpdates => 'Enviar feedback ou ler atualizações';
+
+  @override
+  String get myProfile => 'Meu Perfil';
+
+  @override
+  String get editPersonalInfoPreferences =>
+      'Editar informações e preferências pessoais';
+
+  @override
+  String get enableNotifications => 'Ativar Notificações';
+
+  @override
+  String get receiveUrgentSafetyAlerts =>
+      'Receber alertas urgentes de segurança em tempo real';
+
+  @override
+  String get turnOnNow => 'Ativar agora';
+
+  @override
+  String get notInformed => 'Não informado';
+
+  @override
+  String get voteConfirmed => 'Obrigado por confirmar!';
+
+  @override
+  String get voteFeedbackReceived => 'Feedback recebido';
+
+  @override
+  String get voteErrorTitle => 'Não foi possível votar';
+
+  @override
+  String get voteErrorMessage =>
+      'Não conseguimos processar seu voto. Por favor, tente novamente.';
+
+  @override
+  String get voteErrorNetwork =>
+      'Erro de conexão. Verifique sua internet e tente novamente.';
+
+  @override
+  String get voteErrorServer =>
+      'Erro no servidor. Por favor, tente novamente mais tarde.';
+
+  @override
+  String get voteErrorUnauthorized => 'Você precisa estar logado para votar.';
+}
