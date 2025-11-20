@@ -4,27 +4,17 @@ import 'package:rpa/data/services/report.service.dart';
 import 'package:rpa/data/dtos/list_nearby_reports_response_dto.dart';
 import 'package:rpa/core/http_client/exceptions/http_exceptions.dart';
 
-// ============================================================================
-// GET NEARBY REPORTS USE CASE
-// ============================================================================
-// Clean Architecture - Domain Layer
-// Fetches reports near a given location from the backend API
-// Follows Single Responsibility Principle and separates business logic
-// ============================================================================
-
-/// Parameters for fetching nearby reports
 class GetNearbyReportsParams {
   final double latitude;
   final double longitude;
-  final int radius; // in meters
+  final int radius;
 
   GetNearbyReportsParams({
     required this.latitude,
     required this.longitude,
-    this.radius = 10000, // Default 10km radius
+    this.radius = 10000,
   });
 
-  /// Validate parameters
   ValidationError? validate() {
     if (latitude < -90 || latitude > 90) {
       return ValidationError(message: 'Latitude inválida');

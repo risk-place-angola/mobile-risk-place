@@ -1,18 +1,11 @@
-// ============================================================================
-// UPDATE REPORT LOCATION USE CASE
-// ============================================================================
-// Business logic for updating report location
-// Follows Clean Architecture principles and Result pattern
-// ============================================================================
-
 import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/core/http_client/exceptions/http_exceptions.dart';
 import 'package:rpa/data/dtos/update_report_location_dto.dart';
 import 'package:rpa/data/services/report.service.dart';
 
-/// Provider for UpdateReportLocationUseCase
-final updateReportLocationUseCaseProvider = Provider<UpdateReportLocationUseCase>((ref) {
+final updateReportLocationUseCaseProvider =
+    Provider<UpdateReportLocationUseCase>((ref) {
   final reportService = ref.read(reportServiceProvider);
   return UpdateReportLocationUseCase(reportService: reportService);
 });
@@ -40,20 +33,23 @@ class UpdateReportLocationParams {
   /// Validate parameters
   bool isValid() {
     if (reportId.isEmpty) {
-      log('Validation failed: Report ID is required', name: 'UpdateReportLocationParams');
+      log('Validation failed: Report ID is required',
+          name: 'UpdateReportLocationParams');
       return false;
     }
-    
+
     if (latitude < -90 || latitude > 90) {
-      log('Validation failed: Invalid latitude', name: 'UpdateReportLocationParams');
+      log('Validation failed: Invalid latitude',
+          name: 'UpdateReportLocationParams');
       return false;
     }
-    
+
     if (longitude < -180 || longitude > 180) {
-      log('Validation failed: Invalid longitude', name: 'UpdateReportLocationParams');
+      log('Validation failed: Invalid longitude',
+          name: 'UpdateReportLocationParams');
       return false;
     }
-    
+
     return true;
   }
 }
@@ -89,7 +85,8 @@ class UpdateReportLocationUseCase {
       : _reportService = reportService;
 
   /// Execute the use case
-  Future<UpdateReportLocationResult> call(UpdateReportLocationParams params) async {
+  Future<UpdateReportLocationResult> call(
+      UpdateReportLocationParams params) async {
     try {
       // Validate parameters
       if (!params.isValid()) {
@@ -118,7 +115,8 @@ class UpdateReportLocationUseCase {
         locationData: requestDTO,
       );
 
-      log('Report location updated successfully', name: 'UpdateReportLocationUseCase');
+      log('Report location updated successfully',
+          name: 'UpdateReportLocationUseCase');
 
       return UpdateReportLocationSuccess(response);
     } on NetworkException catch (e) {

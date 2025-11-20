@@ -5,19 +5,6 @@ import 'package:rpa/data/dtos/create_report_request_dto.dart';
 import 'package:rpa/data/services/report.service.dart';
 import 'package:rpa/data/providers/user_provider.dart';
 
-// ============================================================================
-// CREATE REPORT USE CASE
-// ============================================================================
-// Implements Clean Architecture principles and Single Responsibility
-// Handles all business logic for creating a report
-// - Validates user authentication
-// - Prepares request data
-// - Calls service layer
-// - Handles errors with proper categorization
-// ============================================================================
-
-/// Result type for create report operation
-/// Using union pattern for exhaustive error handling
 abstract class CreateReportResult {}
 
 class CreateReportSuccess implements CreateReportResult {
@@ -30,7 +17,6 @@ class CreateReportFailure implements CreateReportResult {
   const CreateReportFailure(this.error);
 }
 
-/// Error categories following Strategy Pattern
 abstract class CreateReportError {
   String get message;
 }
@@ -187,9 +173,10 @@ class CreateReportUseCase {
 }
 
 /// Provider for CreateReportUseCase
-final createReportUseCaseProvider = FutureProvider<CreateReportUseCase>((ref) async {
+final createReportUseCaseProvider =
+    FutureProvider<CreateReportUseCase>((ref) async {
   final reportService = ref.watch(reportServiceProvider);
-  
+
   // Wait for user to be loaded from storage
   final user = await ref.watch(currentUserProvider.future);
   final currentUserId = user?.id;
