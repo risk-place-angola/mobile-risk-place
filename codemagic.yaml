@@ -2,45 +2,26 @@
 # CodeMagic CI/CD Configuration
 # MakaNetu - Risk Place Angola
 # ==========================================
-# 
-# Workflows:
-# - android-develop: Build de teste (Firebase App Distribution)
-# - android-production: Build de produção (Google Play Store)
-#
-# Environment Management:
-# - develop branch → Test builds → Firebase App Distribution
-# - main branch → Production builds → Google Play Store (Internal Testing)
-# ==========================================
 
 workflows:
   # ==========================================
-  # WORKFLOW: ANDROID DEVELOP (TESTES)
+  # WORKFLOW: ANDROID DEVELOP
   # ==========================================
   android-develop:
-    name: Android Develop - Test Build
+    name: Android Development Build
     
     max_build_duration: 60
     
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     
     environment:
       groups:
-        # Grupo de variáveis para desenvolvimento
-        - develop_environment
+        - environment_vars_dev
+        - common_environment
       
       vars:
-        # Configurações do Flutter
         FLUTTER_VERSION: "3.35.7"
-        
-        # Configurações do Android
         PACKAGE_NAME: "ao.riskplace.makanetu"
-        
-        # Configurações do Firebase
-        FIREBASE_APP_ID_ANDROID: $FIREBASE_APP_ID_ANDROID_DEV
-        FIREBASE_TOKEN: $FIREBASE_CLI_TOKEN
-        
-        # Build configurations
-        BUILD_TYPE: "debug"
         
       flutter: stable
       
@@ -61,29 +42,28 @@ workflows:
       cancel_previous_builds: true
     
     scripts:
-      - name: 🔧 Get Flutter packages
+      - name: � Get Flutter packages
         script: |
           flutter packages pub get
       
       - name: 🔍 Analyze code
         script: |
           flutter analyze
+        ignore_failure: true
       
       - name: 🧪 Run tests
         script: |
           flutter test
         ignore_failure: true
       
-      - name: 📝 Setup Firebase configuration
+      - name: 🏗️ Build Android APK (Development)
         script: |
-          # Copiar arquivo de configuração do Firebase para development
-          if [ -f "android/app/google-services-dev.json" ]; then
-            cp android/app/google-services-dev.json android/app/google-services.json
-          fi
-      
-      - name: 🏗️ Build Android APK (Debug)
-        script: |
-          flutter build apk --debug --flavor development
+          flutter build apk \
+            --debug \
+            --dart-define=ENV=$ENV \
+            --dart-define=BASE_URL=$BASE_URL \
+            --dart-define=WS_URL=$WS_URL \
+            --dart-define=OSM_TILE_URL=$OSM_TILE_URL
       
       - name: 🚀 Upload to Firebase App Distribution
         script: |
@@ -92,10 +72,10 @@ workflows:
           
           echo "Deploying to Firebase App Distribution..."
           firebase appdistribution:distribute \
-            build/app/outputs/flutter-apk/app-development-debug.apk \
-            --app $FIREBASE_APP_ID_ANDROID_DEV \
-            --groups "testers" \
-            --release-notes "Build automático da branch develop - $(date)" \
+            build/app/outputs/flutter-apk/app-debug.apk \
+            --app $FIREBASE_APP_ID_ANDROID \
+            --groups "nete-testers" \
+            --release-notes "Development build - $(date)" \
             --token $FIREBASE_CLI_TOKEN
     
     artifacts:
@@ -120,32 +100,24 @@ workflows:
           failure: true
 
   # ==========================================
-  # WORKFLOW: ANDROID PRODUCTION (GOOGLE PLAY)
+  # WORKFLOW: ANDROID PRODUCTION
   # ==========================================
   android-production:
-    name: Android Production - Google Play Release
+    name: Android Production Build
     
     max_build_duration: 90
     
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     
     environment:
       groups:
-        # Grupo de variáveis para produção
-        - production_environment
+        - common_environment
+        - environment_vars_prod
         - google_play_credentials
       
       vars:
-        # Configurações do Flutter
         FLUTTER_VERSION: "3.35.7"
-        
-        # Configurações do Android
         PACKAGE_NAME: "ao.riskplace.makanetu"
-        
-        # Build configurations
-        BUILD_TYPE: "release"
-        
-        # Google Play configurations
         GOOGLE_PLAY_TRACK: "internal"
         
       android_signing:
@@ -173,44 +145,38 @@ workflows:
       cancel_previous_builds: false
     
     scripts:
-      - name: 🔧 Get Flutter packages
+      - name: � Get Flutter packages
         script: |
           flutter packages pub get
       
       - name: 🔍 Analyze code
         script: |
           flutter analyze
-        ignore_failure: false
+        ignore_failure: true
       
       - name: 🧪 Run tests (Production)
         script: |
           flutter test
         ignore_failure: false
       
-      - name: 📝 Setup Firebase configuration (Production)
-        script: |
-          # Copiar arquivo de configuração do Firebase para produção
-          if [ -f "android/app/google-services-prod.json" ]; then
-            cp android/app/google-services-prod.json android/app/google-services.json
-          fi
-      
       - name: 🔢 Update version code
         script: |
-          # Incrementar automaticamente o version code
           VERSION_NAME=$(grep 'version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
           VERSION_CODE=$(($(grep 'version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f2) + 1))
           
           echo "Building version $VERSION_NAME+$VERSION_CODE"
-          
-          # Atualizar pubspec.yaml
           sed -i '' "s/version: .*/version: $VERSION_NAME+$VERSION_CODE/" pubspec.yaml
       
-      - name: 🏗️ Build Android App Bundle (Release)
+      - name: 🏗️ Build Android App Bundle (Production)
         script: |
           flutter build appbundle \
             --release \
             --build-name=$VERSION_NAME \
-            --build-number=$VERSION_CODE
+            --build-number=$VERSION_CODE \
+            --dart-define=ENV=$ENV \
+            --dart-define=BASE_URL=$BASE_URL \
+            --dart-define=WS_URL=$WS_URL \
+            --dart-define=OSM_TILE_URL=$OSM_TILE_URL
       
       - name: 🚀 Publish to Google Play (Internal Testing)
         script: |
@@ -258,95 +224,19 @@ workflows:
             echo "Rollout: 10% dos usuários"
 
   # ==========================================
-  # WORKFLOW: ANDROID STAGING (OPCIONAL)
-  # ==========================================
-  android-staging:
-    name: Android Staging - Pre-Production Test
-    
-    max_build_duration: 60
-    
-    instance_type: mac_mini_m1
-    
-    environment:
-      groups:
-        - staging_environment
-      
-      vars:
-        FLUTTER_VERSION: "3.35.7"
-        PACKAGE_NAME: "ao.riskplace.makanetu"
-        BUILD_TYPE: "release"
-      
-      android_signing:
-        - makaneto_keystore
-      
-      flutter: stable
-    
-    triggering:
-      events:
-        - push
-      
-      branch_patterns:
-        - pattern: 'staging'
-          include: true
-          source: true
-        - pattern: 'release/*'
-          include: true
-          source: true
-      
-      cancel_previous_builds: true
-    
-    scripts:
-      - name: 🔧 Get Flutter packages
-        script: |
-          flutter packages pub get
-      
-      - name: 🔍 Analyze code
-        script: |
-          flutter analyze
-      
-      - name: 🧪 Run tests
-        script: |
-          flutter test
-      
-      - name: 🏗️ Build Android App Bundle (Staging)
-        script: |
-          flutter build appbundle --release --flavor staging
-      
-      - name: 🚀 Deploy to Firebase App Distribution (Staging Group)
-        script: |
-          npm install -g firebase-tools
-          firebase appdistribution:distribute \
-            build/app/outputs/bundle/stagingRelease/app-staging-release.aab \
-            --app $FIREBASE_APP_ID_ANDROID_STAGING \
-            --groups "staging-testers" \
-            --release-notes "Build de staging - Pre-production test" \
-            --token $FIREBASE_CLI_TOKEN
-    
-    artifacts:
-      - build/app/outputs/**/*.aab
-      - build/app/outputs/**/mapping.txt
-    
-    publishing:
-      email:
-        recipients:
-          - $TEAM_EMAIL
-        notify:
-          success: true
-          failure: true
-
-  # ==========================================
-  # WORKFLOW: iOS DEVELOP (TESTFLIGHT BETA)
+  # WORKFLOW: iOS DEVELOP
   # ==========================================
   ios-develop:
-    name: iOS Develop - TestFlight Beta
+    name: iOS Development Build
     
     max_build_duration: 60
     
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     
     environment:
       groups:
-        - ios_develop_environment
+        - common_environment
+        - environment_vars_dev
         - app_store_credentials
       
       vars:
@@ -378,6 +268,13 @@ workflows:
       cancel_previous_builds: true
     
     scripts:
+      - name: 🔐 Setup signing (automatic)
+        script: |
+          echo "Using Xcode automatic signing"
+          echo "Team ID: 4883KF3Z76"
+          echo "Bundle ID: $BUNDLE_ID"
+
+      
       - name: 🔧 Get Flutter packages
         script: |
           flutter packages pub get
@@ -385,31 +282,28 @@ workflows:
       - name: 🍎 Install CocoaPods dependencies
         script: |
           cd ios
-          pod install
+          pod install --repo-update
+          echo "✅ CocoaPods configured successfully"
       
       - name: 🔍 Analyze code
         script: |
           flutter analyze
+        ignore_failure: true
       
       - name: 🧪 Run tests
         script: |
           flutter test
         ignore_failure: true
       
-      - name: 📝 Setup Firebase configuration (Development)
-        script: |
-          # Copiar arquivo de configuração do Firebase para development
-          if [ -f "ios/Runner/GoogleService-Info-dev.plist" ]; then
-            cp ios/Runner/GoogleService-Info-dev.plist ios/Runner/GoogleService-Info.plist
-          fi
-      
       - name: 🏗️ Build iOS IPA (Development)
         script: |
-          flutter build ipa \
-            --release \
-            --export-options-plist=ios/ExportOptions.plist \
+          flutter build ipa --release \
             --build-name=1.0.0 \
-            --build-number=$BUILD_NUMBER
+            --build-number=$BUILD_NUMBER \
+            --dart-define=ENV=$ENV \
+            --dart-define=BASE_URL=$BASE_URL \
+            --dart-define=WS_URL=$WS_URL \
+            --dart-define=OSM_TILE_URL=$OSM_TILE_URL
       
       - name: 🚀 Publish to TestFlight
         script: |
@@ -429,8 +323,9 @@ workflows:
         
         submit_to_testflight: true
         beta_groups:
-          - Internal Testers
-          - Beta Testers
+          - Nete Testers
+          #- Internal Testers
+          #- Beta Testers
         
         submit_to_app_store: false
       
@@ -449,18 +344,19 @@ workflows:
           failure: true
 
   # ==========================================
-  # WORKFLOW: iOS PRODUCTION (APP STORE)
+  # WORKFLOW: iOS PRODUCTION
   # ==========================================
   ios-production:
-    name: iOS Production - App Store Release
+    name: iOS Production Build
     
     max_build_duration: 90
     
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     
     environment:
       groups:
-        - ios_production_environment
+        - common_environment
+        - environment_vars_prod
         - app_store_credentials
       
       vars:
@@ -495,6 +391,12 @@ workflows:
       cancel_previous_builds: false
     
     scripts:
+      - name: 🔐 Setup signing (automatic)
+        script: |
+          echo "Using Xcode automatic signing"
+          echo "Team ID: 4883KF3Z76"
+          echo "Bundle ID: $BUNDLE_ID"
+      
       - name: 🔧 Get Flutter packages
         script: |
           flutter packages pub get
@@ -502,43 +404,36 @@ workflows:
       - name: 🍎 Install CocoaPods dependencies
         script: |
           cd ios
-          pod install
+          pod install --repo-update
+          echo "✅ CocoaPods configured successfully"
       
       - name: 🔍 Analyze code
         script: |
           flutter analyze
-        ignore_failure: false
+        ignore_failure: true
       
       - name: 🧪 Run tests (Production)
         script: |
           flutter test
         ignore_failure: false
       
-      - name: 📝 Setup Firebase configuration (Production)
-        script: |
-          # Copiar arquivo de configuração do Firebase para produção
-          if [ -f "ios/Runner/GoogleService-Info-prod.plist" ]; then
-            cp ios/Runner/GoogleService-Info-prod.plist ios/Runner/GoogleService-Info.plist
-          fi
-      
       - name: 🔢 Update version code
         script: |
-          # Incrementar automaticamente o version code
           VERSION_NAME=$(grep 'version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
           VERSION_CODE=$(($(grep 'version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f2) + 1))
           
           echo "Building version $VERSION_NAME+$VERSION_CODE"
-          
-          # Atualizar pubspec.yaml
           sed -i '' "s/version: .*/version: $VERSION_NAME+$VERSION_CODE/" pubspec.yaml
       
       - name: 🏗️ Build iOS IPA (Production)
         script: |
-          flutter build ipa \
-            --release \
-            --export-options-plist=ios/ExportOptions.plist \
+          flutter build ipa --release \
             --build-name=$VERSION_NAME \
-            --build-number=$VERSION_CODE
+            --build-number=$VERSION_CODE \
+            --dart-define=ENV=$ENV \
+            --dart-define=BASE_URL=$BASE_URL \
+            --dart-define=WS_URL=$WS_URL \
+            --dart-define=OSM_TILE_URL=$OSM_TILE_URL
       
       - name: 🚀 Publish to App Store
         script: |

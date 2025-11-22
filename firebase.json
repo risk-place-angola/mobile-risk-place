@@ -1,0 +1,30 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "riskplace-ao",
+          "appId": "1:982759520741:android:77d4bd1fe13bdafd91d70c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "riskplace-ao",
+          "appId": "1:982759520741:ios:c11f3fbb13d55b8d91d70c",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "riskplace-ao",
+          "configurations": {
+            "android": "1:982759520741:android:77d4bd1fe13bdafd91d70c",
+            "ios": "1:982759520741:ios:c11f3fbb13d55b8d91d70c"
+          }
+        }
+      }
+    }
+  }
+}

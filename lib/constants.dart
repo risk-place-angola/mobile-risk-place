@@ -1,13 +1,25 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// Environment variables - pode ser definido via --dart-define ou .env
+const String ENV = String.fromEnvironment(
+  'ENV',
+  defaultValue: 'development',
+);
 
-String get BASE_URL =>
-    dotenv.env['BASE_URL'] ??
-    'https://risk-place-angola-904a.onrender.com/api/v1';
-String get BASE_DOMAIN =>
-    dotenv.env['BASE_DOMAIN'] ?? 'https://risk-place-angola-904a.onrender.com';
-String get WS_URL =>
-    dotenv.env['WS_URL'] ??
-    'wss://risk-place-angola-904a.onrender.com/api/ws/alerts';
-String get OSM_TILE_URL =>
-    dotenv.env['OSM_TILE_URL'] ??
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const String BASE_URL = String.fromEnvironment(
+  'BASE_URL',
+  defaultValue: 'https://risk-place-angola-904a.onrender.com/api/v1',
+);
+
+const String BASE_DOMAIN = String.fromEnvironment(
+  'BASE_DOMAIN',
+  defaultValue: 'https://risk-place-angola-904a.onrender.com',
+);
+
+const String WS_URL = String.fromEnvironment(
+  'WS_URL',
+  defaultValue: 'wss://risk-place-angola-904a.onrender.com/ws/alerts',
+);
+
+const String OSM_TILE_URL = String.fromEnvironment(
+  'OSM_TILE_URL',
+  defaultValue: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+);

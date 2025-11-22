@@ -51,9 +51,9 @@ app.*.map.json
 /android/app/release
 
 # Firebase
-ios/Runner/GoogleService-Info.plist
-android/app/google-services.json
-lib/firebase_options.dart
+# Nota: firebase_options.dart pode ser commitado (não contém secrets)
+# Os arquivos de configuração nativos também são seguros para open-source
+# (contém apenas IDs públicos do projeto Firebase)
 
 # Env
 .env
@@ -80,9 +80,6 @@ ios/.symlinks/
 ios/Flutter/Flutter.framework
 ios/Flutter/Flutter.podspec
 ios/build/
-
-# iOS specific - Firebase config should be ignored (already listed above)
-# ios/Runner/GoogleService-Info.plist
 
 # iOS Certificates and Provisioning (não commitar!)
 *.p12

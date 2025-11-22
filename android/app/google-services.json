@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "982759520741",
+    "firebase_url": "https://riskplace-ao-default-rtdb.firebaseio.com",
+    "project_id": "riskplace-ao",
+    "storage_bucket": "riskplace-ao.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:982759520741:android:77d4bd1fe13bdafd91d70c",
+        "android_client_info": {
+          "package_name": "ao.riskplace.makanetu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVh-zkFgR6ZSOZeAZ7K26A1a0aPKP_xT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

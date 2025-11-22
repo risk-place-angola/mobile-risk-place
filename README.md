@@ -13,7 +13,7 @@
 
 1. [Sobre o Projeto](#sobre-o-projeto)
 2. [Funcionalidades](#funcionalidades)
-3. [Setup Rápido](#setup-rápido)
+3. [🚀 Setup Rápido (5 minutos)](#-setup-rápido-5-minutos)
 4. [Documentação](#documentação)
 5. [Arquitetura](#arquitetura)
 6. [Tecnologias](#tecnologias)
@@ -55,190 +55,64 @@
 
 ---
 
-## 🚀 Setup Rápido
-
-### 1. Clone o Repositório
+## 🚀 Setup Rápido (5 minutos)
 
 ```bash
+# 1. Clone
 git clone https://github.com/risk-place-angola/mobile-risk-place.git
 cd mobile-risk-place
-```
 
-### 2. Instale Dependências
-
-```bash
+# 2. Instale dependências
 flutter pub get
-```
 
-### 3. Configure Variáveis de Ambiente
-
-```bash
+# 3. Configure ambiente (opcional - valores padrão já funcionam)
 cp .env.example .env
-# Edite .env com suas credenciais
-```
 
-### 4. Execute o App
-
-```bash
+# 4. Execute!
 flutter run
 ```
 
-📚 **Setup Completo**: [`/docs/setup/ENVIRONMENT_SETUP.md`](/docs/setup/ENVIRONMENT_SETUP.md)
+✨ **É só isso!** Firebase e backend já estão configurados.
+
+📚 **Guia completo para desenvolvedores**: [`/docs/DEVELOPER_SETUP.md`](/docs/DEVELOPER_SETUP.md)
 
 ---
 
 ## 📖 Documentação
 
-### 🎓 Getting Started
+📚 **[Developer Setup](/docs/DEVELOPER_SETUP.md)** - Comece aqui!
 
-| Documento | Descrição |
-|-----------|-----------|
-| [⚙️ Environment Setup](/docs/setup/ENVIRONMENT_SETUP.md) | Configuração inicial, Firebase, variáveis de ambiente |
-| [⚡ Quick Reference](/docs/QUICK_REFERENCE.md) | Cheat sheet com snippets prontos para usar |
-
-### 🔧 Architecture & Development
-
-| Documento | Descrição |
-|-----------|-----------|
-| [🔧 HTTP Client Guide](/docs/architecture/HTTP_CLIENT_GUIDE.md) | Sistema HTTP refatorado, interceptors, exceções |
-
-### 📡 API & Backend Integration
-
-| Documento | Descrição |
-|-----------|-----------|
-| [📡 API Complete Guide](/docs/api/API_COMPLETE_GUIDE.md) | Todos os endpoints, exemplos de código, troubleshooting |
-
-### 🔌 Real-Time Features
-
-| Documento | Descrição |
-|-----------|-----------|
-| [🔌 WebSocket Guide](/docs/websocket/WEBSOCKET_GUIDE.md) | Alertas em tempo real, atualização de localização |
-| [📍 Location Tracking](/docs/features/LOCATION_TRACKING.md) | Rastreamento GPS automático, updates via WebSocket |
-
-### 👤 Features
-
-| Documento | Descrição |
-|-----------|-----------|
-| [👻 Anonymous Users](/docs/features/ANONYMOUS_USERS.md) | Sistema Waze-style para usuários sem cadastro |
-| [📱 FCM iOS Setup](/docs/setup/FCM_IOS_SETUP.md) | Configuração de Push Notifications para iOS |
-
-### 🎨 UI/UX
-
-| Documento | Descrição |
-|-----------|-----------|
-| [🎨 Waze Panel Guide](/docs/ui-ux/WAZE_PANEL_GUIDE.md) | Painel deslizante, quick actions, animações |
+**Recursos úteis:**
+- [WebSocket & Location](/docs/features/LOCATION_TRACKING.md)
+- [HTTP Client](/docs/architecture/HTTP_CLIENT_GUIDE.md)
+- [API Guide](/docs/api/API_COMPLETE_GUIDE.md)
 
 ---
 
 ## 🏗️ Arquitetura
 
-### Estrutura do Projeto
-
 ```
 lib/
-├── core/                           # Camada core (infraestrutura)
-│   ├── http_client/                # Cliente HTTP + interceptors
-│   │   ├── dio_http_client.dart
-│   │   ├── interceptors/
-│   │   └── exceptions/
-│   └── services/                   # Serviços globais
-│       └── notification_service.dart
-├── data/                           # Camada de dados
-│   ├── dtos/                       # Data Transfer Objects
-│   ├── services/                   # Serviços de API
-│   │   ├── auth.service.dart
-│   │   ├── risk_types.service.dart
-│   │   ├── report.service.dart
-│   │   ├── alert.service.dart
-│   │   └── alert_websocket_service.dart
-│   └── providers/                  # Riverpod Providers
-│       ├── api_providers.dart
-│       └── websocket_notifications_provider.dart
-└── presenter/                      # Camada de apresentação
-    ├── controllers/                # Controllers (Riverpod)
-    ├── pages/                      # Telas
-    └── widgets/                    # Componentes reutilizáveis
+├── core/          # HTTP client, utils
+├── data/          # Services, models
+├── domain/        # Business logic
+└── presenter/     # UI, widgets
 ```
 
-### Fluxo de Dados
-
-```
-UI (Widget)
-    ↓
-Provider (Riverpod)
-    ↓
-Service (Business Logic)
-    ↓
-HTTP Client (Dio + Interceptors)
-    ↓
-Backend API
-```
-
-### Tecnologias de Arquitetura
-
-- **Clean Architecture** (Core, Data, Presenter)
-- **SOLID Principles**
-- **Dependency Injection** via Riverpod
-- **Interface Segregation** (IHttpClient)
-- **Repository Pattern** (Services)
-
----
-
-## 🛠️ Tecnologias
-
-### Core
-
-- **Flutter** 3.0+ - Framework UI
-- **Dart** 3.0+ - Linguagem
-- **Riverpod** 2.0+ - State Management
-
-### Network
-
-- **Dio** 5.0+ - HTTP Client
-- **WebSocket Channel** 2.4+ - Real-time communication
-
-### Maps
-
-- **Flutter Map** - OpenStreetMap integration
-- **Geolocator** 10.0+ - Geolocation
-
-### Firebase
-
-- **Firebase Core** - Base SDK
-- **Firebase Auth** - Autenticação
-- **Firebase Storage** - Armazenamento de imagens
-- **Firebase Database** - Realtime Database
-
-### Utils
-
-- **Flutter Dotenv** - Environment variables
-- **Unicons Line** - Ícones
+**Stack:** Flutter 3.x • Riverpod • Firebase • WebSocket
 
 ---
 
 ## 🤝 Contribuindo
 
-### Branch Strategy
+```bash
+# 1. Fork e clone
+# 2. Crie branch: feature/nome
+# 3. Commit: feat: descrição
+# 4. Push e abra PR para develop
+```
 
-- `main` - Produção
-- `develop` - Desenvolvimento
-- `feature/*` - Novas features
-- `bugfix/*` - Correções
-
-### Workflow
-
-1. **Fork** o repositório
-2. **Clone** seu fork localmente
-3. **Crie** uma branch: `git checkout -b feature/minha-feature`
-4. **Commit** suas mudanças: `git commit -m 'Add: minha feature'`
-5. **Push** para a branch: `git push origin feature/minha-feature`
-6. **Abra** um Pull Request
-
-### Code Style
-
-- Seguir [Effective Dart](https://dart.dev/guides/language/effective-dart)
-- Executar `flutter format .` antes de commit
-- Executar `flutter analyze` para verificar erros
+**Code style:** `flutter analyze && dart format .`
 
 ---
 

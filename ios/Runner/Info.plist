@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key></key>
+	<string></string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -24,6 +26,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -36,6 +40,8 @@
 	<string>This app needs your location to show nearby safety alerts and reports in your area</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs microphone access to record voice alerts and emergency reports</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to attach photos to incident reports and safety alerts</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>This app needs to send you notifications about nearby safety alerts and incidents</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -44,7 +50,6 @@
 	<array>
 		<string>location</string>
 		<string>remote-notification</string>
-		<string>processing</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

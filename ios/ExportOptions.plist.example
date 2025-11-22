@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Method: app-store, ad-hoc, development, or enterprise -->
+    <key>method</key>
+    <string>app-store</string>
+    
+    <!-- Your Apple Team ID -->
+    <key>teamID</key>
+    <string>4883KF3Z76</string>
+    
+    <!-- Bitcode (deprecated since Xcode 14) -->
+    <key>uploadBitcode</key>
+    <false/>
+    <key>compileBitcode</key>
+    <false/>
+    
+    <!-- Upload symbols for crash reporting -->
+    <key>uploadSymbols</key>
+    <true/>
+    
+    <!-- Signing -->
+    <key>signingStyle</key>
+    <string>manual</string>
+    <key>signingCertificate</key>
+    <string>Apple Distribution</string>
+    
+    <!-- Provisioning profiles mapping -->
+    <key>provisioningProfiles</key>
+    <dict>
+        <!-- Bundle ID → Provisioning Profile UUID -->
+        <key>ao.riskplace.makanetu</key>
+        <string>YOUR_PROVISIONING_PROFILE_UUID</string>
+    </dict>
+    
+    <!-- Strip Swift symbols -->
+    <key>stripSwiftSymbols</key>
+    <true/>
+    
+    <!-- Generate App Size Report -->
+    <key>generateAppStoreInformation</key>
+    <true/>
+    
+    <!-- Thinning (none, thin-for-all-variants) -->
+    <key>thinning</key>
+    <string>&lt;none&gt;</string>
+</dict>
+</plist>
