@@ -44,8 +44,15 @@ class _ReportSelectionBottomSheetState
     final riskTypesAsync = ref.watch(riskTypesProvider);
     // Load all risk topics from backend API
     final riskTopicsAsync = ref.watch(riskTopicsProvider);
+    
+    final screenHeight = MediaQuery.of(context).size.height;
+    final maxHeight = screenHeight * 0.85; // 85% da altura da tela
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: maxHeight,
+        minHeight: 300,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -104,9 +111,11 @@ class _ReportSelectionBottomSheetState
             ),
 
             // Conteúdo baseado nos dados da API
-            Expanded(
+            Flexible(
               child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 20),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     riskTypesAsync.when(
                       data: (riskTypes) {
@@ -154,7 +163,6 @@ class _ReportSelectionBottomSheetState
                       error: (error, stack) =>
                           _buildErrorWidget(AppLocalizations.of(context)?.error ?? 'Error', error),
                     ),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -200,16 +208,21 @@ class _ReportSelectionBottomSheetState
     log('Exibindo ${riskTypes.length} tipos de risco da API backend',
         name: 'ReportSelection');
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    final crossAxisCount = isSmallScreen ? 2 : 3;
+    final childAspectRatio = isSmallScreen ? 0.85 : 0.9;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16 : 20),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 0.9,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: isSmallScreen ? 12 : 16,
+          crossAxisSpacing: isSmallScreen ? 12 : 16,
+          childAspectRatio: childAspectRatio,
         ),
         itemCount: riskTypes.length,
         itemBuilder: (context, index) {
@@ -234,16 +247,20 @@ class _ReportSelectionBottomSheetState
     log('Exibindo ${topics.length} tópicos para ${riskType.name} da API backend',
         name: 'ReportSelection');
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    final childAspectRatio = isSmallScreen ? 1.1 : 1.2;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16 : 20),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.2,
+          mainAxisSpacing: isSmallScreen ? 10 : 12,
+          crossAxisSpacing: isSmallScreen ? 10 : 12,
+          childAspectRatio: childAspectRatio,
         ),
         itemCount: topics.length,
         itemBuilder: (context, index) {
@@ -343,7 +360,11 @@ class _ReportSelectionBottomSheetState
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.6,
+        ),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -365,31 +386,36 @@ class _ReportSelectionBottomSheetState
 
               // Título
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       topicModel.icon,
-                      size: 48,
+                      size: 44,
                       color: riskTypeModel.color,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Text(
                       topicModel.name,
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       topicModel.description,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         color: Colors.grey[600],
                       ),
                       textAlign: TextAlign.center,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -399,10 +425,17 @@ class _ReportSelectionBottomSheetState
 
               // Opções
               ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                 leading:
-                    const Icon(Icons.my_location, color: Color(0xFFF39C12)),
-                title: Text(AppLocalizations.of(context)?.reportAtMyLocation ?? 'Report at my location'),
-                subtitle: Text(AppLocalizations.of(context)?.useCurrentGpsLocation ?? 'Use current GPS location'),
+                    const Icon(Icons.my_location, color: Color(0xFFF39C12), size: 28),
+                title: Text(
+                  AppLocalizations.of(context)?.reportAtMyLocation ?? 'Report at my location',
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  AppLocalizations.of(context)?.useCurrentGpsLocation ?? 'Use current GPS location',
+                  style: const TextStyle(fontSize: 12),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   widget.onReportSelected(riskTypeModel, topicModel,
@@ -411,10 +444,17 @@ class _ReportSelectionBottomSheetState
               ),
 
               ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                 leading:
-                    const Icon(Icons.edit_location, color: Color(0xFF3498DB)),
-                title: Text(AppLocalizations.of(context)?.chooseLocationOnMap ?? 'Choose location on map'),
-                subtitle: Text(AppLocalizations.of(context)?.adjustManuallyOnMap ?? 'Adjust manually on map'),
+                    const Icon(Icons.edit_location, color: Color(0xFF3498DB), size: 28),
+                title: Text(
+                  AppLocalizations.of(context)?.chooseLocationOnMap ?? 'Choose location on map',
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  AppLocalizations.of(context)?.adjustManuallyOnMap ?? 'Adjust manually on map',
+                  style: const TextStyle(fontSize: 12),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   widget.onReportSelected(riskTypeModel, topicModel,
@@ -422,7 +462,7 @@ class _ReportSelectionBottomSheetState
                 },
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
             ],
           ),
         ),

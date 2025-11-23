@@ -32,11 +32,12 @@ class ReportVerificationBadge extends ConsumerWidget {
     return Icons.help_outline;
   }
 
-  String _getVerificationText() {
-    if (report.verified) return 'Verified';
-    if (report.netVotes >= 3) return '${report.netVotes} confirm';
+  String _getVerificationText(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (report.verified) return l10n?.verifiedBadge ?? 'Verified';
+    if (report.netVotes >= 3) return (l10n?.confirmsBadge ?? '{count} confirm').toString().replaceAll('{count}', report.netVotes.toString());
     if (report.netVotes >= 1) return '${report.netVotes}';
-    if (report.netVotes <= -3) return 'Unreliable';
+    if (report.netVotes <= -3) return l10n?.unreliableBadge ?? 'Unreliable';
     return '';
   }
 
@@ -55,10 +56,10 @@ class ReportVerificationBadge extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(_getVerificationIcon(), size: 16, color: color),
-          if (_getVerificationText().isNotEmpty) ...[
+          if (_getVerificationText(context).isNotEmpty) ...[
             const SizedBox(width: 4),
             Text(
-              _getVerificationText(),
+              _getVerificationText(context),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,

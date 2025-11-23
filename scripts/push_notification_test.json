@@ -1,0 +1,10 @@
+{
+  "aps": {
+    "alert": {
+      "title": "Monabele Test",
+      "body": "This is iOS development notification test"
+    }
+  },
+  "Simulator Target Bundle": "ao.riskplace.makanetu"
+}
+

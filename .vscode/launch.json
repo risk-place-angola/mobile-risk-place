@@ -11,7 +11,8 @@
             "flutterMode": "debug",
             "args": [
                 "--dart-define=BASE_URL=https://risk-place-angola-904a.onrender.com/api/v1", 
-                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                "--dart-define=WS_URL=wss://risk-place-angola-904a.onrender.com/ws/alerts"
             ]
         },
         {
@@ -21,7 +22,8 @@
             "flutterMode": "profile",
             "args": [
                 "--dart-define=BASE_URL=https://risk-place-angola-904a.onrender.com/api/v1", 
-                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                "--dart-define=WS_URL=wss://risk-place-angola-904a.onrender.com/ws/alerts"
             ]
 
         },
@@ -32,7 +34,8 @@
             "flutterMode": "release",
             "args": [
                 "--dart-define=BASE_URL=https://risk-place-angola-904a.onrender.com/api/v1", 
-                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                "--dart-define=OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                "--dart-define=WS_URL=wss://risk-place-angola-904a.onrender.com/ws/alerts"
             ]
         }
     ]

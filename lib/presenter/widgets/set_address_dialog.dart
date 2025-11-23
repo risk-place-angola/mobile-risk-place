@@ -67,7 +67,8 @@ class _SetAddressDialogState extends ConsumerState<SetAddressDialog> {
       setState(() {
         _searchResults = [];
         _isSearching = false;
-        _errorMessage = 'Erro ao buscar endereço';
+        final l10n = AppLocalizations.of(context);
+        _errorMessage = l10n?.errorSearchingAddress ?? 'Erro ao buscar endereço';
       });
     }
   }
@@ -83,8 +84,9 @@ class _SetAddressDialogState extends ConsumerState<SetAddressDialog> {
 
   Future<void> _saveAddress() async {
     if (_selectedPlace == null) {
+      final l10n = AppLocalizations.of(context);
       setState(() {
-        _errorMessage = 'Por favor, selecione um endereço';
+        _errorMessage = l10n?.pleaseSelectAddress ?? 'Por favor, selecione um endereço';
       });
       return;
     }
@@ -115,26 +117,38 @@ class _SetAddressDialogState extends ConsumerState<SetAddressDialog> {
         Navigator.of(context).pop(savedAddress);
       }
     } catch (e) {
+      final l10n = AppLocalizations.of(context);
       setState(() {
         _isSaving = false;
-        _errorMessage = 'Erro ao salvar endereço: ${e.toString()}';
+        _errorMessage = (l10n?.errorSavingAddress ?? 'Erro ao salvar endereço: {error}').toString().replaceAll('{error}', e.toString());
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final title = widget.addressType == AddressType.home
-        ? 'Configurar Casa'
-        : 'Configurar Trabalho';
+        ? (l10n?.setHome ?? 'Configurar Casa')
+        : (l10n?.setWork ?? 'Configurar Trabalho');
     final icon =
         widget.addressType == AddressType.home ? Icons.home : Icons.work;
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenWidth < 360;
+    
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 16 : 20,
+        vertical: screenHeight > 700 ? 60 : 40,
+      ),
       child: Container(
-        padding: const EdgeInsets.all(20),
-        constraints: const BoxConstraints(maxHeight: 600),
+        padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+        constraints: BoxConstraints(
+          maxHeight: screenHeight * 0.85,
+          maxWidth: 600,
+        ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -162,7 +176,7 @@ class _SetAddressDialogState extends ConsumerState<SetAddressDialog> {
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Buscar endereço...',
+                  hintText: l10n?.searchAddress ?? 'Buscar endereço...',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -249,7 +263,7 @@ class _SetAddressDialogState extends ConsumerState<SetAddressDialog> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Selecionado: ${_selectedPlace!.displayName}',
+                          (l10n?.selected ?? 'Selecionado: {address}').toString().replaceAll('{address}', _selectedPlace!.displayName),
                           style: TextStyle(
                             color: Colors.green.shade900,
                             fontWeight: FontWeight.w500,
@@ -269,7 +283,7 @@ class _SetAddressDialogState extends ConsumerState<SetAddressDialog> {
                   TextButton(
                     onPressed:
                         _isSaving ? null : () => Navigator.of(context).pop(),
-                    child: const Text('Cancelar'),
+                    child: Text(l10n?.cancel ?? 'Cancelar'),
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton(
@@ -292,7 +306,7 @@ class _SetAddressDialogState extends ConsumerState<SetAddressDialog> {
                                   AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text('Salvar'),
+                        : Text(l10n?.save ?? 'Salvar'),
                   ),
                 ],
               ),

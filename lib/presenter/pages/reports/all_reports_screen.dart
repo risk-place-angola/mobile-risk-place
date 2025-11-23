@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/data/providers/api_providers.dart';
 import 'package:rpa/data/dtos/list_reports_response_dto.dart';
 import 'package:rpa/data/dtos/list_nearby_reports_response_dto.dart';
@@ -324,13 +325,14 @@ class _AllReportsScreenState extends ConsumerState<AllReportsScreen> {
   }
 
   Widget _buildErrorState(Object error) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error, size: 48, color: Colors.red),
           const SizedBox(height: 16),
-          const Text('Erro ao carregar relatórios'),
+          Text(l10n?.errorLoadingReports ?? 'Erro ao carregar relatórios'),
           const SizedBox(height: 8),
           Text(
             error.toString(),
@@ -340,7 +342,7 @@ class _AllReportsScreenState extends ConsumerState<AllReportsScreen> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _refreshData,
-            child: const Text('Tentar novamente'),
+            child: Text(l10n?.tryAgainButton ?? 'Tentar novamente'),
           ),
         ],
       ),

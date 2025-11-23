@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rpa/domain/entities/emergency_contact.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 
 class AddEmergencyContactDialog extends StatefulWidget {
   final EmergencyContact? contact;
@@ -36,6 +37,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isEditing = widget.contact != null;
 
     return Dialog(
@@ -50,7 +52,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isEditing ? 'Editar Contato' : 'Adicionar Contato',
+                  isEditing ? (l10n?.editContact ?? 'Editar Contato') : (l10n?.addContact ?? 'Adicionar Contato'),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -58,7 +60,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Configure um contato de emergência para ser notificado em situações críticas.',
+                  l10n?.configureEmergencyContact ?? 'Configure um contato de emergência para ser notificado em situações críticas.',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade600,
@@ -67,15 +69,15 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                 const SizedBox(height: 24),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nome *',
-                    hintText: 'Ex: Maria Silva',
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: '${l10n?.name ?? 'Nome'} *',
+                    hintText: l10n?.exampleName ?? 'Ex: Maria Silva',
+                    prefixIcon: const Icon(Icons.person),
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Nome é obrigatório';
+                      return l10n?.nameRequired ?? 'Nome é obrigatório';
                     }
                     return null;
                   },
@@ -84,15 +86,15 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Telefone *',
-                    hintText: '+244 923 456 789',
-                    prefixIcon: Icon(Icons.phone),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: '${l10n?.phone ?? 'Telefone'} *',
+                    hintText: l10n?.examplePhone ?? '+244 923 456 789',
+                    prefixIcon: const Icon(Icons.phone),
+                    border: const OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Telefone é obrigatório';
+                      return l10n?.phoneRequired ?? 'Telefone é obrigatório';
                     }
                     return null;
                   },
@@ -100,10 +102,10 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<ContactRelation>(
                   value: _selectedRelation,
-                  decoration: const InputDecoration(
-                    labelText: 'Relação',
-                    prefixIcon: Icon(Icons.people),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n?.relation ?? 'Relação',
+                    prefixIcon: const Icon(Icons.people),
+                    border: const OutlineInputBorder(),
                   ),
                   items: ContactRelation.values.map((relation) {
                     return DropdownMenuItem(
@@ -152,9 +154,8 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                       _isPriority = value ?? false;
                     });
                   },
-                  title: const Text('Marcar como prioritário'),
-                  subtitle:
-                      const Text('Receberá alertas de emergência automáticos'),
+                  title: Text(l10n?.priorityContact ?? 'Marcar como prioritário'),
+                  subtitle: Text(l10n?.willReceiveEmergencyAlerts ?? 'Receberá alertas de emergência automáticos'),
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,
                 ),
@@ -164,7 +165,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Cancelar'),
+                      child: Text(l10n?.cancel ?? 'Cancelar'),
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton(
@@ -175,7 +176,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                           vertical: 12,
                         ),
                       ),
-                      child: Text(isEditing ? 'Salvar' : 'Adicionar'),
+                      child: Text(isEditing ? (l10n?.save ?? 'Salvar') : (l10n?.add ?? 'Adicionar')),
                     ),
                   ],
                 ),

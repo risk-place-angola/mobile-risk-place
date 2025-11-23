@@ -1040,6 +1040,216 @@ abstract class AppLocalizations {
   /// **'Search Radius'**
   String get searchRadius;
 
+  /// No description provided for @searchLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Location'**
+  String get searchLocation;
+
+  /// No description provided for @recent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get recent;
+
+  /// No description provided for @moreOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'More Options'**
+  String get moreOptions;
+
+  /// No description provided for @savedPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Places'**
+  String get savedPlaces;
+
+  /// No description provided for @savedPlacesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick access to your locations'**
+  String get savedPlacesSubtitle;
+
+  /// No description provided for @shareMyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Share My Location'**
+  String get shareMyLocation;
+
+  /// No description provided for @shareMyLocationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send location to family & friends'**
+  String get shareMyLocationSubtitle;
+
+  /// No description provided for @checkSafeRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Check Safe Route'**
+  String get checkSafeRoute;
+
+  /// No description provided for @checkSafeRouteSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the safest path'**
+  String get checkSafeRouteSubtitle;
+
+  /// No description provided for @emergencyServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency Services'**
+  String get emergencyServices;
+
+  /// No description provided for @emergencyServicesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Call 112 / Police / Firefighters'**
+  String get emergencyServicesSubtitle;
+
+  /// No description provided for @editAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Alert'**
+  String get editAlert;
+
+  /// No description provided for @updateAlertMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the message, severity or radius of the alert.'**
+  String get updateAlertMessage;
+
+  /// No description provided for @message.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get message;
+
+  /// No description provided for @describeTheAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the alert'**
+  String get describeTheAlert;
+
+  /// No description provided for @messageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Message is required'**
+  String get messageRequired;
+
+  /// No description provided for @severity.
+  ///
+  /// In en, this message translates to:
+  /// **'Severity'**
+  String get severity;
+
+  /// No description provided for @radius.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius'**
+  String get radius;
+
+  /// No description provided for @radiusMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius (meters)'**
+  String get radiusMeters;
+
+  /// No description provided for @radiusRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius is required'**
+  String get radiusRequired;
+
+  /// No description provided for @invalidValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid value'**
+  String get invalidValue;
+
+  /// No description provided for @radiusMustBeBetween.
+  ///
+  /// In en, this message translates to:
+  /// **'Radius must be between 100 and 10,000m'**
+  String get radiusMustBeBetween;
+
+  /// No description provided for @changesWillBeApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes will be applied immediately and subscribers will be notified.'**
+  String get changesWillBeApplied;
+
+  /// No description provided for @addContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Contact'**
+  String get addContact;
+
+  /// No description provided for @editContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Contact'**
+  String get editContact;
+
+  /// No description provided for @configureEmergencyContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure an emergency contact to be notified in critical situations.'**
+  String get configureEmergencyContact;
+
+  /// No description provided for @nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get nameRequired;
+
+  /// No description provided for @exampleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Ex: Maria Silva'**
+  String get exampleName;
+
+  /// No description provided for @phoneRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone is required'**
+  String get phoneRequired;
+
+  /// No description provided for @examplePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Ex: +244 923 456 789'**
+  String get examplePhone;
+
+  /// No description provided for @relation.
+  ///
+  /// In en, this message translates to:
+  /// **'Relation'**
+  String get relation;
+
+  /// No description provided for @priority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get priority;
+
+  /// No description provided for @priorityContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority contact'**
+  String get priorityContact;
+
+  /// No description provided for @willReceiveEmergencyAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Will receive automatic emergency alerts'**
+  String get willReceiveEmergencyAlerts;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
   /// No description provided for @reportAtMyLocation.
   ///
   /// In en, this message translates to:
@@ -1159,12 +1369,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm Destination'**
   String get confirmDestination;
-
-  /// No description provided for @add.
-  ///
-  /// In en, this message translates to:
-  /// **'Add'**
-  String get add;
 
   /// No description provided for @removeContact.
   ///
@@ -1412,18 +1616,6 @@ abstract class AppLocalizations {
   /// **'Describe the alert'**
   String get describeAlert;
 
-  /// No description provided for @severity.
-  ///
-  /// In en, this message translates to:
-  /// **'Severity'**
-  String get severity;
-
-  /// No description provided for @radiusMustBeBetween.
-  ///
-  /// In en, this message translates to:
-  /// **'Radius must be between 100 and 10,000m'**
-  String get radiusMustBeBetween;
-
   /// No description provided for @fullName.
   ///
   /// In en, this message translates to:
@@ -1435,12 +1627,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter your full name'**
   String get enterFullName;
-
-  /// No description provided for @relation.
-  ///
-  /// In en, this message translates to:
-  /// **'Relation'**
-  String get relation;
 
   /// No description provided for @markAsPriority.
   ///
@@ -1807,6 +1993,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You must be logged in to vote.'**
   String get voteErrorUnauthorized;
+
+  /// No description provided for @setHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Home'**
+  String get setHome;
+
+  /// No description provided for @setWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Work'**
+  String get setWork;
+
+  /// No description provided for @searchAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Search address...'**
+  String get searchAddress;
+
+  /// No description provided for @errorSearchingAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Error searching address'**
+  String get errorSearchingAddress;
+
+  /// No description provided for @pleaseSelectAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select an address'**
+  String get pleaseSelectAddress;
+
+  /// No description provided for @errorSavingAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving address: {error}'**
+  String errorSavingAddress(Object error);
+
+  /// No description provided for @selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: {address}'**
+  String selected(Object address);
+
+  /// No description provided for @fillAllFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill all fields!'**
+  String get fillAllFields;
+
+  /// No description provided for @loginSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Login Successful!'**
+  String get loginSuccessful;
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get welcomeBack;
+
+  /// No description provided for @verifiedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get verifiedBadge;
+
+  /// No description provided for @unreliableBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Unreliable'**
+  String get unreliableBadge;
+
+  /// No description provided for @confirmsBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} confirm'**
+  String confirmsBadge(Object count);
+
+  /// No description provided for @tryAgainButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgainButton;
+
+  /// No description provided for @unsubscribeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsubscribe'**
+  String get unsubscribeButton;
+
+  /// No description provided for @subscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get subscribe;
+
+  /// No description provided for @confirmDestinationButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Destination'**
+  String get confirmDestinationButton;
+
+  /// No description provided for @errorCalculatingRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Error calculating route'**
+  String get errorCalculatingRoute;
+
+  /// No description provided for @errorSendingSMS.
+  ///
+  /// In en, this message translates to:
+  /// **'Error sending SMS: {error}'**
+  String errorSendingSMS(Object error);
+
+  /// No description provided for @errorRegisterCheckCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Error registering. Check your credentials.'**
+  String get errorRegisterCheckCredentials;
+
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission denied'**
+  String get locationPermissionDenied;
+
+  /// No description provided for @couldNotGetLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not get location'**
+  String get couldNotGetLocation;
+
+  /// No description provided for @locationStreamError.
+  ///
+  /// In en, this message translates to:
+  /// **'Location stream error: {error}'**
+  String locationStreamError(Object error);
+
+  /// No description provided for @addSafePlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Safe Place'**
+  String get addSafePlace;
+
+  /// No description provided for @safeRouteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe Route'**
+  String get safeRouteButton;
+
+  /// No description provided for @waitingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for location...'**
+  String get waitingLocation;
+
+  /// No description provided for @waitingGPS.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for GPS location...'**
+  String get waitingGPS;
+
+  /// No description provided for @homeAddressSavedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Home address saved successfully!'**
+  String get homeAddressSavedSuccess;
+
+  /// No description provided for @workAddressSavedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Work address saved successfully!'**
+  String get workAddressSavedSuccess;
+
+  /// No description provided for @addedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} added successfully!'**
+  String addedSuccessfully(Object name);
 }
 
 class _AppLocalizationsDelegate

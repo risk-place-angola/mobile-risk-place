@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/domain/entities/emergency_contact.dart';
 
 class EmergencyContactTile extends StatelessWidget {
@@ -19,14 +20,26 @@ class EmergencyContactTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? 12 : 16,
+        vertical: isSmallScreen ? 6 : 8,
+      ),
       child: ListTile(
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 12 : 16,
+          vertical: isSmallScreen ? 8 : 12,
+        ),
         leading: CircleAvatar(
+          radius: isSmallScreen ? 18 : 20,
           backgroundColor:
               contact.isPriority ? Colors.red.shade100 : Colors.grey.shade200,
           child: Icon(
             _getRelationIcon(),
+            size: isSmallScreen ? 18 : 20,
             color:
                 contact.isPriority ? Colors.red.shade700 : Colors.grey.shade700,
           ),
@@ -36,15 +49,21 @@ class EmergencyContactTile extends StatelessWidget {
             Expanded(
               child: Text(
                 contact.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: isSmallScreen ? 14 : 16,
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ),
-            if (contact.isPriority)
+            if (contact.isPriority) ...[
+              const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 6 : 8,
+                  vertical: 2,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(12),
@@ -53,12 +72,13 @@ class EmergencyContactTile extends StatelessWidget {
                 child: Text(
                   'Prioritário',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: isSmallScreen ? 9 : 11,
                     fontWeight: FontWeight.bold,
                     color: Colors.red.shade700,
                   ),
                 ),
               ),
+            ],
           ],
         ),
         subtitle: Column(
@@ -69,7 +89,7 @@ class EmergencyContactTile extends StatelessWidget {
               contact.phone,
               style: TextStyle(
                 color: Colors.grey.shade700,
-                fontSize: 14,
+                fontSize: isSmallScreen ? 13 : 14,
               ),
             ),
             const SizedBox(height: 2),
@@ -77,7 +97,7 @@ class EmergencyContactTile extends StatelessWidget {
               contact.relation.displayName,
               style: TextStyle(
                 color: Colors.grey.shade600,
-                fontSize: 12,
+                fontSize: isSmallScreen ? 11 : 12,
               ),
             ),
           ],
@@ -130,13 +150,13 @@ class EmergencyContactTile extends StatelessWidget {
                 ],
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete, size: 20, color: Colors.red),
-                  SizedBox(width: 12),
-                  Text('Remover', style: TextStyle(color: Colors.red)),
+                  const Icon(Icons.delete, size: 20, color: Colors.red),
+                  const SizedBox(width: 12),
+                  Text(AppLocalizations.of(context)?.remove ?? 'Remover', style: const TextStyle(color: Colors.red)),
                 ],
               ),
             ),

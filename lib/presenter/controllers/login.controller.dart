@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/core/error/error_handler.dart';
 import 'package:rpa/core/device/device_id_manager.dart';
 import 'package:rpa/data/dtos/auth_request_dto.dart';
@@ -20,9 +21,10 @@ class LoginController extends ChangeNotifier {
 
   Future<void> login(BuildContext context, WidgetRef ref) async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      final l10n = AppLocalizations.of(context);
       _showSnackBar(
         context,
-        "Preencha todos os campos!",
+        l10n?.fillAllFields ?? "Preencha todos os campos!",
         isError: true,
       );
       return;
@@ -156,7 +158,7 @@ class LoginController extends ChangeNotifier {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Login Realizado!',
+                  AppLocalizations.of(context)?.loginSuccessful ?? 'Login Realizado!',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.green.shade700,
@@ -164,7 +166,7 @@ class LoginController extends ChangeNotifier {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Bem-vindo de volta',
+                  AppLocalizations.of(context)?.welcomeBack ?? 'Bem-vindo de volta',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.grey.shade600,
                       ),

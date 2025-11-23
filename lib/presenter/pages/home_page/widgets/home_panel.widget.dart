@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/presenter/controllers/home_panel.controller.dart';
 import 'package:rpa/presenter/controllers/location.controller.dart';
 import 'package:rpa/presenter/controllers/safe_route.controller.dart';
@@ -201,9 +202,10 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
 
     final currentPosition = locationController.currentPosition;
     if (currentPosition == null) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Aguardando localização...'),
+        SnackBar(
+          content: Text(l10n?.waitingLocation ?? 'Aguardando localização...'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -250,12 +252,13 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
         homePanelController.setWorkAddress(result.address);
       }
 
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             addressType == AddressType.home
-                ? 'Endereço de casa salvo com sucesso!'
-                : 'Endereço de trabalho salvo com sucesso!',
+                ? (l10n?.homeAddressSavedSuccess ?? 'Endereço de casa salvo com sucesso!')
+                : (l10n?.workAddressSavedSuccess ?? 'Endereço de trabalho salvo com sucesso!'),
           ),
           backgroundColor: Colors.green,
         ),
@@ -274,9 +277,10 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
 
     if (locationController.currentPosition == null) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Aguardando localização GPS...'),
+          SnackBar(
+            content: Text(l10n?.waitingGPS ?? 'Aguardando localização GPS...'),
             backgroundColor: Colors.orange,
             behavior: SnackBarBehavior.floating,
           ),
@@ -308,9 +312,10 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
         await service.createSafePlace(result);
 
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${result.name} adicionado com sucesso!'),
+              content: Text((l10n?.addedSuccessfully ?? '{name} adicionado com sucesso!').toString().replaceAll('{name}', result.name)),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
             ),
@@ -339,9 +344,10 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
 
         if (position == null) {
           if (mounted) {
+            final l10n = AppLocalizations.of(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Aguardando localização GPS...'),
+              SnackBar(
+                content: Text(l10n?.waitingGPS ?? 'Aguardando localização GPS...'),
                 backgroundColor: Colors.orange,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -541,28 +547,29 @@ class _RiskPlaceHomePanelState extends ConsumerState<RiskPlaceHomePanel>
     BuildContext context,
     HomePanelController controller,
   ) {
+    final l10n = AppLocalizations.of(context);
     return [
       QuickActionData(
         icon: UniconsLine.home,
-        label: controller.homeAddress ?? 'Home',
+        label: controller.homeAddress ?? (l10n?.home ?? 'Home'),
         iconColor: Colors.blue,
         onTap: () => _handleQuickAction('home'),
       ),
       QuickActionData(
         icon: UniconsLine.briefcase,
-        label: controller.workAddress ?? 'Work',
+        label: controller.workAddress ?? (l10n?.work ?? 'Work'),
         iconColor: Colors.purple,
         onTap: () => _handleQuickAction('work'),
       ),
       QuickActionData(
         icon: UniconsLine.plus_circle,
-        label: 'Add Safe Place',
+        label: l10n?.addSafePlace ?? 'Add Safe Place',
         iconColor: Colors.green,
         onTap: () => _handleQuickAction('add_place'),
       ),
       QuickActionData(
         icon: UniconsLine.map_marker_shield,
-        label: 'Safe Route',
+        label: l10n?.safeRouteButton ?? 'Safe Route',
         iconColor: Colors.teal,
         onTap: () => _handleQuickAction('safe_route'),
       ),

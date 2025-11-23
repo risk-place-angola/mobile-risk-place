@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:unicons/unicons.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 
 class MoreOptionsSection extends StatelessWidget {
   final Function(String) onOptionTap;
@@ -11,14 +12,16 @@ class MoreOptionsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: Text(
-            'More Options',
-            style: TextStyle(
+            l10n?.moreOptions ?? 'More Options',
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -28,29 +31,29 @@ class MoreOptionsSection extends StatelessWidget {
         _OptionTile(
           icon: UniconsLine.bookmark,
           iconColor: Colors.purple,
-          title: 'Saved Places',
-          subtitle: 'Quick access to your locations',
+          title: l10n?.savedPlaces ?? 'Saved Places',
+          subtitle: l10n?.savedPlacesSubtitle ?? 'Quick access to your locations',
           onTap: () => onOptionTap('saved_places'),
         ),
         _OptionTile(
           icon: UniconsLine.location_arrow,
           iconColor: Colors.green,
-          title: 'Share My Location',
-          subtitle: 'Send location to family & friends',
+          title: l10n?.shareMyLocation ?? 'Share My Location',
+          subtitle: l10n?.shareMyLocationSubtitle ?? 'Send location to family & friends',
           onTap: () => onOptionTap('share_location'),
         ),
         _OptionTile(
           icon: UniconsLine.shield_check,
           iconColor: Colors.teal,
-          title: 'Check Safe Route',
-          subtitle: 'Find the safest path',
+          title: l10n?.checkSafeRoute ?? 'Check Safe Route',
+          subtitle: l10n?.checkSafeRouteSubtitle ?? 'Find the safest path',
           onTap: () => onOptionTap('safe_route'),
         ),
         _OptionTile(
           icon: UniconsLine.phone_volume,
           iconColor: Colors.red,
-          title: 'Emergency Services',
-          subtitle: 'Call 112 / Police / Firefighters',
+          title: l10n?.emergencyServices ?? 'Emergency Services',
+          subtitle: l10n?.emergencyServicesSubtitle ?? 'Call 112 / Police / Firefighters',
           onTap: () => onOptionTap('emergency_services'),
         ),
       ],
@@ -76,15 +79,21 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 12 : 20,
+          vertical: isSmallScreen ? 8 : 12,
+        ),
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: isSmallScreen ? 44 : 48,
+              height: isSmallScreen ? 44 : 48,
               decoration: BoxDecoration(
                 color: iconColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -92,36 +101,40 @@ class _OptionTile extends StatelessWidget {
               child: Icon(
                 icon,
                 color: iconColor,
-                size: 24,
+                size: isSmallScreen ? 20 : 24,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: isSmallScreen ? 12 : 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 15,
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 14 : 15,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: isSmallScreen ? 11 : 13,
                       color: Colors.grey[600],
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ],
               ),
             ),
             Icon(
               Icons.arrow_forward_ios,
-              size: 16,
+              size: isSmallScreen ? 14 : 16,
               color: Colors.grey[400],
             ),
           ],

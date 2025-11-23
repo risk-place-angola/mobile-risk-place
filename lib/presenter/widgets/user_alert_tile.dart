@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/domain/entities/user_alert.dart';
 import 'package:intl/intl.dart';
 import 'package:rpa/core/services/risk_topic_translation_service.dart';
@@ -190,8 +191,11 @@ class UserAlertTile extends StatelessWidget {
               fontSize: 13,
               color: Colors.grey.shade700,
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
         ),
+        const SizedBox(width: 8),
         Text(
           '${(alert.radiusMeters / 1000).toStringAsFixed(1)} km',
           style: TextStyle(
@@ -283,14 +287,16 @@ class UserAlertTile extends StatelessWidget {
     } else {
       if (alert.isSubscribed && onUnsubscribe != null) {
         items.add(
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'unsubscribe',
-            child: Row(
-              children: [
-                Icon(Icons.notifications_off, size: 20),
-                SizedBox(width: 12),
-                Text('Cancelar Inscrição'),
-              ],
+            child: Builder(
+              builder: (context) => Row(
+                children: [
+                  const Icon(Icons.notifications_off, size: 20),
+                  const SizedBox(width: 12),
+                  Text(AppLocalizations.of(context)?.unsubscribeButton ?? 'Cancelar Inscrição'),
+                ],
+              ),
             ),
           ),
         );

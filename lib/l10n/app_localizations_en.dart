@@ -484,6 +484,115 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchRadius => 'Search Radius';
 
   @override
+  String get searchLocation => 'Search Location';
+
+  @override
+  String get recent => 'Recent';
+
+  @override
+  String get moreOptions => 'More Options';
+
+  @override
+  String get savedPlaces => 'Saved Places';
+
+  @override
+  String get savedPlacesSubtitle => 'Quick access to your locations';
+
+  @override
+  String get shareMyLocation => 'Share My Location';
+
+  @override
+  String get shareMyLocationSubtitle => 'Send location to family & friends';
+
+  @override
+  String get checkSafeRoute => 'Check Safe Route';
+
+  @override
+  String get checkSafeRouteSubtitle => 'Find the safest path';
+
+  @override
+  String get emergencyServices => 'Emergency Services';
+
+  @override
+  String get emergencyServicesSubtitle => 'Call 112 / Police / Firefighters';
+
+  @override
+  String get editAlert => 'Edit Alert';
+
+  @override
+  String get updateAlertMessage =>
+      'Update the message, severity or radius of the alert.';
+
+  @override
+  String get message => 'Message';
+
+  @override
+  String get describeTheAlert => 'Describe the alert';
+
+  @override
+  String get messageRequired => 'Message is required';
+
+  @override
+  String get severity => 'Severity';
+
+  @override
+  String get radius => 'Radius';
+
+  @override
+  String get radiusMeters => 'Radius (meters)';
+
+  @override
+  String get radiusRequired => 'Radius is required';
+
+  @override
+  String get invalidValue => 'Invalid value';
+
+  @override
+  String get radiusMustBeBetween => 'Radius must be between 100 and 10,000m';
+
+  @override
+  String get changesWillBeApplied =>
+      'Changes will be applied immediately and subscribers will be notified.';
+
+  @override
+  String get addContact => 'Add Contact';
+
+  @override
+  String get editContact => 'Edit Contact';
+
+  @override
+  String get configureEmergencyContact =>
+      'Configure an emergency contact to be notified in critical situations.';
+
+  @override
+  String get nameRequired => 'Name is required';
+
+  @override
+  String get exampleName => 'Ex: Maria Silva';
+
+  @override
+  String get phoneRequired => 'Phone is required';
+
+  @override
+  String get examplePhone => 'Ex: +244 923 456 789';
+
+  @override
+  String get relation => 'Relation';
+
+  @override
+  String get priority => 'Priority';
+
+  @override
+  String get priorityContact => 'Priority contact';
+
+  @override
+  String get willReceiveEmergencyAlerts =>
+      'Will receive automatic emergency alerts';
+
+  @override
+  String get add => 'Add';
+
+  @override
   String get reportAtMyLocation => 'Report at my location';
 
   @override
@@ -543,9 +652,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmDestination => 'Confirm Destination';
-
-  @override
-  String get add => 'Add';
 
   @override
   String get removeContact => 'Remove Contact';
@@ -671,19 +777,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get describeAlert => 'Describe the alert';
 
   @override
-  String get severity => 'Severity';
-
-  @override
-  String get radiusMustBeBetween => 'Radius must be between 100 and 10,000m';
-
-  @override
   String get fullName => 'Full Name';
 
   @override
   String get enterFullName => 'Enter your full name';
-
-  @override
-  String get relation => 'Relation';
 
   @override
   String get markAsPriority => 'Mark as priority';
@@ -880,4 +977,107 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voteErrorUnauthorized => 'You must be logged in to vote.';
+
+  @override
+  String get setHome => 'Set Home';
+
+  @override
+  String get setWork => 'Set Work';
+
+  @override
+  String get searchAddress => 'Search address...';
+
+  @override
+  String get errorSearchingAddress => 'Error searching address';
+
+  @override
+  String get pleaseSelectAddress => 'Please select an address';
+
+  @override
+  String errorSavingAddress(Object error) {
+    return 'Error saving address: $error';
+  }
+
+  @override
+  String selected(Object address) {
+    return 'Selected: $address';
+  }
+
+  @override
+  String get fillAllFields => 'Fill all fields!';
+
+  @override
+  String get loginSuccessful => 'Login Successful!';
+
+  @override
+  String get welcomeBack => 'Welcome back';
+
+  @override
+  String get verifiedBadge => 'Verified';
+
+  @override
+  String get unreliableBadge => 'Unreliable';
+
+  @override
+  String confirmsBadge(Object count) {
+    return '$count confirm';
+  }
+
+  @override
+  String get tryAgainButton => 'Try Again';
+
+  @override
+  String get unsubscribeButton => 'Unsubscribe';
+
+  @override
+  String get subscribe => 'Subscribe';
+
+  @override
+  String get confirmDestinationButton => 'Confirm Destination';
+
+  @override
+  String get errorCalculatingRoute => 'Error calculating route';
+
+  @override
+  String errorSendingSMS(Object error) {
+    return 'Error sending SMS: $error';
+  }
+
+  @override
+  String get errorRegisterCheckCredentials =>
+      'Error registering. Check your credentials.';
+
+  @override
+  String get locationPermissionDenied => 'Location permission denied';
+
+  @override
+  String get couldNotGetLocation => 'Could not get location';
+
+  @override
+  String locationStreamError(Object error) {
+    return 'Location stream error: $error';
+  }
+
+  @override
+  String get addSafePlace => 'Add Safe Place';
+
+  @override
+  String get safeRouteButton => 'Safe Route';
+
+  @override
+  String get waitingLocation => 'Waiting for location...';
+
+  @override
+  String get waitingGPS => 'Waiting for GPS location...';
+
+  @override
+  String get homeAddressSavedSuccess => 'Home address saved successfully!';
+
+  @override
+  String get workAddressSavedSuccess => 'Work address saved successfully!';
+
+  @override
+  String addedSuccessfully(Object name) {
+    return '$name added successfully!';
+  }
 }

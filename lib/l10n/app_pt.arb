@@ -204,6 +204,52 @@
   "acidente_transito": "Acidente de Trânsito",
   
   "searchRadius": "Raio de Busca",
+  
+  "searchLocation": "Buscar Localização",
+  
+  "recent": "Recentes",
+  
+  "moreOptions": "Mais Opções",
+  
+  "savedPlaces": "Lugares Salvos",
+  
+  "savedPlacesSubtitle": "Acesso rápido às suas localizações",
+  
+  "shareMyLocation": "Compartilhar Minha Localização",
+  
+  "shareMyLocationSubtitle": "Enviar localização para família e amigos",
+  
+  "checkSafeRoute": "Verificar Rota Segura",
+  
+  "checkSafeRouteSubtitle": "Encontre o caminho mais seguro",
+  
+  "emergencyServices": "Serviços de Emergência",
+  
+  "emergencyServicesSubtitle": "Ligar 112 / Polícia / Bombeiros",
+  "editAlert": "Editar Alerta",
+  "updateAlertMessage": "Atualize a mensagem, gravidade ou raio do alerta.",
+  "message": "Mensagem",
+  "describeTheAlert": "Descreva o alerta",
+  "messageRequired": "Mensagem é obrigatória",
+  "severity": "Gravidade",
+  "radius": "Raio",
+  "radiusMeters": "Raio (metros)",
+  "radiusRequired": "Raio é obrigatório",
+  "invalidValue": "Valor inválido",
+  "radiusMustBeBetween": "Raio deve estar entre 100 e 10.000m",
+  "changesWillBeApplied": "As alterações serão aplicadas imediatamente e os inscritos serão notificados.",
+  "addContact": "Adicionar Contato",
+  "editContact": "Editar Contato",
+  "configureEmergencyContact": "Configure um contato de emergência para ser notificado em situações críticas.",
+  "nameRequired": "Nome é obrigatório",
+  "exampleName": "Ex: Maria Silva",
+  "phoneRequired": "Telefone é obrigatório",
+  "examplePhone": "Ex: +244 923 456 789",
+  "relation": "Relação",
+  "priority": "Prioridade",
+  "priorityContact": "Contato prioritário",
+  "willReceiveEmergencyAlerts": "Receberá alertas de emergência automáticos",
+  "add": "Adicionar",
   "reportAtMyLocation": "Reportar na minha localização",
   "useCurrentGpsLocation": "Usar localização atual do GPS",
   "chooseLocationOnMap": "Escolher localização no mapa",
@@ -339,5 +385,42 @@
   "voteErrorMessage": "Não conseguimos processar seu voto. Por favor, tente novamente.",
   "voteErrorNetwork": "Erro de conexão. Verifique sua internet e tente novamente.",
   "voteErrorServer": "Erro no servidor. Por favor, tente novamente mais tarde.",
-  "voteErrorUnauthorized": "Você precisa estar logado para votar."
+  "voteErrorUnauthorized": "Você precisa estar logado para votar.",
+  
+  "home": "Casa",
+  "work": "Trabalho",
+  "setHome": "Configurar Casa",
+  "setWork": "Configurar Trabalho",
+  "searchAddress": "Buscar endereço...",
+  "errorSearchingAddress": "Erro ao buscar endereço",
+  "pleaseSelectAddress": "Por favor, selecione um endereço",
+  "errorSavingAddress": "Erro ao salvar endereço: {error}",
+  "selected": "Selecionado: {address}",
+  "fillAllFields": "Preencha todos os campos!",
+  "loginSuccessful": "Login Realizado!",
+  "welcomeBack": "Bem-vindo de volta",
+  "verifiedBadge": "Verificado",
+  "unreliableBadge": "Não confiável",
+  "confirmsBadge": "{count} confirmam",
+  
+  "errorLoadingReports": "Erro ao carregar relatórios",
+  "tryAgainButton": "Tentar novamente",
+  "remove": "Remover",
+  "unsubscribeButton": "Cancelar Inscrição",
+  "subscribe": "Inscrever",
+  "confirmDestinationButton": "Confirmar Destino",
+  "errorCalculatingRoute": "Erro ao calcular rota",
+  "errorSendingSMS": "Erro ao enviar SMS: {error}",
+  "errorRegisterCheckCredentials": "Erro ao registrar. Verifique suas credenciais.",
+  "locationPermissionDenied": "Permissão de localização negada",
+  "couldNotGetLocation": "Não foi possível obter a localização",
+  "locationStreamError": "Erro no stream de localização: {error}",
+  
+  "addSafePlace": "Adicionar Lugar Seguro",
+  "safeRouteButton": "Rota Segura",
+  "waitingLocation": "Aguardando localização...",
+  "waitingGPS": "Aguardando localização GPS...",
+  "homeAddressSavedSuccess": "Endereço de casa salvo com sucesso!",
+  "workAddressSavedSuccess": "Endereço de trabalho salvo com sucesso!",
+  "addedSuccessfully": "{name} adicionado com sucesso!"
 }

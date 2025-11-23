@@ -484,6 +484,116 @@ class AppLocalizationsPt extends AppLocalizations {
   String get searchRadius => 'Raio de Busca';
 
   @override
+  String get searchLocation => 'Buscar Localização';
+
+  @override
+  String get recent => 'Recentes';
+
+  @override
+  String get moreOptions => 'Mais Opções';
+
+  @override
+  String get savedPlaces => 'Lugares Salvos';
+
+  @override
+  String get savedPlacesSubtitle => 'Acesso rápido às suas localizações';
+
+  @override
+  String get shareMyLocation => 'Compartilhar Minha Localização';
+
+  @override
+  String get shareMyLocationSubtitle =>
+      'Enviar localização para família e amigos';
+
+  @override
+  String get checkSafeRoute => 'Verificar Rota Segura';
+
+  @override
+  String get checkSafeRouteSubtitle => 'Encontre o caminho mais seguro';
+
+  @override
+  String get emergencyServices => 'Serviços de Emergência';
+
+  @override
+  String get emergencyServicesSubtitle => 'Ligar 112 / Polícia / Bombeiros';
+
+  @override
+  String get editAlert => 'Editar Alerta';
+
+  @override
+  String get updateAlertMessage =>
+      'Atualize a mensagem, gravidade ou raio do alerta.';
+
+  @override
+  String get message => 'Mensagem';
+
+  @override
+  String get describeTheAlert => 'Descreva o alerta';
+
+  @override
+  String get messageRequired => 'Mensagem é obrigatória';
+
+  @override
+  String get severity => 'Gravidade';
+
+  @override
+  String get radius => 'Raio';
+
+  @override
+  String get radiusMeters => 'Raio (metros)';
+
+  @override
+  String get radiusRequired => 'Raio é obrigatório';
+
+  @override
+  String get invalidValue => 'Valor inválido';
+
+  @override
+  String get radiusMustBeBetween => 'Raio deve estar entre 100 e 10.000m';
+
+  @override
+  String get changesWillBeApplied =>
+      'As alterações serão aplicadas imediatamente e os inscritos serão notificados.';
+
+  @override
+  String get addContact => 'Adicionar Contato';
+
+  @override
+  String get editContact => 'Editar Contato';
+
+  @override
+  String get configureEmergencyContact =>
+      'Configure um contato de emergência para ser notificado em situações críticas.';
+
+  @override
+  String get nameRequired => 'Nome é obrigatório';
+
+  @override
+  String get exampleName => 'Ex: Maria Silva';
+
+  @override
+  String get phoneRequired => 'Telefone é obrigatório';
+
+  @override
+  String get examplePhone => 'Ex: +244 923 456 789';
+
+  @override
+  String get relation => 'Relação';
+
+  @override
+  String get priority => 'Prioridade';
+
+  @override
+  String get priorityContact => 'Contato prioritário';
+
+  @override
+  String get willReceiveEmergencyAlerts =>
+      'Receberá alertas de emergência automáticos';
+
+  @override
+  String get add => 'Adicionar';
+
+  @override
   String get reportAtMyLocation => 'Reportar na minha localização';
 
   @override
@@ -543,9 +653,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get confirmDestination => 'Confirmar Destino';
-
-  @override
-  String get add => 'Adicionar';
 
   @override
   String get removeContact => 'Remover Contato';
@@ -675,19 +782,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get describeAlert => 'Descreva o alerta';
 
   @override
-  String get severity => 'Gravidade';
-
-  @override
-  String get radiusMustBeBetween => 'Raio deve estar entre 100 e 10.000m';
-
-  @override
   String get fullName => 'Nome Completo';
 
   @override
   String get enterFullName => 'Digite seu nome completo';
-
-  @override
-  String get relation => 'Relação';
 
   @override
   String get markAsPriority => 'Marcar como prioritário';
@@ -887,4 +985,108 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get voteErrorUnauthorized => 'Você precisa estar logado para votar.';
+
+  @override
+  String get setHome => 'Configurar Casa';
+
+  @override
+  String get setWork => 'Configurar Trabalho';
+
+  @override
+  String get searchAddress => 'Buscar endereço...';
+
+  @override
+  String get errorSearchingAddress => 'Erro ao buscar endereço';
+
+  @override
+  String get pleaseSelectAddress => 'Por favor, selecione um endereço';
+
+  @override
+  String errorSavingAddress(Object error) {
+    return 'Erro ao salvar endereço: $error';
+  }
+
+  @override
+  String selected(Object address) {
+    return 'Selecionado: $address';
+  }
+
+  @override
+  String get fillAllFields => 'Preencha todos os campos!';
+
+  @override
+  String get loginSuccessful => 'Login Realizado!';
+
+  @override
+  String get welcomeBack => 'Bem-vindo de volta';
+
+  @override
+  String get verifiedBadge => 'Verificado';
+
+  @override
+  String get unreliableBadge => 'Não confiável';
+
+  @override
+  String confirmsBadge(Object count) {
+    return '$count confirmam';
+  }
+
+  @override
+  String get tryAgainButton => 'Tentar novamente';
+
+  @override
+  String get unsubscribeButton => 'Cancelar Inscrição';
+
+  @override
+  String get subscribe => 'Inscrever';
+
+  @override
+  String get confirmDestinationButton => 'Confirmar Destino';
+
+  @override
+  String get errorCalculatingRoute => 'Erro ao calcular rota';
+
+  @override
+  String errorSendingSMS(Object error) {
+    return 'Erro ao enviar SMS: $error';
+  }
+
+  @override
+  String get errorRegisterCheckCredentials =>
+      'Erro ao registrar. Verifique suas credenciais.';
+
+  @override
+  String get locationPermissionDenied => 'Permissão de localização negada';
+
+  @override
+  String get couldNotGetLocation => 'Não foi possível obter a localização';
+
+  @override
+  String locationStreamError(Object error) {
+    return 'Erro no stream de localização: $error';
+  }
+
+  @override
+  String get addSafePlace => 'Adicionar Lugar Seguro';
+
+  @override
+  String get safeRouteButton => 'Rota Segura';
+
+  @override
+  String get waitingLocation => 'Aguardando localização...';
+
+  @override
+  String get waitingGPS => 'Aguardando localização GPS...';
+
+  @override
+  String get homeAddressSavedSuccess => 'Endereço de casa salvo com sucesso!';
+
+  @override
+  String get workAddressSavedSuccess =>
+      'Endereço de trabalho salvo com sucesso!';
+
+  @override
+  String addedSuccessfully(Object name) {
+    return '$name adicionado com sucesso!';
+  }
 }

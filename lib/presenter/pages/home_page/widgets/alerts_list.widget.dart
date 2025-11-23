@@ -10,8 +10,9 @@ import 'package:rpa/presenter/controllers/home.controller.dart';
 import 'package:rpa/presenter/controllers/warns.controller.dart';
 
 class AlertsList extends ConsumerWidget {
-  AlertsList({super.key, this.warns});
-  List<Warning>? warns;
+  final List<Warning>? warns;
+  
+  const AlertsList({super.key, this.warns});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var hasNewAlert = ref.watch(hasNewAlertNotifier.notifier).state;

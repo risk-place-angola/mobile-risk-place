@@ -1,6 +1,9 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/l10n/app_localizations.dart';
+import 'package:rpa/core/services/permission_service.dart';
+import 'package:rpa/core/services/fcm_service.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
 import 'package:rpa/presenter/pages/menu/widgets/menu_item.widget.dart';
@@ -99,8 +102,7 @@ class SlideOutMenu extends ConsumerWidget {
               ),
             ),
             
-            // Footer Section
-            _buildFooter(context),
+            _buildFooter(context, ref),
           ],
         ),
       ),
@@ -206,14 +208,13 @@ class SlideOutMenu extends ConsumerWidget {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
-    const appVersion = 'v1.0.0'; // TODO: Get from package_info_plus
+  Widget _buildFooter(BuildContext context, WidgetRef ref) {
+    const appVersion = 'v1.0.0';
     
     return Column(
       children: [
-        // Notification Permission Card
         NotificationPermissionCard(
-          onEnableTap: _handleEnableNotifications,
+          onEnableTap: () => _handleEnableNotifications(ref),
         ),
         
         // App Version
@@ -233,7 +234,7 @@ class SlideOutMenu extends ConsumerWidget {
 
   void _handleMenuTap(String action) {
     onClose();
-    print('Menu action: $action');
+    log('Menu action: $action', name: 'SlideOutMenu');
   }
 
   void _handleEmergencyContacts(BuildContext context) {
@@ -246,8 +247,25 @@ class SlideOutMenu extends ConsumerWidget {
     );
   }
 
-  void _handleEnableNotifications() {
-    print('Enable notifications tapped');
+  Future<void> _handleEnableNotifications(WidgetRef ref) async {
+    try {
+      final permissionService = ref.read(permissionServiceProvider);
+      final hasPermission = await permissionService.checkNotificationPermission();
+      
+      if (hasPermission) {
+        log('Notifications already enabled', name: 'SlideOutMenu');
+        return;
+      }
+
+      await permissionService.requestNotificationPermission();
+      
+      final fcmService = FCMService();
+      await fcmService.initialize();
+      
+      log('Notification setup completed', name: 'SlideOutMenu');
+    } catch (e) {
+      log('Error enabling notifications: $e', name: 'SlideOutMenu');
+    }
   }
 
   void _handleLogin(BuildContext context) {

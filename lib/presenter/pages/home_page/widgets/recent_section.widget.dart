@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rpa/presenter/controllers/home_panel.controller.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 
 class RecentSection extends StatelessWidget {
   final List<RecentItem> recentItems;
@@ -17,14 +18,16 @@ class RecentSection extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final l10n = AppLocalizations.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: Text(
-            'Recent',
-            style: TextStyle(
+            l10n?.recent ?? 'Recent',
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -79,16 +82,21 @@ class RecentItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconColor = _getIconColor(item.type);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
 
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 12 : 20,
+          vertical: isSmallScreen ? 8 : 12,
+        ),
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: isSmallScreen ? 44 : 48,
+              height: isSmallScreen ? 44 : 48,
               decoration: BoxDecoration(
                 color: iconColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -96,18 +104,18 @@ class RecentItemTile extends StatelessWidget {
               child: Icon(
                 item.icon,
                 color: iconColor,
-                size: 24,
+                size: isSmallScreen ? 20 : 24,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: isSmallScreen ? 12 : 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     item.title,
-                    style: const TextStyle(
-                      fontSize: 15,
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 14 : 15,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
@@ -118,7 +126,7 @@ class RecentItemTile extends StatelessWidget {
                   Text(
                     item.subtitle,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: isSmallScreen ? 11 : 13,
                       color: Colors.grey[600],
                     ),
                     maxLines: 1,
@@ -129,7 +137,7 @@ class RecentItemTile extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              size: 16,
+              size: isSmallScreen ? 14 : 16,
               color: Colors.grey[400],
             ),
           ],
