@@ -25,20 +25,18 @@ class RiskTypesService {
 
       final response = await _httpClient.get('/risks/types');
 
-      if (response.statusCode == 200 && response.data != null) {
-        final data = response.data['data'] as List;
-        final riskTypes =
-            data.map((json) => RiskTypeResponseDTO.fromJson(json)).toList();
-
-        log('Successfully fetched ${riskTypes.length} risk types',
-            name: 'RiskTypesService');
-        return riskTypes;
-      } else {
-        throw ServerException(
-          message: 'Falha ao buscar tipos de risco',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      final data = response.data['data'] as List;
+      final riskTypes =
+          data.map((json) => RiskTypeResponseDTO.fromJson(json)).toList();
+
+      log('Successfully fetched ${riskTypes.length} risk types',
+          name: 'RiskTypesService');
+      return riskTypes;
     } on HttpException {
       rethrow;
     } catch (e) {
@@ -59,20 +57,18 @@ class RiskTypesService {
       final response =
           await _httpClient.get('/risks/topics', queryParameters: queryParams);
 
-      if (response.statusCode == 200 && response.data != null) {
-        final data = response.data['data'] as List;
-        final riskTopics =
-            data.map((json) => RiskTopicResponseDTO.fromJson(json)).toList();
-
-        log('Successfully fetched ${riskTopics.length} risk topics',
-            name: 'RiskTypesService');
-        return riskTopics;
-      } else {
-        throw ServerException(
-          message: 'Falha ao buscar tópicos de risco',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      final data = response.data['data'] as List;
+      final riskTopics =
+          data.map((json) => RiskTopicResponseDTO.fromJson(json)).toList();
+
+      log('Successfully fetched ${riskTopics.length} risk topics',
+          name: 'RiskTypesService');
+      return riskTopics;
     } on HttpException {
       rethrow;
     } catch (e) {

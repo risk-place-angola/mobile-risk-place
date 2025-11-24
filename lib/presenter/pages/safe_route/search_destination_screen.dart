@@ -197,8 +197,9 @@ class _SearchDestinationScreenState extends State<SearchDestinationScreen> {
                     children: [
                       TileLayer(
                         urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.riskplace.angola',
+                            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                        userAgentPackageName: 'ao.riskplace.makanetu',
+                        tileDisplay: TileDisplay.instantaneous(),
                       ),
                       if (_selectedDestination != null)
                         MarkerLayer(

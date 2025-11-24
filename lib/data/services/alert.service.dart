@@ -68,16 +68,14 @@ class AlertService {
         data: alertData.toJson(),
       );
 
-      if (response.statusCode == 201 && response.data != null) {
-        log('Alert created successfully: ${response.data['status']}',
-            name: 'AlertService');
-        return true;
-      } else {
-        throw ServerException(
-          message: 'Falha ao criar alerta',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      log('Alert created successfully: ${response.data['status']}',
+          name: 'AlertService');
+      return true;
     } on HttpException {
       rethrow;
     } catch (e) {

@@ -1,18 +1,18 @@
 class LoginRequestDTO {
-  final String email;
+  final String identifier;
   final String password;
   final String? deviceFcmToken;
   final String? deviceLanguage;
 
   const LoginRequestDTO({
-    required this.email,
+    required this.identifier,
     required this.password,
     this.deviceFcmToken,
     this.deviceLanguage,
   });
 
   Map<String, dynamic> toJson() => {
-        'email': email,
+        'identifier': identifier,
         'password': password,
         if (deviceFcmToken != null) 'device_fcm_token': deviceFcmToken,
         if (deviceLanguage != null) 'device_language': deviceLanguage,
@@ -44,6 +44,35 @@ class RegisterRequestDTO {
         if (deviceFcmToken != null) 'device_fcm_token': deviceFcmToken,
         if (deviceLanguage != null) 'device_language': deviceLanguage,
       };
+}
+
+class EmailFallbackResponseDTO {
+  final bool success;
+  final String message;
+  final String? email;
+  final String? id;
+
+  const EmailFallbackResponseDTO({
+    required this.success,
+    required this.message,
+    this.email,
+    this.id,
+  });
+
+  factory EmailFallbackResponseDTO.fromJson(Map<String, dynamic> json) {
+    return EmailFallbackResponseDTO(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      email: json['data']?['email'] as String?,
+      id: json['data']?['id'] as String? ?? json['id'] as String?,
+    );
+  }
+
+  bool get isSentViaEmail =>
+      success &&
+      (message.toLowerCase().contains('sent via email') ||
+          message.toLowerCase().contains('enviado via email') ||
+          message.toLowerCase().contains('enviado para o email'));
 }
 
 class AuthTokenResponseDTO {
@@ -116,4 +145,50 @@ class AuthUserSummaryDTO {
       'role_name': roles,
     };
   }
+}
+
+class ForgotPasswordRequestDTO {
+  final String identifier;
+
+  const ForgotPasswordRequestDTO({required this.identifier});
+
+  Map<String, dynamic> toJson() => {'identifier': identifier};
+}
+
+class VerifyCodeRequestDTO {
+  final String identifier;
+  final String code;
+
+  const VerifyCodeRequestDTO({
+    required this.identifier,
+    required this.code,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'identifier': identifier,
+        'code': code,
+      };
+}
+
+class ResetPasswordRequestDTO {
+  final String identifier;
+  final String password;
+
+  const ResetPasswordRequestDTO({
+    required this.identifier,
+    required this.password,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'identifier': identifier,
+        'password': password,
+      };
+}
+
+class ResendCodeRequestDTO {
+  final String identifier;
+
+  const ResendCodeRequestDTO({required this.identifier});
+
+  Map<String, dynamic> toJson() => {'identifier': identifier};
 }

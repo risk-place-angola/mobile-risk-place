@@ -5,7 +5,6 @@ import 'package:rpa/domain/usecases/calculate_safe_route_usecase.dart';
 import 'package:rpa/domain/usecases/get_incidents_heatmap_usecase.dart';
 import 'package:rpa/data/models/safe_route.dart';
 import 'package:rpa/data/models/heatmap_point.dart';
-import 'package:rpa/core/error/error_handler.dart';
 
 enum RouteStatus { idle, loading, success, error }
 
@@ -26,7 +25,7 @@ class SafeRouteController extends ChangeNotifier {
   RouteStatus _status = RouteStatus.idle;
   SafeRoute? _route;
   List<HeatmapPoint> _heatmapPoints = [];
-  String? _errorMessage;
+  dynamic _error;
   LatLng? _selectedOrigin;
   LatLng? _selectedDestination;
 
@@ -39,7 +38,7 @@ class SafeRouteController extends ChangeNotifier {
   RouteStatus get status => _status;
   SafeRoute? get route => _route;
   List<HeatmapPoint> get heatmapPoints => _heatmapPoints;
-  String? get errorMessage => _errorMessage;
+  dynamic get error => _error;
   LatLng? get selectedOrigin => _selectedOrigin;
   LatLng? get selectedDestination => _selectedDestination;
 
@@ -62,7 +61,7 @@ class SafeRouteController extends ChangeNotifier {
       _status = RouteStatus.loading;
       _selectedOrigin = origin;
       _selectedDestination = destination;
-      _errorMessage = null;
+      _error = null;
       notifyListeners();
 
       final response = await _calculateRouteUseCase.execute(
@@ -78,7 +77,7 @@ class SafeRouteController extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _status = RouteStatus.error;
-      _errorMessage = ErrorHandler.getUserFriendlyMessage(e);
+      _error = e;
       notifyListeners();
     }
   }
@@ -104,8 +103,9 @@ class SafeRouteController extends ChangeNotifier {
       _heatmapPoints = response.points;
       notifyListeners();
     } catch (e) {
-      debugPrint(
-          'Error loading heatmap: ${ErrorHandler.getUserFriendlyMessage(e)}');
+      debugPrint('Error loading heatmap: $e');
+      _error = e;
+      notifyListeners();
     }
   }
 
@@ -113,7 +113,7 @@ class SafeRouteController extends ChangeNotifier {
     _status = RouteStatus.idle;
     _route = null;
     _heatmapPoints = [];
-    _errorMessage = null;
+    _error = null;
     _selectedOrigin = null;
     _selectedDestination = null;
     notifyListeners();
@@ -121,7 +121,7 @@ class SafeRouteController extends ChangeNotifier {
 
   void clearError() {
     _status = RouteStatus.idle;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
   }
 }

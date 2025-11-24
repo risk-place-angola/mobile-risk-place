@@ -53,6 +53,16 @@ class ServerException extends HttpException {
   }) : super(message: message, statusCode: statusCode, data: data);
 }
 
+/// Exception for account not verified
+class AccountNotVerifiedException extends HttpException {
+  final String email;
+  
+  AccountNotVerifiedException({
+    required this.email,
+    String message = 'Account not verified',
+  }) : super(message: message, statusCode: 403);
+}
+
 /// Exception for bad request (400)
 class BadRequestException extends HttpException {
   BadRequestException({

@@ -89,6 +89,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get verificationCodeMessage =>
+      'Check your phone or email for the verification code';
+
+  @override
   String get enterCode => '000000';
 
   @override
@@ -107,17 +111,127 @@ class AppLocalizationsEn extends AppLocalizations {
   String get codeResentSuccess => 'Code resent successfully!';
 
   @override
+  String get codeSentToEmail => 'Code sent to email';
+
+  @override
+  String get smsFailed => 'SMS failed. Check your email';
+
+  @override
+  String codeSentTo(String contact) {
+    return 'Code sent to $contact';
+  }
+
+  @override
   String get errorResendingCode => 'Error resending code';
+
+  @override
+  String get verificationCodeExpired =>
+      'Verification code expired. Request a new one.';
+
+  @override
+  String get invalidVerificationCode =>
+      'Invalid verification code. Please check and try again.';
+
+  @override
+  String get failedToConfirmRegistration => 'Failed to confirm registration';
+
+  @override
+  String get verificationCodeTitle => 'Verification Code';
+
+  @override
+  String verificationAttemptsLeft(int attempts) {
+    return '$attempts attempts left';
+  }
+
+  @override
+  String verificationAccountLocked(int minutes) {
+    return 'Too many attempts. Wait $minutes minutes';
+  }
+
+  @override
+  String verificationResendIn(int seconds) {
+    return 'Resend in ${seconds}s';
+  }
+
+  @override
+  String verificationCodeExpiresIn(int minutes, String seconds) {
+    return 'Code expires in $minutes:$seconds';
+  }
+
+  @override
+  String verificationWaitBeforeResend(int seconds) {
+    return 'Wait $seconds seconds before resending';
+  }
+
+  @override
+  String get verificationTooManyAttempts =>
+      'Too many incorrect attempts. Wait 15 minutes';
+
+  @override
+  String verificationCodeSentTo(String contact) {
+    return 'Code sent to $contact';
+  }
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get errorInvalidCredentials =>
+      'Invalid email or password. Please check and try again.';
+
+  @override
+  String get errorAccountNotVerified =>
+      'Your account is not verified. Please check your phone or email for the verification code.';
+
+  @override
+  String get errorSessionExpired =>
+      'Your session has expired. Please log in again.';
+
+  @override
+  String get errorNoPermission =>
+      'You do not have permission to perform this action.';
+
+  @override
+  String get errorNotFound => 'The requested information was not found.';
+
+  @override
+  String get errorNoInternet =>
+      'No internet connection. Check your connection and try again.';
+
+  @override
+  String get errorTimeout =>
+      'The operation is taking too long. Check your connection and try again.';
+
+  @override
+  String get errorServerUnavailable =>
+      'Our servers are temporarily unavailable. Please try again shortly.';
+
+  @override
+  String get errorInvalidData =>
+      'The data sent is invalid. Please check and try again.';
+
+  @override
+  String get errorUnexpected =>
+      'An unexpected error occurred. Please try again.';
+
+  @override
+  String get errorGeneric => 'Something went wrong. Please try again later.';
 
   @override
   String get forgotPasswordTitle => 'Forgot your password?';
 
   @override
   String get forgotPasswordSubtitle =>
-      'Enter your email to receive\nthe recovery code';
+      'Enter your email or phone to receive\nthe recovery code';
 
   @override
   String get sendCode => 'Send code';
+
+  @override
+  String get invalidIdentifier => 'Enter a valid email or phone number';
+
+  @override
+  String get identifierRequired => 'Email or phone is required';
 
   @override
   String get codeSentSuccess => 'Code sent to your email!';
@@ -879,9 +993,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alreadyHaveAccountQuestion => 'Already have an account? ';
-
-  @override
-  String get verificationCodeTitle => 'Verification Code';
 
   @override
   String sentCodeTo(Object email) {

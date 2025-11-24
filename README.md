@@ -86,6 +86,7 @@ flutter run
 - [WebSocket & Location](/docs/features/LOCATION_TRACKING.md)
 - [HTTP Client](/docs/architecture/HTTP_CLIENT_GUIDE.md)
 - [API Guide](/docs/api/API_COMPLETE_GUIDE.md)
+- [Logging Strategy](/docs/LOGGING_STRATEGY.md) - Boas práticas de logs
 
 ---
 

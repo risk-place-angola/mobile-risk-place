@@ -31,15 +31,13 @@ class RouteService implements IRouteService {
         data: request.toJson(),
       );
 
-      if (response.statusCode == 200 && response.data != null) {
-        log('Safe route calculated successfully', name: 'RouteService');
-        return SafeRouteResponseDTO.fromJson(response.data);
-      } else {
-        throw ServerException(
-          message: 'Falha ao calcular rota segura',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      log('Safe route calculated successfully', name: 'RouteService');
+      return SafeRouteResponseDTO.fromJson(response.data);
     } on HttpException {
       rethrow;
     } catch (e) {
@@ -60,15 +58,13 @@ class RouteService implements IRouteService {
         data: request.toJson(),
       );
 
-      if (response.statusCode == 200 && response.data != null) {
-        log('Heatmap data fetched successfully', name: 'RouteService');
-        return HeatmapResponseDTO.fromJson(response.data);
-      } else {
-        throw ServerException(
-          message: 'Falha ao obter mapa de calor',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      log('Heatmap data fetched successfully', name: 'RouteService');
+      return HeatmapResponseDTO.fromJson(response.data);
     } on HttpException {
       rethrow;
     } catch (e) {

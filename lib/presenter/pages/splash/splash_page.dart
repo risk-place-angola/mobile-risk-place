@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rpa/data/providers/repository_providers.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/pages/home_page/home.page.dart';
 import 'package:rpa/core/utils/navigator_handler.dart';
@@ -45,16 +47,25 @@ class _SplashPageState extends ConsumerState<SplashPage> {
                 duration: Duration(milliseconds: 1200),
               )
             ],
-            onComplete: (controller) {
-              authController.initialize();
-
-              Future.delayed(const Duration(milliseconds: 800), () {
+            onComplete: (controller) async {
+              await _ensureAuthenticationState(authController);
+              
+              if (mounted) {
                 context.navigateToAndReplace(const HomePage());
-              });
+              }
             },
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _ensureAuthenticationState(AuthController authController) async {
+    if (!AuthTokenManager().hasToken) {
+      log('Token not in memory, loading from storage', name: 'SplashPage');
+      await authController.initialize();
+    } else {
+      log('Token already loaded in memory', name: 'SplashPage');
+    }
   }
 }

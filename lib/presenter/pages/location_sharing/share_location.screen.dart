@@ -280,7 +280,8 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.riskplace.app',
+                  userAgentPackageName: 'ao.riskplace.makanetu',
+                  tileDisplay: TileDisplay.instantaneous(),
                 ),
                 MarkerLayer(
                   markers: [

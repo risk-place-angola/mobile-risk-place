@@ -31,17 +31,78 @@
   
   "verificationCode": "Código de Verificação",
   "verificationCodeSent": "Enviamos um código para\n{email}",
+  "verificationCodeMessage": "Verifique seu telefone ou email pelo código de verificação",
   "enterCode": "000000",
   "confirm": "Confirmar",
   "resendCode": "Reenviar código",
   "accountConfirmed": "Conta confirmada com sucesso!",
   "errorConfirmingCode": "Erro ao confirmar código",
   "codeResentSuccess": "Código reenviado com sucesso!",
+  "codeSentToEmail": "Código enviado para o email",
+  "smsFailed": "Falha no SMS. Verifique seu email",
+  "codeSentTo": "Código enviado para {contact}",
   "errorResendingCode": "Erro ao reenviar código",
+  "verificationCodeExpired": "Código de verificação expirado. Solicite um novo.",
+  "invalidVerificationCode": "Código de verificação inválido. Verifique e tente novamente.",
+  "failedToConfirmRegistration": "Falha ao confirmar cadastro",
+  "verificationCodeTitle": "Verifique Sua Conta",
+  "verificationAttemptsLeft": "{attempts} tentativas restantes",
+  "@verificationAttemptsLeft": {
+    "placeholders": {
+      "attempts": {"type": "int"}
+    }
+  },
+  "verificationAccountLocked": "Muitas tentativas. Aguarde {minutes} minutos",
+  "@verificationAccountLocked": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "verificationResendIn": "Reenviar em {seconds}s",
+  "@verificationResendIn": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "verificationCodeExpiresIn": "Código expira em {minutes}:{seconds}",
+  "@verificationCodeExpiresIn": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "seconds": {"type": "String"}
+    }
+  },
+  "verificationWaitBeforeResend": "Aguarde {seconds} segundos antes de reenviar",
+  "@verificationWaitBeforeResend": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "verificationTooManyAttempts": "Muitas tentativas incorretas. Aguarde 15 minutos",
+  "verificationCodeSentTo": "Código enviado para {contact}",
+  "@verificationCodeSentTo": {
+    "placeholders": {
+      "contact": {"type": "String"}
+    }
+  },
+  "clear": "Limpar",
+  
+  "errorInvalidCredentials": "Email ou senha inválidos. Verifique e tente novamente.",
+  "errorAccountNotVerified": "Sua conta não está verificada. Verifique seu telefone ou email pelo código de verificação.",
+  "errorSessionExpired": "Sua sessão expirou. Por favor, faça login novamente.",
+  "errorNoPermission": "Você não tem permissão para realizar esta ação.",
+  "errorNotFound": "As informações solicitadas não foram encontradas.",
+  "errorNoInternet": "Sem conexão com a internet. Verifique sua conexão e tente novamente.",
+  "errorTimeout": "A operação está demorando muito. Verifique sua conexão e tente novamente.",
+  "errorServerUnavailable": "Nossos servidores estão temporariamente indisponíveis. Tente novamente em alguns instantes.",
+  "errorInvalidData": "Os dados enviados são inválidos. Verifique e tente novamente.",
+  "errorUnexpected": "Ocorreu um erro inesperado. Por favor, tente novamente.",
+  "errorGeneric": "Algo deu errado. Por favor, tente novamente mais tarde.",
   
   "forgotPasswordTitle": "Esqueceu sua senha?",
-  "forgotPasswordSubtitle": "Digite seu email para receber\no código de recuperação",
+  "forgotPasswordSubtitle": "Digite seu email ou telefone para receber\no código de recuperação",
   "sendCode": "Enviar código",
+  "invalidIdentifier": "Digite um email ou telefone válido",
+  "identifierRequired": "Email ou telefone é obrigatório",
   "codeSentSuccess": "Código enviado para seu email!",
   "errorSendingCode": "Erro ao enviar código",
   

@@ -8,6 +8,7 @@ import 'package:rpa/data/models/enums/risk_level.dart';
 import 'package:rpa/presenter/controllers/safe_route.controller.dart';
 import 'package:rpa/presenter/pages/safe_route/search_destination_screen.dart';
 import 'package:rpa/presenter/controllers/location.controller.dart';
+import 'package:rpa/core/error/error_handler.dart';
 
 class SafeRouteScreen extends ConsumerStatefulWidget {
   const SafeRouteScreen({super.key});
@@ -111,7 +112,8 @@ class _SafeRouteScreenState extends ConsumerState<SafeRouteScreen> {
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.riskplace.angola',
+                userAgentPackageName: 'ao.riskplace.makanetu',
+                tileDisplay: TileDisplay.instantaneous(),
               ),
               if (controller.route != null) ...[
                 PolylineLayer(
@@ -193,7 +195,9 @@ class _SafeRouteScreenState extends ConsumerState<SafeRouteScreen> {
                 color: Colors.red,
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  controller.errorMessage ?? 'Erro ao calcular rota',
+                  controller.error != null 
+                      ? ErrorHandler.getUserFriendlyMessage(controller.error, context)
+                      : 'Erro ao calcular rota',
                   style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),

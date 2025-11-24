@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rpa/data/services/location.service.dart';
 import 'package:rpa/data/services/alert_websocket_service.dart';
-import 'package:rpa/core/error/error_handler.dart';
 
 /// Location controller using ChangeNotifier
 class LocationController extends ChangeNotifier {
@@ -17,13 +16,13 @@ class LocationController extends ChangeNotifier {
 
   Position? _currentPosition;
   bool _isLoading = false;
-  String? _errorMessage;
+  dynamic _error;
   bool _permissionGranted = false;
 
   // Getters
   Position? get currentPosition => _currentPosition;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
+  dynamic get error => _error;
   bool get permissionGranted => _permissionGranted;
 
   LocationController(this._locationService,
@@ -33,7 +32,7 @@ class LocationController extends ChangeNotifier {
   /// Request location permission and get current position
   Future<bool> requestLocationPermission() async {
     _isLoading = true;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
 
     try {
@@ -42,7 +41,7 @@ class LocationController extends ChangeNotifier {
       if (!hasPermission) {
         _isLoading = false;
         _permissionGranted = false;
-        _errorMessage = 'Permissão de localização negada';
+        _error = Exception('Permissão de localização negada');
         notifyListeners();
         return false;
       }
@@ -55,7 +54,7 @@ class LocationController extends ChangeNotifier {
       return true;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = ErrorHandler.getUserFriendlyMessage(e);
+      _error = e;
       notifyListeners();
       log('Error requesting permission: $e', name: 'LocationController');
       return false;
@@ -65,7 +64,7 @@ class LocationController extends ChangeNotifier {
   /// Get current position once
   Future<void> getCurrentPosition() async {
     _isLoading = true;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
 
     try {
@@ -80,12 +79,12 @@ class LocationController extends ChangeNotifier {
             name: 'LocationController');
       } else {
         _isLoading = false;
-        _errorMessage = 'Não foi possível obter a localização';
+        _error = Exception('Não foi possível obter a localização');
         notifyListeners();
       }
     } catch (e) {
       _isLoading = false;
-      _errorMessage = ErrorHandler.getUserFriendlyMessage(e);
+      _error = e;
       notifyListeners();
       log('Error getting position: $e', name: 'LocationController');
     }
@@ -123,7 +122,7 @@ class LocationController extends ChangeNotifier {
         }
       },
       onError: (error) {
-        _errorMessage = 'Erro no stream de localização: $error';
+        _error = error;
         notifyListeners();
         log('Position stream error: $error', name: 'LocationController');
       },

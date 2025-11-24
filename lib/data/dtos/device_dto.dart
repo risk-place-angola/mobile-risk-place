@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 class DeviceRegisterRequestDTO {
   final String deviceId;
@@ -15,11 +16,12 @@ class DeviceRegisterRequestDTO {
     this.fcmToken,
     String? platform,
     this.model,
-    this.language = 'pt',
+    String? language,
     this.latitude,
     this.longitude,
-    this.alertRadiusMeters = 1000,
-  }) : platform = platform ?? (Platform.isIOS ? 'ios' : 'android');
+    this.alertRadiusMeters = 10000,
+  }) : platform = platform ?? (Platform.isIOS ? 'ios' : 'android'),
+       language = language ?? ui.PlatformDispatcher.instance.locale.languageCode;
 
   Map<String, dynamic> toJson() => {
         'device_id': deviceId,

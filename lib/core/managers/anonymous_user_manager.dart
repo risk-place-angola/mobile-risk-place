@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:ui' as ui;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:rpa/core/device/device_id_manager.dart';
 import 'package:rpa/data/services/device.service.dart';
 import 'package:rpa/data/services/alert_websocket_service.dart';
 import 'package:rpa/data/services/location.service.dart';
+import 'package:rpa/data/providers/repository_providers.dart';
 import 'package:rpa/presenter/controllers/location.controller.dart';
 import 'package:rpa/data/dtos/device_dto.dart';
 
@@ -41,35 +43,83 @@ class AnonymousUserManager {
 
   Future<void> initialize() async {
     try {
-      log('Initializing anonymous user system', name: 'AnonymousUserManager');
+      log('✅ [AnonymousUserManager] Starting initialization (non-blocking)', name: 'AnonymousUserManager');
 
+      // ✅ CORE: Device ID (always needed, fast)
       _deviceId = await _deviceIdManager.getDeviceId();
+      log('✅ Device ID obtained: $_deviceId', name: 'AnonymousUserManager');
 
-      try {
-        _fcmToken = await _getFCMToken();
-        log('FCM token obtained', name: 'AnonymousUserManager');
-      } catch (e) {
-        log('FCM token error: $e - will retry in background',
-            name: 'AnonymousUserManager');
-      }
+      // ✅ ENHANCEMENT: FCM token (background, non-blocking)
+      _fetchFCMTokenInBackground();
 
-      await _registerDevice();
-      await _connectWebSocket();
+      // ✅ ENHANCEMENT: Device registration (best-effort, non-blocking)
+      _registerDeviceInBackground();
+
+      // ✅ ENHANCEMENT: WebSocket (fire-and-forget)
+      _connectWebSocket();
+
+      // ✅ Start location tracking immediately
       _startLocationTracking();
 
-      log('Anonymous user system initialized', name: 'AnonymousUserManager');
+      log('✅ [AnonymousUserManager] Core initialization complete (enhancements in background)', name: 'AnonymousUserManager');
     } catch (e) {
-      log('Initialization error: $e', name: 'AnonymousUserManager');
-      rethrow;
+      log('❌ [AnonymousUserManager] Initialization error: $e', name: 'AnonymousUserManager');
+      // Don't rethrow - app should continue even if anonymous features fail
     }
+  }
+
+  void _fetchFCMTokenInBackground() {
+    Future(() async {
+      try {
+        log('🔍 [AnonymousUserManager] Fetching FCM token in background...', name: 'AnonymousUserManager');
+        
+        String? token = await FirebaseMessaging.instance.getToken();
+        if (token != null) {
+          _fcmToken = token;
+          log('✅ [AnonymousUserManager] FCM token obtained', name: 'AnonymousUserManager');
+          // Try to update device registration with token
+          _registerDeviceInBackground();
+          return;
+        }
+
+        // Retry once after 2s (APNS needs time on iOS)
+        log('⏳ [AnonymousUserManager] FCM token null, retrying after 2s...', name: 'AnonymousUserManager');
+        await Future.delayed(const Duration(seconds: 2));
+        
+        token = await FirebaseMessaging.instance.getToken();
+        if (token != null) {
+          _fcmToken = token;
+          log('✅ [AnonymousUserManager] FCM token obtained on retry', name: 'AnonymousUserManager');
+          _registerDeviceInBackground();
+        } else {
+          log('⚠️ [AnonymousUserManager] FCM token unavailable, continuing without push notifications', name: 'AnonymousUserManager');
+        }
+      } catch (e) {
+        log('❌ [AnonymousUserManager] FCM token error: $e', name: 'AnonymousUserManager');
+      }
+    });
+  }
+
+  void _registerDeviceInBackground() {
+    Future(() async {
+      try {
+        await _registerDevice();
+      } catch (e) {
+        log('❌ [AnonymousUserManager] Device registration error: $e (non-critical)', name: 'AnonymousUserManager');
+      }
+    });
   }
 
   Future<void> _registerDevice() async {
     final position = await _locationService.getCurrentPosition();
+    final systemLocale = ui.PlatformDispatcher.instance.locale.languageCode;
+
+    log('Device language: $systemLocale', name: 'AnonymousUserManager');
 
     final request = DeviceRegisterRequestDTO(
       deviceId: _deviceId!,
       fcmToken: _fcmToken,
+      language: systemLocale,
       latitude: position?.latitude,
       longitude: position?.longitude,
     );
@@ -78,22 +128,52 @@ class AnonymousUserManager {
     log('✅ Device registered', name: 'AnonymousUserManager');
   }
 
-  Future<void> _connectWebSocket() async {
-    _wsService.connect(
-      deviceId: _deviceId,
-      onAlert: (alert) {
-        log('🚨 Alert: ${alert['message']}', name: 'AnonymousUserManager');
-      },
-      onError: (error) {
-        log('❌ WebSocket error: $error', name: 'AnonymousUserManager');
-      },
-      onConnected: () {
-        log('✅ WebSocket connected', name: 'AnonymousUserManager');
-      },
-      onDisconnected: () {
-        log('🔌 WebSocket disconnected', name: 'AnonymousUserManager');
-      },
-    );
+  void _connectWebSocket() {
+    final authToken = AuthTokenManager().token;
+    
+    log('🔌 [AnonymousUserManager] Starting WebSocket connection (non-blocking)', name: 'AnonymousUserManager');
+    
+    if (authToken != null && authToken.isNotEmpty) {
+      log('🔐 [AnonymousUserManager] Authenticated user detected, using JWT for WebSocket', name: 'AnonymousUserManager');
+      _wsService.connect(
+        token: authToken,
+        onAlert: (alert) {
+          log('🚨 Alert: ${alert['message']}', name: 'AnonymousUserManager');
+        },
+        onNearbyUsers: (users) {
+          log('👥 ${users.length} nearby users', name: 'AnonymousUserManager');
+        },
+        onError: (error) {
+          log('❌ WebSocket error: $error', name: 'AnonymousUserManager');
+        },
+        onConnected: () {
+          log('✅ Connected', name: 'AnonymousUserManager');
+        },
+        onDisconnected: () {
+          log('🔌 Disconnected', name: 'AnonymousUserManager');
+        },
+      );
+    } else {
+      log('🌐 [AnonymousUserManager] Anonymous user detected, using device_id for WebSocket', name: 'AnonymousUserManager');
+      _wsService.connect(
+        deviceId: _deviceId,
+        onAlert: (alert) {
+          log('🚨 Alert: ${alert['message']}', name: 'AnonymousUserManager');
+        },
+        onNearbyUsers: (users) {
+          log('👥 ${users.length} nearby users', name: 'AnonymousUserManager');
+        },
+        onError: (error) {
+          log('❌ WebSocket error: $error', name: 'AnonymousUserManager');
+        },
+        onConnected: () {
+          log('✅ Connected', name: 'AnonymousUserManager');
+        },
+        onDisconnected: () {
+          log('🔌 Disconnected', name: 'AnonymousUserManager');
+        },
+      );
+    }
   }
 
   void _startLocationTracking() {
@@ -102,19 +182,12 @@ class AnonymousUserManager {
       (_) async {
         final position = await _locationService.getCurrentPosition();
         if (position != null) {
-          _wsService.updateLocation(position.latitude, position.longitude);
-
-          final request = UpdateDeviceLocationDTO(
-            deviceId: _deviceId!,
-            latitude: position.latitude,
-            longitude: position.longitude,
+          _wsService.updateLocation(
+            position.latitude, 
+            position.longitude,
+            speed: position.speed,
+            heading: position.heading,
           );
-
-          try {
-            await _deviceService.updateLocation(request: request);
-          } catch (e) {
-            log('❌ Location update error: $e', name: 'AnonymousUserManager');
-          }
         }
       },
     );
@@ -126,26 +199,5 @@ class AnonymousUserManager {
   }
 
   String? get deviceId => _deviceId;
-
-  Future<String?> _getFCMToken() async {
-    try {
-      String? token = await FirebaseMessaging.instance.getToken();
-      if (token != null) return token;
-
-      log('⏳ FCM token null, waiting 2s for APNS token...',
-          name: 'AnonymousUserManager');
-      await Future.delayed(const Duration(seconds: 2));
-
-      token = await FirebaseMessaging.instance.getToken();
-      if (token != null) return token;
-
-      log('⏳ Retrying FCM token after 3s...', name: 'AnonymousUserManager');
-      await Future.delayed(const Duration(seconds: 3));
-
-      return await FirebaseMessaging.instance.getToken();
-    } catch (e) {
-      log('❌ Error getting FCM token: $e', name: 'AnonymousUserManager');
-      return null;
-    }
-  }
+  String? get fcmToken => _fcmToken;
 }

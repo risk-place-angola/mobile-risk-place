@@ -41,17 +41,85 @@
       }
     }
   },
+  "verificationCodeMessage": "Check your phone or email for the verification code",
   "enterCode": "000000",
   "confirm": "Confirm",
   "resendCode": "Resend code",
   "accountConfirmed": "Account confirmed successfully!",
   "errorConfirmingCode": "Error confirming code",
   "codeResentSuccess": "Code resent successfully!",
+  "@codeSentTo": {
+    "placeholders": {
+      "contact": {
+        "type": "String"
+      }
+    }
+  },
+  "codeSentToEmail": "Code sent to email",
+  "smsFailed": "SMS failed. Check your email",
+  "codeSentTo": "Code sent to {contact}",
   "errorResendingCode": "Error resending code",
+  "verificationCodeExpired": "Verification code expired. Request a new one.",
+  "invalidVerificationCode": "Invalid verification code. Please check and try again.",
+  "failedToConfirmRegistration": "Failed to confirm registration",
+  "verificationCodeTitle": "Verify Your Account",
+  "verificationAttemptsLeft": "{attempts} attempts left",
+  "@verificationAttemptsLeft": {
+    "placeholders": {
+      "attempts": {"type": "int"}
+    }
+  },
+  "verificationAccountLocked": "Too many attempts. Wait {minutes} minutes",
+  "@verificationAccountLocked": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "verificationResendIn": "Resend in {seconds}s",
+  "@verificationResendIn": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "verificationCodeExpiresIn": "Code expires in {minutes}:{seconds}",
+  "@verificationCodeExpiresIn": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "seconds": {"type": "String"}
+    }
+  },
+  "verificationWaitBeforeResend": "Wait {seconds} seconds before resending",
+  "@verificationWaitBeforeResend": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "verificationTooManyAttempts": "Too many incorrect attempts. Wait 15 minutes",
+  "verificationCodeSentTo": "Code sent to {contact}",
+  "@verificationCodeSentTo": {
+    "placeholders": {
+      "contact": {"type": "String"}
+    }
+  },
+  "clear": "Clear",
+  
+  "errorInvalidCredentials": "Invalid email or password. Please check and try again.",
+  "errorAccountNotVerified": "Your account is not verified. Please check your phone or email for the verification code.",
+  "errorSessionExpired": "Your session has expired. Please log in again.",
+  "errorNoPermission": "You do not have permission to perform this action.",
+  "errorNotFound": "The requested information was not found.",
+  "errorNoInternet": "No internet connection. Check your connection and try again.",
+  "errorTimeout": "The operation is taking too long. Check your connection and try again.",
+  "errorServerUnavailable": "Our servers are temporarily unavailable. Please try again shortly.",
+  "errorInvalidData": "The data sent is invalid. Please check and try again.",
+  "errorUnexpected": "An unexpected error occurred. Please try again.",
+  "errorGeneric": "Something went wrong. Please try again later.",
   
   "forgotPasswordTitle": "Forgot your password?",
-  "forgotPasswordSubtitle": "Enter your email to receive\nthe recovery code",
+  "forgotPasswordSubtitle": "Enter your email or phone to receive\nthe recovery code",
   "sendCode": "Send code",
+  "invalidIdentifier": "Enter a valid email or phone number",
+  "identifierRequired": "Email or phone is required",
   "codeSentSuccess": "Code sent to your email!",
   "errorSendingCode": "Error sending code",
   

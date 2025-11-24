@@ -60,6 +60,8 @@ class _ReportLocationEditorState extends State<ReportLocationEditor> {
             children: [
               TileLayer(
                 urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                userAgentPackageName: 'ao.riskplace.makanetu',
+                tileDisplay: TileDisplay.instantaneous(),
               ),
             ],
           ),

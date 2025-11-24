@@ -31,16 +31,13 @@ class ReportService {
         data: reportData.toJson(),
       );
 
-      if (response.statusCode == 201 && response.data != null) {
-        log('Report created successfully: ${response.data['id']}',
-            name: 'ReportService');
-        return ReportResponseDTO.fromJson(response.data);
-      } else {
-        throw ServerException(
-          message: 'Falha ao criar relatório',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      log('Report created successfully: ${response.data['id']}',
+          name: 'ReportService');
+      return ReportResponseDTO.fromJson(response.data);
     } on HttpException {
       rethrow;
     } catch (e) {
@@ -68,22 +65,20 @@ class ReportService {
         },
       );
 
-      if (response.statusCode == 200 && response.data != null) {
-        final List<dynamic> dataList =
-            response.data is List ? response.data : response.data['data'] ?? [];
-
-        final reports =
-            dataList.map((json) => NearbyReportDTO.fromJson(json)).toList();
-
-        log('Successfully fetched ${reports.length} nearby reports',
-            name: 'ReportService');
-        return reports;
-      } else {
-        throw ServerException(
-          message: 'Falha ao buscar relatórios próximos',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      final List<dynamic> dataList =
+          response.data is List ? response.data : response.data['data'] ?? [];
+
+      final reports =
+          dataList.map((json) => NearbyReportDTO.fromJson(json)).toList();
+
+      log('Successfully fetched ${reports.length} nearby reports',
+          name: 'ReportService');
+      return reports;
     } on HttpException {
       rethrow;
     } catch (e) {
@@ -119,17 +114,15 @@ class ReportService {
         },
       );
 
-      if (response.statusCode == 200 && response.data != null) {
-        final result = ListReportsResponseDTO.fromJson(response.data);
-        log('Successfully fetched ${result.data.length} reports (total: ${result.pagination.total})',
-            name: 'ReportService');
-        return result;
-      } else {
-        throw ServerException(
-          message: 'Falha ao buscar relatórios',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      final result = ListReportsResponseDTO.fromJson(response.data);
+      log('Successfully fetched ${result.data.length} reports (total: ${result.pagination.total})',
+          name: 'ReportService');
+      return result;
     } on HttpException {
       rethrow;
     } catch (e) {
@@ -146,20 +139,14 @@ class ReportService {
     try {
       log('Verifying report: $reportId', name: 'ReportService');
 
-      final response = await _httpClient.post(
+      await _httpClient.post(
         '/reports/$reportId/verify',
         data: {'moderator_id': moderatorId},
       );
 
-      if (response.statusCode == 200) {
-        log('Report verified successfully', name: 'ReportService');
-        return true;
-      } else {
-        throw ServerException(
-          message: 'Falha ao verificar relatório',
-          statusCode: response.statusCode,
-        );
-      }
+      // If we get here, request was successful (200-299)
+      log('Report verified successfully', name: 'ReportService');
+      return true;
     } on HttpException {
       rethrow;
     } catch (e) {
@@ -176,20 +163,14 @@ class ReportService {
     try {
       log('Resolving report: $reportId', name: 'ReportService');
 
-      final response = await _httpClient.post(
+      await _httpClient.post(
         '/reports/$reportId/resolve',
         data: {'moderator_id': moderatorId},
       );
 
-      if (response.statusCode == 200) {
-        log('Report resolved successfully', name: 'ReportService');
-        return true;
-      } else {
-        throw ServerException(
-          message: 'Falha ao resolver relatório',
-          statusCode: response.statusCode,
-        );
-      }
+      // If we get here, request was successful (200-299)
+      log('Report resolved successfully', name: 'ReportService');
+      return true;
     } on HttpException {
       rethrow;
     } catch (e) {
@@ -211,15 +192,13 @@ class ReportService {
         data: locationData.toJson(),
       );
 
-      if (response.statusCode == 200 && response.data != null) {
-        log('Report location updated successfully', name: 'ReportService');
-        return UpdateReportLocationResponseDTO.fromJson(response.data);
-      } else {
-        throw ServerException(
-          message: 'Falha ao atualizar localização do relatório',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      log('Report location updated successfully', name: 'ReportService');
+      return UpdateReportLocationResponseDTO.fromJson(response.data);
     } on HttpException {
       rethrow;
     } catch (e) {

@@ -254,6 +254,12 @@ abstract class AppLocalizations {
   /// **'We sent a code to\n{email}'**
   String verificationCodeSent(String email);
 
+  /// No description provided for @verificationCodeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your phone or email for the verification code'**
+  String get verificationCodeMessage;
+
   /// No description provided for @enterCode.
   ///
   /// In en, this message translates to:
@@ -290,11 +296,167 @@ abstract class AppLocalizations {
   /// **'Code resent successfully!'**
   String get codeResentSuccess;
 
+  /// No description provided for @codeSentToEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Code sent to email'**
+  String get codeSentToEmail;
+
+  /// No description provided for @smsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS failed. Check your email'**
+  String get smsFailed;
+
+  /// No description provided for @codeSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Code sent to {contact}'**
+  String codeSentTo(String contact);
+
   /// No description provided for @errorResendingCode.
   ///
   /// In en, this message translates to:
   /// **'Error resending code'**
   String get errorResendingCode;
+
+  /// No description provided for @verificationCodeExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code expired. Request a new one.'**
+  String get verificationCodeExpired;
+
+  /// No description provided for @invalidVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid verification code. Please check and try again.'**
+  String get invalidVerificationCode;
+
+  /// No description provided for @failedToConfirmRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to confirm registration'**
+  String get failedToConfirmRegistration;
+
+  /// No description provided for @verificationCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code'**
+  String get verificationCodeTitle;
+
+  /// No description provided for @verificationAttemptsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{attempts} attempts left'**
+  String verificationAttemptsLeft(int attempts);
+
+  /// No description provided for @verificationAccountLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Wait {minutes} minutes'**
+  String verificationAccountLocked(int minutes);
+
+  /// No description provided for @verificationResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {seconds}s'**
+  String verificationResendIn(int seconds);
+
+  /// No description provided for @verificationCodeExpiresIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Code expires in {minutes}:{seconds}'**
+  String verificationCodeExpiresIn(int minutes, String seconds);
+
+  /// No description provided for @verificationWaitBeforeResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait {seconds} seconds before resending'**
+  String verificationWaitBeforeResend(int seconds);
+
+  /// No description provided for @verificationTooManyAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many incorrect attempts. Wait 15 minutes'**
+  String get verificationTooManyAttempts;
+
+  /// No description provided for @verificationCodeSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Code sent to {contact}'**
+  String verificationCodeSentTo(String contact);
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @errorInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email or password. Please check and try again.'**
+  String get errorInvalidCredentials;
+
+  /// No description provided for @errorAccountNotVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is not verified. Please check your phone or email for the verification code.'**
+  String get errorAccountNotVerified;
+
+  /// No description provided for @errorSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Please log in again.'**
+  String get errorSessionExpired;
+
+  /// No description provided for @errorNoPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to perform this action.'**
+  String get errorNoPermission;
+
+  /// No description provided for @errorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The requested information was not found.'**
+  String get errorNotFound;
+
+  /// No description provided for @errorNoInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Check your connection and try again.'**
+  String get errorNoInternet;
+
+  /// No description provided for @errorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The operation is taking too long. Check your connection and try again.'**
+  String get errorTimeout;
+
+  /// No description provided for @errorServerUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Our servers are temporarily unavailable. Please try again shortly.'**
+  String get errorServerUnavailable;
+
+  /// No description provided for @errorInvalidData.
+  ///
+  /// In en, this message translates to:
+  /// **'The data sent is invalid. Please check and try again.'**
+  String get errorInvalidData;
+
+  /// No description provided for @errorUnexpected.
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred. Please try again.'**
+  String get errorUnexpected;
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again later.'**
+  String get errorGeneric;
 
   /// No description provided for @forgotPasswordTitle.
   ///
@@ -305,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @forgotPasswordSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter your email to receive\nthe recovery code'**
+  /// **'Enter your email or phone to receive\nthe recovery code'**
   String get forgotPasswordSubtitle;
 
   /// No description provided for @sendCode.
@@ -313,6 +475,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send code'**
   String get sendCode;
+
+  /// No description provided for @invalidIdentifier.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email or phone number'**
+  String get invalidIdentifier;
+
+  /// No description provided for @identifierRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or phone is required'**
+  String get identifierRequired;
 
   /// No description provided for @codeSentSuccess.
   ///
@@ -1813,12 +1987,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Already have an account? '**
   String get alreadyHaveAccountQuestion;
-
-  /// No description provided for @verificationCodeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Verification Code'**
-  String get verificationCodeTitle;
 
   /// No description provided for @sentCodeTo.
   ///

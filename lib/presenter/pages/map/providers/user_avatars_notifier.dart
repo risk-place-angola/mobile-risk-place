@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/data/models/websocket/nearby_user_model.dart';
 
@@ -38,15 +39,14 @@ class UserAvatarsNotifier extends Notifier<UserAvatarsState> {
   }
 
   void updateNearbyUsers(List<NearbyUserModel> newUsers) {
-    if (_throttleTimer?.isActive ?? false) {
-      return;
-    }
+    if (_throttleTimer?.isActive ?? false) return;
     
     _throttleTimer = Timer(const Duration(milliseconds: 500), () {
       final updatedUsers = Map<String, NearbyUserModel>.from(state.users);
       bool hasChanges = false;
       
       final limitedUsers = newUsers.take(maxVisibleUsers);
+      
       for (final user in limitedUsers) {
         final existing = updatedUsers[user.userId];
         
@@ -64,6 +64,7 @@ class UserAvatarsNotifier extends Notifier<UserAvatarsState> {
 
       // Only update state if there are actual changes
       if (hasChanges) {
+        log('✅ ${updatedUsers.length} avatars', name: 'UserAvatarsNotifier');
         state = state.copyWith(
           users: updatedUsers,
           lastUpdate: DateTime.now(),

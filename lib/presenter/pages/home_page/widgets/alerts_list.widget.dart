@@ -39,7 +39,15 @@ class AlertsList extends ConsumerWidget {
                         subtitle:
                             Text(warns![index].createdAt!.toFormatString()),
                         trailing: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Alert deletion will be available in a future update'),
+                                backgroundColor: Colors.orange,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          },
                           icon: const Icon(Icons.delete),
                         ),
                       ),
@@ -114,6 +122,8 @@ class NewAlert extends ConsumerWidget {
                             urlTemplate:
                                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                             subdomains: ['a', 'b', 'c'],
+                            userAgentPackageName: 'ao.riskplace.makanetu',
+                            tileDisplay: TileDisplay.instantaneous(),
                           ),
                           MarkerLayer(
                             markers: [
