@@ -252,7 +252,7 @@ workflows:
       cocoapods: default
       
       ios_signing:
-        distribution_type: app_store
+        distribution_type: development
         bundle_identifier: ao.riskplace.makanetu
     
     triggering:
@@ -298,6 +298,7 @@ workflows:
       - name: 🏗️ Build iOS IPA (Development)
         script: |
           flutter build ipa --release \
+            --export-options-plist=$HOME/export_options.plist \
             --build-name=1.0.0 \
             --build-number=$BUILD_NUMBER \
             --dart-define=ENV=$ENV \
@@ -305,10 +306,18 @@ workflows:
             --dart-define=WS_URL=$WS_URL \
             --dart-define=OSM_TILE_URL=$OSM_TILE_URL
       
-      - name: 🚀 Publish to TestFlight
+      - name: 🚀 Upload to Firebase App Distribution
         script: |
-          echo "Publishing to TestFlight Beta..."
-          # CodeMagic automaticamente publica usando App Store Connect API
+          echo "Installing Firebase CLI..."
+          npm install -g firebase-tools
+          
+          echo "Deploying to Firebase App Distribution..."
+          firebase appdistribution:distribute \
+            build/ios/ipa/*.ipa \
+            --app $FIREBASE_APP_ID_IOS \
+            --groups "nete-testers" \
+            --release-notes "Development build - $(date)" \
+            --token $FIREBASE_CLI_TOKEN
     
     artifacts:
       - build/ios/ipa/*.ipa
@@ -316,19 +325,6 @@ workflows:
       - flutter_drive.log
     
     publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        
-        submit_to_testflight: true
-        beta_groups:
-          - Nete Testers
-          #- Internal Testers
-          #- Beta Testers
-        
-        submit_to_app_store: false
-      
       email:
         recipients:
           - $TEAM_EMAIL
@@ -391,11 +387,13 @@ workflows:
       cancel_previous_builds: false
     
     scripts:
-      - name: 🔐 Setup signing (automatic)
+      - name: 🔐 Setup iOS Signing
         script: |
-          echo "Using Xcode automatic signing"
-          echo "Team ID: 4883KF3Z76"
+          # CodeMagic will automatically fetch/generate certificates
+          # using App Store Connect API credentials
           echo "Bundle ID: $BUNDLE_ID"
+          echo "Team ID: 4883KF3Z76"
+          echo "Distribution: App Store"
       
       - name: 🔧 Get Flutter packages
         script: |
@@ -428,17 +426,13 @@ workflows:
       - name: 🏗️ Build iOS IPA (Production)
         script: |
           flutter build ipa --release \
+            --export-options-plist=$HOME/export_options.plist \
             --build-name=$VERSION_NAME \
             --build-number=$VERSION_CODE \
             --dart-define=ENV=$ENV \
             --dart-define=BASE_URL=$BASE_URL \
             --dart-define=WS_URL=$WS_URL \
             --dart-define=OSM_TILE_URL=$OSM_TILE_URL
-      
-      - name: 🚀 Publish to App Store
-        script: |
-          echo "Publishing to App Store..."
-          # CodeMagic automaticamente publica usando App Store Connect API
     
     artifacts:
       - build/ios/ipa/*.ipa
