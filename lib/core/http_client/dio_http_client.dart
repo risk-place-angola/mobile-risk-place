@@ -35,8 +35,7 @@ class HttpClient implements IHttpClient {
       receiveTimeout: const Duration(seconds: 30),
       sendTimeout: const Duration(seconds: 30),
       validateStatus: (status) =>
-          status != null &&
-          status < 600, // Accept all status codes to handle them properly
+          status != null && status >= 200 && status < 300, // Only accept success status codes
     );
   }
 

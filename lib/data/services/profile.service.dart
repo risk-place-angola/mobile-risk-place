@@ -35,21 +35,15 @@ class ProfileService implements IProfileService {
         workAddress: workAddress,
       );
 
-      final response = await _httpClient.put(
+      await _httpClient.put(
         '/users/profile',
         data: request.toJson(),
       );
 
-      if (response.statusCode == 200) {
-        log('Profile updated successfully', name: 'ProfileService');
-        if (homeAddress != null) _cachedHomeAddress = homeAddress;
-        if (workAddress != null) _cachedWorkAddress = workAddress;
-      } else {
-        throw ServerException(
-          message: 'Falha ao atualizar perfil',
-          statusCode: response.statusCode,
-        );
-      }
+      // If we get here, request was successful (200-299)
+      log('Profile updated successfully', name: 'ProfileService');
+      if (homeAddress != null) _cachedHomeAddress = homeAddress;
+      if (workAddress != null) _cachedWorkAddress = workAddress;
     } catch (e) {
       log('Error updating profile: $e', name: 'ProfileService');
       rethrow;
@@ -65,7 +59,8 @@ class ProfileService implements IProfileService {
 
       final response = await _httpClient.get('/users/profile');
 
-      if (response.statusCode == 200 && response.data != null) {
+      // If we get here, request was successful (200-299)
+      if (response.data != null) {
         final homeData = response.data['home_address'];
         if (homeData != null) {
           _cachedHomeAddress = SavedAddress.fromJson(homeData);
@@ -88,7 +83,8 @@ class ProfileService implements IProfileService {
 
       final response = await _httpClient.get('/users/profile');
 
-      if (response.statusCode == 200 && response.data != null) {
+      // If we get here, request was successful (200-299)
+      if (response.data != null) {
         final workData = response.data['work_address'];
         if (workData != null) {
           _cachedWorkAddress = SavedAddress.fromJson(workData);
@@ -120,15 +116,13 @@ class ProfileService implements IProfileService {
         data: request.toJson(),
       );
 
-      if (response.statusCode == 200 && response.data != null) {
-        log('Home route calculated successfully', name: 'ProfileService');
-        return SafeRouteResponseDTO.fromJson(response.data);
-      } else {
-        throw ServerException(
-          message: 'Falha ao calcular rota para casa',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      log('Home route calculated successfully', name: 'ProfileService');
+      return SafeRouteResponseDTO.fromJson(response.data);
     } catch (e) {
       log('Error navigating to home: $e', name: 'ProfileService');
       rethrow;
@@ -153,15 +147,13 @@ class ProfileService implements IProfileService {
         data: request.toJson(),
       );
 
-      if (response.statusCode == 200 && response.data != null) {
-        log('Work route calculated successfully', name: 'ProfileService');
-        return SafeRouteResponseDTO.fromJson(response.data);
-      } else {
-        throw ServerException(
-          message: 'Falha ao calcular rota para trabalho',
-          statusCode: response.statusCode,
-        );
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
+        throw ServerException(message: 'Empty response from server');
       }
+      
+      log('Work route calculated successfully', name: 'ProfileService');
+      return SafeRouteResponseDTO.fromJson(response.data);
     } catch (e) {
       log('Error navigating to work: $e', name: 'ProfileService');
       rethrow;

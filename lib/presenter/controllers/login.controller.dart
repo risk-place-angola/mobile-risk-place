@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,20 +7,37 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/core/error/error_handler.dart';
 import 'package:rpa/core/device/device_id_manager.dart';
+import 'package:rpa/core/services/fcm_service.dart';
+import 'package:rpa/core/http_client/exceptions/http_exceptions.dart';
 import 'package:rpa/data/dtos/auth_request_dto.dart';
 import 'package:rpa/data/providers/user_provider.dart';
 import 'package:rpa/data/services/auth.service.dart';
-import 'package:rpa/data/services/alert_websocket_service.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
-import 'package:rpa/presenter/controllers/location.controller.dart';
 import 'package:rpa/presenter/pages/home_page/home.page.dart';
+import 'package:rpa/presenter/pages/auth/verification_code_page.dart';
 
 class LoginController extends ChangeNotifier {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
 
-  Future<void> login(BuildContext context, WidgetRef ref) async {
+  void reset() {
+    emailController.clear();
+    passwordController.clear();
+    isLoading = false;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<bool> login(BuildContext context, WidgetRef ref) async {
+    if (isLoading) return false;
+    
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       final l10n = AppLocalizations.of(context);
       _showSnackBar(
@@ -27,7 +45,7 @@ class LoginController extends ChangeNotifier {
         l10n?.fillAllFields ?? "Preencha todos os campos!",
         isError: true,
       );
-      return;
+      return false;
     }
 
     isLoading = true;
@@ -38,78 +56,81 @@ class LoginController extends ChangeNotifier {
       final deviceIdManager = ref.read(deviceIdManagerProvider);
       final deviceId = await deviceIdManager.getDeviceId();
 
+      final fcmToken = FCMService().token;
+      final systemLocale = ui.PlatformDispatcher.instance.locale.languageCode;
+      
+      log('Device language detected: $systemLocale', name: 'LoginController');
+
       final loginRequester = LoginRequestDTO(
-        email: emailController.text.trim(),
+        identifier: emailController.text.trim(),
         password: passwordController.text.trim(),
+        deviceFcmToken: fcmToken,
+        deviceLanguage: systemLocale,
       );
 
       await authService.login(user: loginRequester, deviceId: deviceId);
 
       if (!context.mounted) {
-        log("Context not mounted", name: "LoginController");
-        return;
+        log("Context not mounted after login", name: "LoginController");
+        return false;
       }
 
-      // Update auth state
-      ref.read(authControllerProvider).updateUser();
+      log("✅ [Login] Authentication successful", name: "LoginController");
 
-      // Refresh user provider to load new user data
+      ref.read(authControllerProvider).updateUser();
       final _ = ref.refresh(currentUserProvider.future);
 
-      log("🔐 [Login] Upgrading to authenticated WebSocket connection...",
-          name: "LoginController");
+      if (!context.mounted) return false;
 
-      final wsService = ref.read(alertWebSocketProvider);
-      wsService.disconnect();
-
-      wsService.connect(
-        token: '',
-        onAlert: (alertData) {
-          log("🚨 [Login] Alert: ${alertData['message']}",
-              name: "LoginController");
-        },
-        onError: (error) {
-          log("❌ [Login] WebSocket error: $error", name: "LoginController");
-        },
-        onConnected: () {
-          log("✅ [Login] Authenticated WebSocket connected!",
-              name: "LoginController");
-        },
-        onDisconnected: () {
-          log("🔌 [Login] WebSocket disconnected", name: "LoginController");
-        },
+      log("✅ [Login] Auth state updated, navigating to home", name: "LoginController");
+      
+      final l10n = AppLocalizations.of(context);
+      _showSnackBar(
+        context,
+        l10n?.welcomeBack ?? 'Welcome back!',
+        isError: false,
       );
-
-      // ========================================================================
-      // 📍 REQUEST LOCATION PERMISSION
-      // ========================================================================
-      // Request location permission after successful login
-      final locationController = ref.read(locationControllerProvider);
-      final locationPermissionGranted =
-          await locationController.requestLocationPermission();
-
-      if (!locationPermissionGranted) {
-        log("⚠️ [Login] Location permission denied", name: "LoginController");
-      } else {
-        log("✅ [Login] Location permission granted", name: "LoginController");
-      }
-
-      if (!context.mounted) return;
-
-      _showSuccessDialog(context);
-
-      await Future.delayed(const Duration(milliseconds: 1500));
-
-      if (!context.mounted) return;
-
+      
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (_) => const HomePage()),
       );
+      
+      return true;
+    } on ForbiddenException catch (e) {
+      log("Account verification required", name: "LoginController");
+      
+      if (!context.mounted) return false;
+      
+      final message = e.message.toLowerCase();
+      if (message.contains('not verified') || message.contains('verify')) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => VerificationCodePage(
+              identifier: emailController.text.trim(),
+            ),
+          ),
+        );
+      } else {
+        ErrorHandler.showErrorSnackBar(context, e);
+      }
+      return false;
+    } on AccountNotVerifiedException catch (e) {
+      log("Account not verified, redirecting to verification", name: "LoginController");
+      
+      if (!context.mounted) return false;
+      
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => VerificationCodePage(identifier: e.email),
+        ),
+      );
+      return false;
     } catch (e) {
-      log("❌ Login error: $e", name: "LoginController");
+      log("Login error: $e", name: "LoginController");
       if (context.mounted) {
         ErrorHandler.showErrorSnackBar(context, e);
       }
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();
@@ -122,70 +143,9 @@ class LoginController extends ChangeNotifier {
       SnackBar(
         content: Text(message),
         backgroundColor: isError ? Colors.red : Colors.green,
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
       ),
-    );
-  }
-
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check_circle,
-                    color: Colors.green.shade700,
-                    size: 48,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  AppLocalizations.of(context)?.loginSuccessful ?? 'Login Realizado!',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green.shade700,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  AppLocalizations.of(context)?.welcomeBack ?? 'Bem-vindo de volta',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                const SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

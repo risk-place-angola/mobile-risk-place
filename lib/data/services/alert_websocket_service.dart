@@ -253,9 +253,10 @@ class AlertWebSocketService {
           .map((json) => NearbyUserModel.fromJson(json as Map<String, dynamic>))
           .toList();
       
+      log('👥 Received ${users.length} nearby users', name: 'AlertWebSocketService');
       onNearbyUsersReceived?.call(users);
     } catch (e) {
-      log('❌ [WebSocket] Error parsing nearby users: $e', name: 'AlertWebSocketService');
+      log('❌ Error parsing nearby users: $e', name: 'AlertWebSocketService');
     }
   }
 

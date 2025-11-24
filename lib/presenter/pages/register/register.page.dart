@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/presenter/controllers/register.controller.dart';
 import 'package:rpa/presenter/pages/login/login.page.dart';
@@ -22,6 +23,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A2E),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -82,33 +91,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       _obscurePassword = !_obscurePassword;
                     });
                   },
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)?.iAmRFCE ?? 'I am RFCE',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Switch.adaptive(
-                        activeColor: const Color(0xFFF39C12),
-                        value: controller.imRFCE,
-                        onChanged: (newValue) =>
-                            setState(() => controller.setRFCE(newValue)),
-                      ),
-                    ],
-                  ),
                 ),
                 const SizedBox(height: 32),
                 SizedBox(
@@ -320,20 +302,12 @@ class _PhoneField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: TextInputType.phone,
-      textInputAction: TextInputAction.next,
+    return IntlPhoneField(
       decoration: InputDecoration(
         labelText: AppLocalizations.of(context)?.phone ?? 'Phone',
         labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-        hintText: AppLocalizations.of(context)?.enterPhonePlaceholder ??
-            'Enter your phone',
+        hintText: AppLocalizations.of(context)?.enterPhonePlaceholder ?? 'Enter your phone',
         hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-        prefixIcon: Icon(
-          Icons.phone_outlined,
-          color: Colors.white.withOpacity(0.7),
-        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -361,12 +335,15 @@ class _PhoneField extends StatelessWidget {
         fillColor: Colors.white.withOpacity(0.1),
       ),
       style: const TextStyle(color: Colors.white),
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
+      dropdownTextStyle: const TextStyle(color: Colors.white),
+      initialCountryCode: 'AO',
+      disableLengthCheck: false,
+      onChanged: (phone) {
+        controller.text = phone.completeNumber;
+      },
+      validator: (phone) {
+        if (phone == null || phone.completeNumber.isEmpty) {
           return 'Por favor, insira seu telefone';
-        }
-        if (value.trim().length < 9) {
-          return 'Por favor, insira um telefone válido';
         }
         return null;
       },

@@ -24,7 +24,7 @@ class ErrorInterceptor extends Interceptor {
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
           return TimeoutException(
-            message: 'A requisição demorou muito tempo. Tente novamente.',
+            message: 'Request timeout',
           );
 
         case DioExceptionType.connectionError:
@@ -33,45 +33,44 @@ class ErrorInterceptor extends Interceptor {
             if (socketError.osError?.errorCode == 7 ||
                 socketError.osError?.errorCode == 61) {
               return NetworkException(
-                message:
-                    'Não foi possível conectar ao servidor. Verifique sua conexão.',
+                message: 'Could not connect to server',
               );
             }
             return NetworkException(
-              message: 'Sem conexão com a internet. Verifique sua conexão.',
+              message: 'No internet connection',
             );
           }
           return NetworkException(
-            message: 'Erro de conexão. Verifique sua internet.',
+            message: 'Connection error',
           );
 
         case DioExceptionType.badResponse:
           return _handleStatusCodeError(error);
 
         case DioExceptionType.cancel:
-          return HttpException(message: 'Requisição cancelada');
+          return HttpException(message: 'Request cancelled');
 
         case DioExceptionType.unknown:
           if (error.error is SocketException) {
             return NetworkException(
-              message: 'Sem conexão com a internet',
+              message: 'No internet connection',
             );
           }
           if (error.error is FormatException) {
             return HttpException(
-              message: 'Erro ao processar resposta do servidor',
+              message: 'Invalid server response',
             );
           }
           return HttpException(
-            message: 'Ocorreu um erro inesperado',
+            message: 'Unexpected error',
           );
 
         default:
-          return HttpException(message: 'Ocorreu um erro inesperado');
+          return HttpException(message: 'Unexpected error');
       }
     } catch (e) {
       return HttpException(
-        message: 'Erro ao processar requisição',
+        message: 'Request processing error',
       );
     }
   }
@@ -83,8 +82,15 @@ class ErrorInterceptor extends Interceptor {
 
       String? message;
       if (data is Map<String, dynamic>) {
-        message = data['message'] as String? ??
-            data['error'] as String? ??
+        if (data.containsKey('error')) {
+          final errorField = data['error'];
+          if (errorField is Map<String, dynamic>) {
+            message = errorField['message'] as String?;
+          } else if (errorField is String) {
+            message = errorField;
+          }
+        }
+        message ??= data['message'] as String? ??
             data['msg'] as String? ??
             data['detail'] as String?;
       } else if (data is String) {
@@ -94,37 +100,34 @@ class ErrorInterceptor extends Interceptor {
       switch (statusCode) {
         case 400:
           return BadRequestException(
-            message: message ?? 'Requisição inválida',
+            message: message ?? 'Invalid request',
             data: data,
           );
 
         case 401:
           return UnauthorizedException(
-            message: message ?? 'Credenciais inválidas ou sessão expirada',
+            message: message ?? 'Unauthorized',
           );
 
         case 403:
+          if (message != null && 
+              (message.contains('not verified') ||
+               message.contains('verification required') ||
+               message.contains('verify'))) {
+            return ForbiddenException(message: 'account not verified');
+          }
           return ForbiddenException(
-            message:
-                message ?? 'Você não tem permissão para acessar este recurso',
+            message: message ?? 'Forbidden',
           );
 
         case 404:
-          if (data is String && data.toLowerCase().contains('not found')) {
-            return NotFoundException(
-              message:
-                  'Este recurso ainda não está disponível. Estamos trabalhando nisso.',
-            );
-          }
           return NotFoundException(
-            message:
-                message ?? 'As informações solicitadas não foram encontradas',
+            message: message ?? 'Not found',
           );
 
         case 409:
           return BadRequestException(
-            message:
-                message ?? 'Conflito: esta operação não pode ser realizada',
+            message: message ?? 'Conflict',
             data: data,
           );
 
@@ -145,15 +148,14 @@ class ErrorInterceptor extends Interceptor {
             }
           }
           return ValidationException(
-            message: message ?? 'Erro de validação',
+            message: message ?? 'Validation error',
             errors: errors,
             data: data,
           );
 
         case 429:
           return HttpException(
-            message:
-                'Muitas requisições. Aguarde alguns instantes e tente novamente.',
+            message: 'Too many requests',
             statusCode: statusCode,
             data: data,
           );
@@ -163,21 +165,21 @@ class ErrorInterceptor extends Interceptor {
         case 503:
         case 504:
           return ServerException(
-            message: 'Erro no servidor. Tente novamente mais tarde.',
+            message: 'Server error',
             statusCode: statusCode,
             data: data,
           );
 
         default:
           return HttpException(
-            message: message ?? 'Erro ao processar requisição',
+            message: message ?? 'Request error',
             statusCode: statusCode,
             data: data,
           );
       }
     } catch (e) {
       return HttpException(
-        message: 'Erro ao processar resposta do servidor',
+        message: 'Invalid server response',
         statusCode: error.response?.statusCode,
       );
     }

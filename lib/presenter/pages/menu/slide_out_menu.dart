@@ -211,24 +211,32 @@ class SlideOutMenu extends ConsumerWidget {
   Widget _buildFooter(BuildContext context, WidgetRef ref) {
     const appVersion = 'v1.0.0';
     
-    return Column(
-      children: [
-        NotificationPermissionCard(
-          onEnableTap: () => _handleEnableNotifications(ref),
-        ),
+    return FutureBuilder<bool>(
+      future: ref.read(permissionServiceProvider).checkNotificationPermission(),
+      builder: (context, snapshot) {
+        final hasPermission = snapshot.data ?? false;
         
-        // App Version
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(
-            appVersion,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+        return Column(
+          children: [
+            if (!hasPermission)
+              NotificationPermissionCard(
+                onEnableTap: () => _handleEnableNotifications(ref),
+              ),
+            
+            // App Version
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text(
+                appVersion,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -257,12 +265,22 @@ class SlideOutMenu extends ConsumerWidget {
         return;
       }
 
+      // Tentar solicitar permissão
       await permissionService.requestNotificationPermission();
       
-      final fcmService = FCMService();
-      await fcmService.initialize();
+      // Verificar novamente após solicitar
+      final granted = await permissionService.checkNotificationPermission();
       
-      log('Notification setup completed', name: 'SlideOutMenu');
+      if (granted) {
+        // Se concedida, inicializar FCM
+        final fcmService = FCMService();
+        await fcmService.initialize();
+        log('Notification setup completed', name: 'SlideOutMenu');
+      } else {
+        // Se negada, abrir configurações
+        log('Permission denied, opening settings', name: 'SlideOutMenu');
+        await permissionService.openSettings();
+      }
     } catch (e) {
       log('Error enabling notifications: $e', name: 'SlideOutMenu');
     }

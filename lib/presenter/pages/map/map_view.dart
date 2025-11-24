@@ -67,8 +67,7 @@ class _MapViewState extends ConsumerState<MapView> {
       locationController.startLocationUpdates();
     }
 
-    await Future.delayed(const Duration(seconds: 1));
-    
+    // ✅ Load reports immediately instead of arbitrary delay
     if (mounted) {
       _loadNearbyReportsFromBackend();
     }
@@ -79,6 +78,7 @@ class _MapViewState extends ConsumerState<MapView> {
     
     wsService.onNearbyUsersReceived = (users) {
       if (mounted) {
+        log('🗺️ ${users.length} nearby users', name: 'MapView');
         ref.read(userAvatarsProvider.notifier).updateNearbyUsers(users);
       }
     };
@@ -999,6 +999,8 @@ class _MapViewState extends ConsumerState<MapView> {
           children: [
             TileLayer(
               urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              userAgentPackageName: 'ao.riskplace.makanetu',
+              tileDisplay: TileDisplay.instantaneous(),
             ),
             // Alert radius circles (drawn first, under markers)
             CircleLayer(

@@ -1,52 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 import 'package:rpa/core/http_client/exceptions/http_exceptions.dart';
 
 class ErrorHandler {
-  static String getUserFriendlyMessage(dynamic error) {
+  static String getUserFriendlyMessage(dynamic error, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     if (error is ValidationException) {
-      return _handleValidationError(error);
+      return _handleValidationError(error, l10n);
     } else if (error is UnauthorizedException) {
-      return 'Sua sessão expirou. Por favor, faça login novamente.';
+      final message = error.message.toLowerCase();
+      if (message.contains('invalid credentials') ||
+          message.contains('invalid email') ||
+          message.contains('invalid password') ||
+          message.contains('wrong password') ||
+          message.contains('wrong email')) {
+        return l10n.errorInvalidCredentials;
+      }
+      return l10n.errorSessionExpired;
     } else if (error is ForbiddenException) {
-      return 'Você não tem permissão para realizar esta ação.';
+      final message = error.message.toLowerCase();
+      if (message.contains('not verified') ||
+          message.contains('verify') ||
+          message.contains('verification')) {
+        return l10n.errorAccountNotVerified;
+      }
+      return l10n.errorNoPermission;
     } else if (error is NotFoundException) {
-      return 'As informações solicitadas não foram encontradas.';
+      return l10n.errorNotFound;
     } else if (error is NetworkException) {
-      return 'Sem conexão com a internet. Verifique sua conexão e tente novamente.';
+      return l10n.errorNoInternet;
     } else if (error is TimeoutException) {
-      return 'A operação está demorando muito. Verifique sua conexão e tente novamente.';
+      return l10n.errorTimeout;
     } else if (error is ServerException) {
-      return 'Nossos servidores estão temporariamente indisponíveis. Tente novamente em alguns instantes.';
+      return l10n.errorServerUnavailable;
     } else if (error is BadRequestException) {
+      final message = error.message.toLowerCase();
+      if (message.contains('invalid credentials') ||
+          message.contains('invalid email') ||
+          message.contains('invalid password') ||
+          message.contains('wrong password') ||
+          message.contains('wrong email')) {
+        return l10n.errorInvalidCredentials;
+      }
       return error.message.isNotEmpty
-          ? error.message
-          : 'Os dados enviados são inválidos. Verifique e tente novamente.';
+          ? _sanitizeBackendMessage(error.message, l10n)
+          : l10n.errorInvalidData;
     } else if (error is HttpException) {
-      return _sanitizeBackendMessage(error.message);
+      return _sanitizeBackendMessage(error.message, l10n);
     } else if (error is Exception) {
-      return 'Ocorreu um erro inesperado. Por favor, tente novamente.';
+      return l10n.errorUnexpected;
     } else {
-      return 'Algo deu errado. Por favor, tente novamente mais tarde.';
+      return l10n.errorGeneric;
     }
   }
 
-  static String _handleValidationError(ValidationException error) {
+  static String _handleValidationError(ValidationException error, AppLocalizations l10n) {
     if (error.errors != null && error.errors!.isNotEmpty) {
       final firstError = error.errors!.values.first.first;
-      return _sanitizeBackendMessage(firstError);
+      return _sanitizeBackendMessage(firstError, l10n);
     }
     return error.message.isNotEmpty
-        ? _sanitizeBackendMessage(error.message)
-        : 'Por favor, verifique os dados informados e tente novamente.';
+        ? _sanitizeBackendMessage(error.message, l10n)
+        : l10n.errorInvalidData;
   }
 
-  static String _sanitizeBackendMessage(String message) {
+  static String _sanitizeBackendMessage(String message, AppLocalizations l10n) {
     final cleanMessage = message.toLowerCase();
+
+    if (cleanMessage.contains('invalid credentials') ||
+        cleanMessage.contains('invalid email') ||
+        cleanMessage.contains('invalid password') ||
+        cleanMessage.contains('wrong password') ||
+        cleanMessage.contains('wrong email')) {
+      return l10n.errorInvalidCredentials;
+    }
 
     if (cleanMessage.contains('page not found') ||
         cleanMessage.contains('endpoint not found') ||
         cleanMessage.contains('route not found')) {
-      return 'Esta funcionalidade ainda não está disponível. Estamos trabalhando nisso.';
+      return l10n.errorNotFound;
     }
 
     if (cleanMessage.contains('internal server error') ||
@@ -56,36 +89,41 @@ class ErrorHandler {
         cleanMessage.contains('exception') ||
         cleanMessage.contains('error:') ||
         cleanMessage.contains('stack trace')) {
-      return 'Nossos servidores estão temporariamente indisponíveis. Tente novamente em alguns instantes.';
+      return l10n.errorServerUnavailable;
     }
 
     if (cleanMessage.contains('unauthorized') ||
         cleanMessage.contains('token')) {
-      return 'Sua sessão expirou. Por favor, faça login novamente.';
+      return l10n.errorSessionExpired;
+    }
+
+    if (cleanMessage.contains('not verified') ||
+        cleanMessage.contains('verification required')) {
+      return l10n.errorAccountNotVerified;
     }
 
     if (cleanMessage.contains('forbidden') ||
         cleanMessage.contains('permission')) {
-      return 'Você não tem permissão para realizar esta ação.';
+      return l10n.errorNoPermission;
     }
 
     if (cleanMessage.contains('not found') || cleanMessage.contains('404')) {
-      return 'As informações solicitadas não foram encontradas.';
+      return l10n.errorNotFound;
     }
 
     if (cleanMessage.contains('network') ||
         cleanMessage.contains('connection')) {
-      return 'Sem conexão com a internet. Verifique sua conexão e tente novamente.';
+      return l10n.errorNoInternet;
     }
 
     if (cleanMessage.contains('timeout')) {
-      return 'A operação está demorando muito. Tente novamente.';
+      return l10n.errorTimeout;
     }
 
     if (cleanMessage.startsWith('http') ||
         cleanMessage.contains('://') ||
         message.length > 100) {
-      return 'Ocorreu um erro ao processar sua solicitação. Tente novamente.';
+      return l10n.errorUnexpected;
     }
 
     return message;
@@ -94,7 +132,7 @@ class ErrorHandler {
   static void showErrorSnackBar(BuildContext context, dynamic error) {
     if (!context.mounted) return;
 
-    final message = getUserFriendlyMessage(error);
+    final message = getUserFriendlyMessage(error, context);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -121,7 +159,7 @@ class ErrorHandler {
   }) {
     if (!context.mounted) return;
 
-    final message = getUserFriendlyMessage(error);
+    final message = getUserFriendlyMessage(error, context);
     final isNetworkError =
         error is NetworkException || error is TimeoutException;
 

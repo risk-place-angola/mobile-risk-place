@@ -169,7 +169,7 @@ class SavedPlacesScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              Text(ErrorHandler.getUserFriendlyMessage(error)),
+              Text(ErrorHandler.getUserFriendlyMessage(error, context)),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(safePlacesListProvider),
@@ -287,10 +287,7 @@ class SavedPlacesScreen extends ConsumerWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Navegar para ${place.name}'),
-                action: SnackBarAction(
-                  label: 'OK',
-                  onPressed: () {},
-                ),
+                duration: const Duration(seconds: 2),
               ),
             );
           },

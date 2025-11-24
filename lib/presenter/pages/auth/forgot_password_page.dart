@@ -12,52 +12,85 @@ class ForgotPasswordPage extends ConsumerStatefulWidget {
 }
 
 class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
-  final _emailController = TextEditingController();
+  final _identifierController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _identifierController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleResetPassword() async {
+  bool _isEmail(String value) => value.contains('@');
+  
+  bool _isPhone(String value) {
+    final cleaned = value.replaceAll(RegExp(r'[^0-9+]'), '');
+    return RegExp(r'^\+?\d{10,15}$').hasMatch(cleaned);
+  }
+
+  Future<void> _handleSendCode() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
       final authService = ref.read(authServiceProvider);
-      await authService.resetPassword(email: _emailController.text.trim());
+      final identifier = _identifierController.text.trim();
+      
+      final fallbackResponse = await authService.forgotPassword(identifier: identifier);
 
       if (!mounted) return;
 
-      _showSnackBar('Código enviado para seu email!');
+      final l10n = AppLocalizations.of(context);
+      String? fallbackEmail;
+      
+      if (fallbackResponse?.isSentViaEmail == true) {
+        fallbackEmail = fallbackResponse!.email ?? identifier;
+        _showSnackBar(l10n?.codeSentTo(fallbackEmail) ?? 'Code sent to $fallbackEmail', icon: Icons.info_outline);
+      } else {
+        _showSnackBar(l10n?.codeSentSuccess ?? 'Code sent successfully!');
+      }
+      
       await Future.delayed(const Duration(seconds: 1));
 
       if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              ResetPasswordPage(email: _emailController.text.trim()),
+          builder: (_) => ResetPasswordPage(
+            identifier: identifier,
+            fallbackEmail: fallbackEmail,
+          ),
         ),
       );
     } catch (e) {
       if (mounted) {
-        _showSnackBar('Erro ao enviar código: $e', isError: true);
+        final l10n = AppLocalizations.of(context);
+        _showSnackBar(l10n?.errorSendingCode ?? 'Error sending code', isError: true);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  void _showSnackBar(String message, {bool isError = false}) {
+  void _showSnackBar(String message, {bool isError = false, IconData? icon}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
+        content: icon != null
+            ? Row(
+                children: [
+                  Icon(icon, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(message)),
+                ],
+              )
+            : Text(message),
+        backgroundColor: isError 
+            ? Colors.red 
+            : (icon != null ? const Color(0xFFF39C12) : Colors.green),
+        duration: Duration(seconds: icon != null ? 5 : 3),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -88,10 +121,10 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                   size: 80,
                 ),
                 const SizedBox(height: 32),
-                const Text(
-                  'Esqueceu sua senha?',
+                Text(
+                  AppLocalizations.of(context)?.forgotPasswordTitle ?? 'Forgot your password?',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -99,7 +132,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Digite seu email para receber\no código de recuperação',
+                  AppLocalizations.of(context)?.forgotPasswordSubtitle ?? 'Enter your email or phone to receive\nthe recovery code',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -108,25 +141,23 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                 ),
                 const SizedBox(height: 48),
                 TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
+                  controller: _identifierController,
+                  keyboardType: TextInputType.text,
                   style: const TextStyle(color: Colors.white),
                   validator: (value) {
+                    final l10n = AppLocalizations.of(context);
                     if (value == null || value.isEmpty) {
-                      return AppLocalizations.of(context)?.invalidEmail ??
-                          'Invalid email';
+                      return l10n?.identifierRequired ?? 'Email or phone is required';
                     }
-                    if (!value.contains('@')) {
-                      return AppLocalizations.of(context)?.invalidEmail ??
-                          'Invalid email';
+                    if (!_isEmail(value) && !_isPhone(value)) {
+                      return l10n?.invalidIdentifier ?? 'Enter a valid email or phone number';
                     }
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)?.email ?? 'Email',
+                    labelText: AppLocalizations.of(context)?.emailOrPhone ?? 'Email or Phone',
                     labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                    prefixIcon:
-                        const Icon(Icons.email, color: Color(0xFFF39C12)),
+                    prefixIcon: const Icon(Icons.person, color: Color(0xFFF39C12)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -145,7 +176,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    onPressed: _isLoading ? null : _handleResetPassword,
+                    onPressed: _isLoading ? null : _handleSendCode,
                     child: _isLoading
                         ? const SizedBox(
                             height: 24,
@@ -155,9 +186,9 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                               valueColor: AlwaysStoppedAnimation(Colors.white),
                             ),
                           )
-                        : const Text(
-                            'Enviar código',
-                            style: TextStyle(
+                        : Text(
+                            AppLocalizations.of(context)?.sendCode ?? 'Send code',
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),

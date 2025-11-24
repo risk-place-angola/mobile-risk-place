@@ -4,8 +4,8 @@ import 'package:rpa/core/local_storage/user_box_storage.dart';
 import 'package:rpa/data/models/user.model.dart';
 
 class AuthController extends ChangeNotifier {
-  void initialize() async {
-    updateUser();
+  Future<void> initialize() async {
+    await updateUser();
   }
 
   User? _userStored;
@@ -18,7 +18,7 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateUser() async {
+  Future<void> updateUser() async {
     _userStored = await UserBox().getUser() ?? User();
     notifyListeners();
   }

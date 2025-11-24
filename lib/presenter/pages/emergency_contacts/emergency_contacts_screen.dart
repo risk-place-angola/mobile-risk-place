@@ -43,10 +43,12 @@ class _EmergencyContactsScreenState
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _errorMessage = ErrorHandler.getUserFriendlyMessage(e);
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = ErrorHandler.getUserFriendlyMessage(e, context);
+          _isLoading = false;
+        });
+      }
     }
   }
 

@@ -89,6 +89,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get verificationCodeMessage =>
+      'Verifique seu telefone ou email pelo código de verificação';
+
+  @override
   String get enterCode => '000000';
 
   @override
@@ -107,17 +111,129 @@ class AppLocalizationsPt extends AppLocalizations {
   String get codeResentSuccess => 'Código reenviado com sucesso!';
 
   @override
+  String get codeSentToEmail => 'Código enviado para o email';
+
+  @override
+  String get smsFailed => 'Falha no SMS. Verifique seu email';
+
+  @override
+  String codeSentTo(String contact) {
+    return 'Código enviado para $contact';
+  }
+
+  @override
   String get errorResendingCode => 'Erro ao reenviar código';
+
+  @override
+  String get verificationCodeExpired =>
+      'Código de verificação expirado. Solicite um novo.';
+
+  @override
+  String get invalidVerificationCode =>
+      'Código de verificação inválido. Verifique e tente novamente.';
+
+  @override
+  String get failedToConfirmRegistration => 'Falha ao confirmar cadastro';
+
+  @override
+  String get verificationCodeTitle => 'Verificação de Código';
+
+  @override
+  String verificationAttemptsLeft(int attempts) {
+    return '$attempts tentativas restantes';
+  }
+
+  @override
+  String verificationAccountLocked(int minutes) {
+    return 'Muitas tentativas. Aguarde $minutes minutos';
+  }
+
+  @override
+  String verificationResendIn(int seconds) {
+    return 'Reenviar em ${seconds}s';
+  }
+
+  @override
+  String verificationCodeExpiresIn(int minutes, String seconds) {
+    return 'Código expira em $minutes:$seconds';
+  }
+
+  @override
+  String verificationWaitBeforeResend(int seconds) {
+    return 'Aguarde $seconds segundos antes de reenviar';
+  }
+
+  @override
+  String get verificationTooManyAttempts =>
+      'Muitas tentativas incorretas. Aguarde 15 minutos';
+
+  @override
+  String verificationCodeSentTo(String contact) {
+    return 'Código enviado para $contact';
+  }
+
+  @override
+  String get clear => 'Limpar';
+
+  @override
+  String get errorInvalidCredentials =>
+      'Email ou senha inválidos. Verifique e tente novamente.';
+
+  @override
+  String get errorAccountNotVerified =>
+      'Sua conta não está verificada. Verifique seu telefone ou email pelo código de verificação.';
+
+  @override
+  String get errorSessionExpired =>
+      'Sua sessão expirou. Por favor, faça login novamente.';
+
+  @override
+  String get errorNoPermission =>
+      'Você não tem permissão para realizar esta ação.';
+
+  @override
+  String get errorNotFound =>
+      'As informações solicitadas não foram encontradas.';
+
+  @override
+  String get errorNoInternet =>
+      'Sem conexão com a internet. Verifique sua conexão e tente novamente.';
+
+  @override
+  String get errorTimeout =>
+      'A operação está demorando muito. Verifique sua conexão e tente novamente.';
+
+  @override
+  String get errorServerUnavailable =>
+      'Nossos servidores estão temporariamente indisponíveis. Tente novamente em alguns instantes.';
+
+  @override
+  String get errorInvalidData =>
+      'Os dados enviados são inválidos. Verifique e tente novamente.';
+
+  @override
+  String get errorUnexpected =>
+      'Ocorreu um erro inesperado. Por favor, tente novamente.';
+
+  @override
+  String get errorGeneric =>
+      'Algo deu errado. Por favor, tente novamente mais tarde.';
 
   @override
   String get forgotPasswordTitle => 'Esqueceu sua senha?';
 
   @override
   String get forgotPasswordSubtitle =>
-      'Digite seu email para receber\no código de recuperação';
+      'Digite seu email ou telefone para receber\no código de recuperação';
 
   @override
   String get sendCode => 'Enviar código';
+
+  @override
+  String get invalidIdentifier => 'Digite um email ou telefone válido';
+
+  @override
+  String get identifierRequired => 'Email ou telefone é obrigatório';
 
   @override
   String get codeSentSuccess => 'Código enviado para seu email!';
@@ -884,9 +1000,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get alreadyHaveAccountQuestion => 'Já tem uma conta? ';
-
-  @override
-  String get verificationCodeTitle => 'Verificação de Código';
 
   @override
   String sentCodeTo(Object email) {

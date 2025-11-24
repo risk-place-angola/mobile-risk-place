@@ -18,16 +18,12 @@ final authServiceProvider = Provider<IAuthService>((ref) {
 abstract class IAuthService {
   Future<UserProfile> login({required LoginRequestDTO user, String? deviceId});
   Future<bool> logout();
-  Future<bool> register(
+  Future<EmailFallbackResponseDTO?> register(
       {required RegisterRequestDTO registerDto, String? deviceId});
-  Future<bool> resetPassword({required String email});
-  Future<bool> confirmPasswordReset(
-      {required String email,
-      required String code,
-      required String newPassword});
-  Future<bool> resendVerificationCode({required String email});
-  Future<bool> confirmRegistration(
-      {required String email, required String code});
+  Future<EmailFallbackResponseDTO?> forgotPassword({required String identifier});
+  Future<bool> verifyCode({required String identifier, required String code});
+  Future<bool> resetPassword({required String identifier, required String code, required String password});
+  Future<EmailFallbackResponseDTO?> resendVerificationCode({required String identifier});
   Future<AuthTokenResponseDTO> refreshToken({required String refreshToken});
 }
 
@@ -43,7 +39,7 @@ class AuthService implements IAuthService {
   Future<UserProfile> login(
       {required LoginRequestDTO user, String? deviceId}) async {
     try {
-      log('Attempting login for: ${user.email}', name: 'AuthService');
+      log('Attempting login for: ${user.identifier}', name: 'AuthService');
 
       final data = user.toJson();
       if (deviceId != null) {
@@ -55,9 +51,10 @@ class AuthService implements IAuthService {
         data: data,
       );
 
-      if (response.statusCode != 200 || response.data == null) {
+      // Se chegou aqui, o status é 200 (sucesso)
+      if (response.data == null) {
         throw ServerException(
-          message: 'Falha ao fazer login',
+          message: 'Empty response from server',
           statusCode: response.statusCode,
         );
       }
@@ -76,19 +73,20 @@ class AuthService implements IAuthService {
         expiresIn: loggedInUser.expiresIn,
       );
 
-      log('✅ Login successful for user: ${loggedInUser.user.email}',
+      log('Login successful for user: ${loggedInUser.user.email}',
           name: 'AuthService');
 
       return UserProfile.fromAuthUserSummaryDTO(loggedInUser.user);
-    } on HttpException {
+    } on HttpException catch (e) {
+      log('HttpException caught in AuthService: ${e.runtimeType} - ${e.message}', name: 'AuthService');
       rethrow;
     } on FormatException catch (e) {
-      log('❌ Format error during login: ${e.message}', name: 'AuthService');
-      throw HttpException(message: 'Erro ao processar resposta do servidor');
+      log('Format error during login: ${e.message}', name: 'AuthService');
+      throw HttpException(message: 'Invalid server response');
     } catch (e, stackTrace) {
-      log('❌ Unexpected error during login',
+      log('Unexpected error during login',
           name: 'AuthService', error: e, stackTrace: stackTrace);
-      throw HttpException(message: 'Erro ao realizar login');
+      throw HttpException(message: 'Login error');
     }
   }
 
@@ -110,7 +108,7 @@ class AuthService implements IAuthService {
   }
 
   @override
-  Future<bool> register(
+  Future<EmailFallbackResponseDTO?> register(
       {required RegisterRequestDTO registerDto, String? deviceId}) async {
     try {
       final data = registerDto.toJson();
@@ -123,15 +121,17 @@ class AuthService implements IAuthService {
         data: data,
       );
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        log('✅ Registration successful', name: 'AuthService');
-        return true;
+      log('✅ Registration successful', name: 'AuthService');
+
+      if (response.data != null && response.data is Map<String, dynamic>) {
+        final fallbackData = EmailFallbackResponseDTO.fromJson(response.data);
+        if (fallbackData.isSentViaEmail) {
+          log('Code sent via email fallback', name: 'AuthService');
+          return fallbackData;
+        }
       }
 
-      throw ServerException(
-        message: 'Falha ao registrar usuário',
-        statusCode: response.statusCode,
-      );
+      return null;
     } on HttpException {
       rethrow;
     } catch (e, stackTrace) {
@@ -142,119 +142,108 @@ class AuthService implements IAuthService {
   }
 
   @override
-  Future<bool> resetPassword({required String email}) async {
+  Future<EmailFallbackResponseDTO?> forgotPassword({required String identifier}) async {
     try {
       final response = await _httpClient.post(
         '/auth/password/forgot',
-        data: {'email': email},
+        data: {'identifier': identifier},
       );
 
-      if (response.statusCode == 200) {
-        log('✅ Password reset code sent successfully', name: 'AuthService');
-        return true;
+      log('Password reset code sent', name: 'AuthService');
+
+      if (response.data != null && response.data is Map<String, dynamic>) {
+        final fallbackData = EmailFallbackResponseDTO.fromJson(response.data);
+        if (fallbackData.isSentViaEmail) {
+          log('Password reset code sent via email fallback', name: 'AuthService');
+          return fallbackData;
+        }
       }
 
-      throw ServerException(
-        message: 'Falha ao enviar código de recuperação',
-        statusCode: response.statusCode,
-      );
+      return null;
     } on HttpException {
       rethrow;
     } catch (e, stackTrace) {
-      log('❌ Unexpected error during password reset',
+      log('Error during forgot password',
           name: 'AuthService', error: e, stackTrace: stackTrace);
-      throw HttpException(message: 'Erro ao resetar senha');
+      throw HttpException(message: 'Failed to send reset code');
     }
   }
 
-  /// Confirm user registration with verification code
-  Future<bool> confirmRegistration({
-    required String email,
+  @override
+  Future<bool> verifyCode({
+    required String identifier,
     required String code,
   }) async {
     try {
-      final response = await _httpClient.post(
+      await _httpClient.post(
         '/auth/confirm',
         data: {
-          'email': email,
+          'identifier': identifier,
           'code': code,
         },
       );
 
-      if (response.statusCode == 204 || response.statusCode == 200) {
-        log('Registration confirmed successfully', name: 'AuthService');
-        return true;
-      } else {
-        throw ServerException(
-          message: 'Falha ao confirmar cadastro',
-          statusCode: response.statusCode,
-        );
-      }
+      // If we get here, request was successful (200-299)
+      log('Code verified successfully', name: 'AuthService');
+      return true;
     } on HttpException {
       rethrow;
     } catch (e) {
-      log('Unexpected error during registration confirmation: $e',
-          name: 'AuthService');
-      throw ServerException(message: 'Erro inesperado ao confirmar cadastro');
+      log('Error during code verification: $e', name: 'AuthService');
+      rethrow;
     }
   }
 
   @override
-  Future<bool> confirmPasswordReset({
-    required String email,
+  Future<bool> resetPassword({
+    required String identifier,
     required String code,
-    required String newPassword,
+    required String password,
   }) async {
     try {
-      final response = await _httpClient.post(
+      await _httpClient.post(
         '/auth/password/reset',
         data: {
-          'email': email,
+          'identifier': identifier,
           'code': code,
-          'new_password': newPassword,
+          'password': password,
         },
       );
 
-      if (response.statusCode == 200) {
-        log('Password reset successfully', name: 'AuthService');
-        return true;
-      } else {
-        throw ServerException(
-          message: 'Falha ao resetar senha',
-          statusCode: response.statusCode,
-        );
-      }
+      log('Password reset successfully', name: 'AuthService');
+      return true;
     } on HttpException {
       rethrow;
     } catch (e) {
-      log('Unexpected error during password reset confirmation: $e',
-          name: 'AuthService');
-      throw ServerException(message: 'Erro inesperado ao resetar senha');
+      log('Error during password reset: $e', name: 'AuthService');
+      throw ServerException(message: 'Failed to reset password');
     }
   }
 
   @override
-  Future<bool> resendVerificationCode({required String email}) async {
+  Future<EmailFallbackResponseDTO?> resendVerificationCode({required String identifier}) async {
     try {
       final response = await _httpClient.post(
         '/auth/resend-code',
-        data: {'email': email},
+        data: {'identifier': identifier},
       );
 
-      if (response.statusCode == 204 || response.statusCode == 200) {
-        log('✅ Verification code resent successfully', name: 'AuthService');
-        return true;
+      log('Verification code resent', name: 'AuthService');
+
+      if (response.data != null && response.data is Map<String, dynamic>) {
+        final fallbackData = EmailFallbackResponseDTO.fromJson(response.data);
+        if (fallbackData.isSentViaEmail) {
+          log('Verification code sent via email fallback', name: 'AuthService');
+          return fallbackData;
+        }
       }
 
-      throw ServerException(
-        message: 'Falha ao reenviar código de verificação',
-        statusCode: response.statusCode,
-      );
+      return null;
     } on HttpException {
       rethrow;
     } catch (e) {
-      log('❌ Error resending verification code: $e', name: 'AuthService');
-      throw ServerException(message: 'Erro ao reenviar código de verificação');
+      log('Error resending verification code: $e', name: 'AuthService');
+      throw ServerException(message: 'Failed to resend code');
     }
   }
 
@@ -269,9 +258,10 @@ class AuthService implements IAuthService {
         data: {'refresh_token': refreshToken},
       );
 
-      if (response.statusCode != 200 || response.data == null) {
+      // If we get here, request was successful (200-299)
+      if (response.data == null) {
         throw ServerException(
-          message: 'Failed to refresh token',
+          message: 'Empty response from server',
           statusCode: response.statusCode,
         );
       }
