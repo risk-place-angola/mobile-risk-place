@@ -62,6 +62,37 @@
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "BASE_URL=https://risk-place-angola-904a.onrender.com/api/v1"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "OSM_TILE_URL"
+            value = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "BASE_URL"
+            value = "https://risk-place-angola-904a.onrender.com/api/v1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "OSM_TILE_URL"
+            value = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Profile"
@@ -79,6 +110,37 @@
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "BASE_URL=https://risk-place-angola-904a.onrender.com/api/v1"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "OSM_TILE_URL"
+            value = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "BASE_URL"
+            value = "https://risk-place-angola-904a.onrender.com/api/v1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "WS_URL"
+            value = "wss://risk-place-angola-904a.onrender.com/ws/alerts"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
