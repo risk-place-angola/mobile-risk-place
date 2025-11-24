@@ -33,15 +33,20 @@ jobs:
       - name: 📦 Install Flutter dependencies
         run: flutter pub get
 
+      - name: 🔑 Setup App Store Connect API Key
+        env:
+          API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$API_KEY_CONTENT" > ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
+
       - name: 🚀 Build and Deploy to TestFlight
         env:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
-          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-          DART_DEFINES: ENV=${{ secrets.ENV_DEV }},BASE_URL=${{ secrets.BASE_URL_DEV }},WS_URL=${{ secrets.WS_URL_DEV }},OSM_TILE_URL=${{ secrets.OSM_TILE_URL }}
+          APP_STORE_CONNECT_API_KEY_PATH: ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
         run: |
           flutter build ios --release --no-codesign \
             --dart-define=ENV=${{ secrets.ENV_DEV }} \

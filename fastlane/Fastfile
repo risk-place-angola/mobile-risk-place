@@ -47,6 +47,7 @@ platform :ios do
 
     # Upload to TestFlight with tester groups
     upload_to_testflight(
+      api_key_path: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
       skip_waiting_for_build_processing: true,
       distribute_external: true,
       notify_external_testers: true,
@@ -91,6 +92,7 @@ platform :ios do
 
     # Upload to TestFlight first
     upload_to_testflight(
+      api_key_path: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
       skip_waiting_for_build_processing: false,  # Aguardar processamento
       distribute_external: true,
       notify_external_testers: true,
@@ -100,6 +102,7 @@ platform :ios do
 
     # Submit for App Store Review
     deliver(
+      api_key_path: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
       submit_for_review: true,
       automatic_release: false,  # Release manual após aprovação
       force: true,
