@@ -41,17 +41,6 @@ jobs:
             --dart-define=WS_URL=${{ secrets.WS_URL_DEV }} \
             --dart-define=OSM_TILE_URL=${{ secrets.OSM_TILE_URL }}
 
-      - name: 🔐 Setup iOS Certificates
-        env:
-          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
-          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
-          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
-        run: |
-          bundle exec fastlane match appstore --readonly
-
       - name: 🚀 Build and Deploy to TestFlight
         env:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}

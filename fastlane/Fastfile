@@ -111,50 +111,6 @@ platform :ios do
   end
 
   # ==========================================
-  # LANE: Production Release
-  # ==========================================
-  desc "Build and submit to App Store"
-  lane :beta do
-    # Increment build number
-    increment_build_number(
-      xcodeproj: "ios/Runner.xcodeproj",
-      build_number: ENV['GITHUB_RUN_NUMBER'] || latest_testflight_build_number + 1
-    )
-
-    # Get certificates and provisioning profiles using match
-    match(
-      type: "appstore",
-      readonly: true,
-      app_identifier: "ao.riskplace.makanetu",
-      git_url: ENV['MATCH_GIT_URL']
-    )
-
-    # Build the app
-    build_ios_app(
-      workspace: "ios/Runner.xcworkspace",
-      scheme: "Runner",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          "ao.riskplace.makanetu" => "match AppStore ao.riskplace.makanetu"
-        }
-      },
-      output_directory: "./build/ios",
-      output_name: "makanetu-release.ipa"
-    )
-
-    # Upload to App Store
-    upload_to_app_store(
-      submit_for_review: true,
-      automatic_release: false,
-      force: true,
-      skip_metadata: false,
-      skip_screenshots: false,
-      precheck_include_in_app_purchases: false
-    )
-  end
-
-  # ==========================================
   # LANE: Setup Certificates (Match)
   # ==========================================
   desc "Setup certificates and provisioning profiles"
