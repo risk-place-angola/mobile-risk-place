@@ -38,16 +38,19 @@ jobs:
           API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
         run: |
-          mkdir -p ~/.appstoreconnect/private_keys
-          echo "$API_KEY_CONTENT" > ~/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          echo "$API_KEY_CONTENT" > "$HOME/.appstoreconnect/private_keys/AuthKey_${API_KEY_ID}.p8"
 
       - name: 🚀 Build and Deploy to TestFlight
         env:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          APP_STORE_CONNECT_API_KEY_PATH: ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+          APP_STORE_CONNECT_API_KEY_PATH: ${{ github.workspace }}/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
         run: |
+          # Copiar API Key para o workspace para caminho absoluto
+          cp "$HOME/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8" "${{ github.workspace }}/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8"
+          
           flutter build ios --release --no-codesign \
             --dart-define=ENV=${{ secrets.ENV_DEV }} \
             --dart-define=BASE_URL=${{ secrets.BASE_URL_DEV }} \
