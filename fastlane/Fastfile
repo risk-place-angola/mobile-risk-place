@@ -1,0 +1,267 @@
+# Fastlane configuration for MakaNetu (Risk Place Angola)
+# This file contains the fastlane.tools configuration
+
+default_platform(:ios)
+
+# ==========================================
+# iOS Platform
+# ==========================================
+platform :ios do
+  before_all do
+    setup_ci if ENV['CI']
+  end
+
+  # ==========================================
+  # LANE: Development Build (TestFlight)
+  # ==========================================
+  desc "Build and distribute iOS development build to TestFlight"
+  lane :dev do
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "ios/Runner.xcodeproj",
+      build_number: ENV['GITHUB_RUN_NUMBER'] || latest_testflight_build_number + 1
+    )
+
+    # Get certificates and provisioning profiles using match
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: "ao.riskplace.makanetu"
+    )
+
+    # Build the app
+    build_ios_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "ao.riskplace.makanetu" => "match AppStore ao.riskplace.makanetu"
+        }
+      },
+      output_directory: "./build/ios",
+      output_name: "makanetu-dev.ipa"
+    )
+
+    # Upload to TestFlight with tester groups
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      distribute_external: false,
+      notify_external_testers: false,
+      groups: ["Nete Testers", "Internal Testers"],  # Grupos de testadores
+      changelog: "Development build #{ENV['GITHUB_RUN_NUMBER']} - #{Time.now.strftime('%Y-%m-%d %H:%M')}"
+    )
+  end
+
+  # ==========================================
+  # LANE: Production Release (TestFlight + App Store)
+  # ==========================================
+  desc "Build, upload to TestFlight and submit for App Store review"
+  lane :beta do
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "ios/Runner.xcodeproj",
+      build_number: ENV['GITHUB_RUN_NUMBER'] || latest_testflight_build_number + 1
+    )
+
+    # Get certificates and provisioning profiles using match
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: "ao.riskplace.makanetu"
+    )
+
+    # Build the app
+    build_ios_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "ao.riskplace.makanetu" => "match AppStore ao.riskplace.makanetu"
+        }
+      },
+      output_directory: "./build/ios",
+      output_name: "makanetu-prod.ipa"
+    )
+
+    # Upload to TestFlight first
+    upload_to_testflight(
+      skip_waiting_for_build_processing: false,  # Aguardar processamento
+      distribute_external: true,
+      notify_external_testers: true,
+      groups: ["Internal Testers", "Beta Testers"],
+      changelog: "Production build #{ENV['GITHUB_RUN_NUMBER']}"
+    )
+
+    # Submit for App Store Review
+    deliver(
+      submit_for_review: true,
+      automatic_release: false,  # Release manual após aprovação
+      force: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: false
+      }
+    )
+  end
+
+  # ==========================================
+  # LANE: Production Release
+  # ==========================================
+  desc "Build and submit to App Store"
+  lane :release do
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "ios/Runner.xcodeproj",
+      build_number: ENV['GITHUB_RUN_NUMBER'] || latest_testflight_build_number + 1
+    )
+
+    # Get certificates and provisioning profiles using match
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: "ao.riskplace.makanetu"
+    )
+
+    # Build the app
+    build_ios_app(
+      workspace: "ios/Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "ao.riskplace.makanetu" => "match AppStore ao.riskplace.makanetu"
+        }
+      },
+      output_directory: "./build/ios",
+      output_name: "makanetu-release.ipa"
+    )
+
+    # Upload to App Store
+    upload_to_app_store(
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      precheck_include_in_app_purchases: false
+    )
+  end
+
+  # ==========================================
+  # LANE: Setup Certificates (Match)
+  # ==========================================
+  desc "Setup certificates and provisioning profiles"
+  lane :setup_certificates do
+    match(
+      type: "development",
+      app_identifier: "ao.riskplace.makanetu",
+      readonly: false
+    )
+
+    match(
+      type: "appstore",
+      app_identifier: "ao.riskplace.makanetu",
+      readonly: false
+    )
+  end
+end
+
+# ==========================================
+# Android Platform
+# ==========================================
+platform :android do
+  before_all do
+    setup_ci if ENV['CI']
+  end
+
+  # ==========================================
+  # LANE: Development Build (Firebase)
+  # ==========================================
+  desc "Build and distribute Android development build to Firebase"
+  lane :dev do
+    # Build the app
+    gradle(
+      task: "assemble",
+      build_type: "Debug",
+      project_dir: "android/"
+    )
+
+    # Upload to Firebase App Distribution com múltiplos grupos
+    firebase_app_distribution(
+      app: ENV['FIREBASE_APP_ID_ANDROID'],
+      groups: "nete-testers, internal-team, qa-testers",  # Múltiplos grupos
+      release_notes: "Development build #{ENV['GITHUB_RUN_NUMBER']} - #{Time.now.strftime('%Y-%m-%d %H:%M')}",
+      android_artifact_type: "APK",
+      android_artifact_path: "build/app/outputs/flutter-apk/app-debug.apk",
+      firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
+    )
+  end
+
+  # ==========================================
+  # LANE: Production Testing (Internal + Open Testing)
+  # ==========================================
+  desc "Build and upload to Google Play Internal and Open Testing"
+  lane :beta do
+    # Build the app bundle
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+
+    # Upload to Internal Testing first (obrigatório para novos apps)
+    upload_to_play_store(
+      track: "internal",
+      aab: "build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      release_status: "completed",  # Publicar imediatamente
+      rollout: "1.0"  # 100% dos testadores internos
+    )
+
+    # Aguardar alguns segundos para processar
+    sleep(10)
+
+    # Promover para Open Testing (14 dias obrigatórios)
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "beta",  # Beta = Open Testing
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      release_status: "completed",
+      rollout: "1.0"  # 100% para iniciar período de 14 dias
+    )
+  end
+
+  # ==========================================
+  # LANE: Production Release
+  # ==========================================
+  desc "Build and submit to Google Play Store"
+  lane :release do
+    # Build the app bundle
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+
+    # Upload to Google Play Production
+    upload_to_play_store(
+      track: "production",
+      aab: "build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      release_status: "draft",
+      rollout: "0.1"
+    )
+  end
+end

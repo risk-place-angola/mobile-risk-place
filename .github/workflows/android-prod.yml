@@ -1,0 +1,84 @@
+name: Android Production Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build Android Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.7'
+          channel: 'stable'
+          cache: true
+
+      - name: 💎 Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: 📦 Install Flutter dependencies
+        run: flutter pub get
+
+      - name: 🔐 Decode Android Keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+
+      - name: 📝 Create key.properties
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cat > android/key.properties << EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=keystore.jks
+          EOF
+
+      - name: 🔨 Build Flutter Android
+        run: |
+          flutter build appbundle --release \
+            --dart-define=ENV=${{ secrets.ENV_PROD }} \
+            --dart-define=BASE_URL=${{ secrets.BASE_URL_PROD }} \
+            --dart-define=WS_URL=${{ secrets.WS_URL_PROD }} \
+            --dart-define=OSM_TILE_URL=${{ secrets.OSM_TILE_URL }}
+
+      - name: 🚀 Upload to Google Play Internal Testing
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          bundle exec fastlane android beta
+
+      - name: 📤 Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-prod-build
+          path: |
+            build/app/outputs/**/*.aab
+            build/app/outputs/**/mapping.txt
+            fastlane/report.xml
+          retention-days: 30

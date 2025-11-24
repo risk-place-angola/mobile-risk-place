@@ -1,0 +1,66 @@
+name: Android Development Build
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  build:
+    name: Build Android Development
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.7'
+          channel: 'stable'
+          cache: true
+
+      - name: 💎 Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: 📦 Install Flutter dependencies
+        run: flutter pub get
+
+      - name: 🔨 Build Flutter Android
+        run: |
+          flutter build apk --debug \
+            --dart-define=ENV=${{ secrets.ENV_DEV }} \
+            --dart-define=BASE_URL=${{ secrets.BASE_URL_DEV }} \
+            --dart-define=WS_URL=${{ secrets.WS_URL_DEV }} \
+            --dart-define=OSM_TILE_URL=${{ secrets.OSM_TILE_URL }}
+
+      - name: 🚀 Deploy to Firebase App Distribution
+        env:
+          FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
+          FIREBASE_APP_ID_ANDROID: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+        run: |
+          bundle exec fastlane android dev
+
+      - name: 📤 Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-dev-build
+          path: |
+            build/app/outputs/**/*.apk
+            fastlane/report.xml
+          retention-days: 7

@@ -90,6 +90,15 @@ ios/ExportOptions.plist.local
 ios/Runner.xcodeproj/xcuserdata/
 ios/Runner.xcworkspace/xcuserdata/
 
+# Fastlane sensitive files
+fastlane/Matchfile
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/.env
+fastlane/.env.*
+
 # iOS Private Keys (APNs, App Store Connect)
 AuthKey_*.p8
 *.p8
@@ -101,5 +110,8 @@ AuthKey_*.p8
 build/
 android/build/
 ios/build/
+
+# Temporary files
+PR_DESCRIPTION.md
 
 *.pem
