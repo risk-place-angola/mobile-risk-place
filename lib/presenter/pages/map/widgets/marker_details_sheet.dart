@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:rpa/core/services/icon_resolver_service.dart';
 import 'package:rpa/data/models/enums/risk_type.dart';
 import 'package:rpa/data/models/websocket/alert_model.dart';
 import 'package:rpa/data/models/websocket/report_model.dart';
@@ -51,10 +54,12 @@ class AlertDetailsSheet extends StatelessWidget {
                   color: _getAlertColor(riskType).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  _getAlertIcon(riskType),
-                  color: _getAlertColor(riskType),
+                child: IconResolverService.buildIcon(
+                  typeName: riskType.name,
+                  apiIconPath: null,
                   size: 28,
+                  color: _getAlertColor(riskType),
+                  isTopic: false,
                 ),
               ),
               const SizedBox(width: 16),
@@ -86,36 +91,144 @@ class AlertDetailsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           
-          // Message
+          // Alert Message
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  _getAlertColor(riskType).withOpacity(0.1),
+                  _getAlertColor(riskType).withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _getAlertColor(riskType).withOpacity(0.3),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.warning_rounded,
+                  size: 24,
+                  color: _getAlertColor(riskType),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    alert.message,
+                    style: TextStyle(
+                      fontSize: 15,
+                      height: 1.5,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Impact Area
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.orange.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.radar_rounded,
+                      size: 20,
+                      color: Colors.orange[700],
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        l10n.reachRadius,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange[700],
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '${(alert.radius / 1000).toStringAsFixed(1)} km',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange[900],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const SizedBox(width: 32),
+                    Expanded(
+                      child: Text(
+                        'Área de impacto aproximada',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Time Info
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(
-              alert.message,
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.5,
-              ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.access_time_rounded,
+                  size: 20,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  l10n.timeLabel,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  alert.createdAt != null 
+                      ? _formatDateTime(context, alert.createdAt!)
+                      : l10n.now,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          
-          // Details
-          _buildDetailRow(
-            Icons.location_on_rounded,
-            l10n.reachRadius,
-            '${(alert.radius / 1000).toStringAsFixed(1)} km',
-          ),
-          const SizedBox(height: 12),
-          _buildDetailRow(
-            Icons.access_time_rounded,
-            l10n.timeLabel,
-            alert.createdAt != null 
-                ? _formatDateTime(context, alert.createdAt!)
-                : l10n.now,
           ),
           const SizedBox(height: 24),
           
@@ -136,8 +249,14 @@ class AlertDetailsSheet extends StatelessWidget {
               Expanded(
                 child: FilledButton.icon(
                   onPressed: () {
-                    // TODO: Navigate to alert details page
                     Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Detailed view coming in next update'),
+                        backgroundColor: Colors.orange,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.info_rounded),
                   label: Text(l10n.moreDetails),
@@ -155,30 +274,6 @@ class AlertDetailsSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
-        const SizedBox(width: 12),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        ),
-        const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
   Color _getAlertColor(RiskType type) {
     switch (type) {
       case RiskType.crime: return const Color(0xFFB71C1C);
@@ -192,22 +287,6 @@ class AlertDetailsSheet extends StatelessWidget {
       case RiskType.publicSafety: return const Color(0xFF1565C0);
       case RiskType.traffic: return const Color(0xFFFFA000);
       case RiskType.urbanIssue: return const Color(0xFF757575);
-    }
-  }
-
-  IconData _getAlertIcon(RiskType type) {
-    switch (type) {
-      case RiskType.crime: return Icons.gavel_rounded;
-      case RiskType.accident: return Icons.car_crash_rounded;
-      case RiskType.naturalDisaster: return Icons.water_damage_rounded;
-      case RiskType.fire: return Icons.local_fire_department_rounded;
-      case RiskType.health: return Icons.medical_services_rounded;
-      case RiskType.infrastructure: return Icons.construction_rounded;
-      case RiskType.environment: return Icons.eco_rounded;
-      case RiskType.violence: return Icons.warning_rounded;
-      case RiskType.publicSafety: return Icons.shield_rounded;
-      case RiskType.traffic: return Icons.traffic_rounded;
-      case RiskType.urbanIssue: return Icons.location_city_rounded;
     }
   }
 
@@ -260,7 +339,8 @@ class ReportDetailsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final riskType = report.riskType ?? RiskType.infrastructure;
-    
+    // log object report details
+    log('Showing report details: ${report.toJson()}', name: 'ReportDetailsSheet');
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -294,10 +374,12 @@ class ReportDetailsSheet extends StatelessWidget {
                   color: _getReportColor(riskType).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  _getReportIcon(riskType),
-                  color: _getReportColor(riskType),
+                child: IconResolverService.buildIcon(
+                  typeName: riskType.name,
+                  apiIconPath: null,
                   size: 28,
+                  color: _getReportColor(riskType),
+                  isTopic: false,
                 ),
               ),
               const SizedBox(width: 16),
@@ -377,58 +459,154 @@ class ReportDetailsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           
-          // Message
+          // Topic Title (extracted from message before ":")
+          if (_extractTopicName(report.message) != null) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: _getReportColor(riskType).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: _getReportColor(riskType).withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.label_rounded,
+                    size: 20,
+                    color: _getReportColor(riskType),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _formatTopicName(_extractTopicName(report.message)!),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: _getReportColor(riskType),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          
+          // Message/Description
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(
-              report.message,
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.5,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.description_outlined,
+                  size: 20,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _extractDescription(report.message),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      height: 1.5,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          
+          // Location Info
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.blue.withOpacity(0.2),
+                width: 1,
               ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_rounded,
+                      size: 20,
+                      color: Colors.blue[700],
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Coordenadas',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const SizedBox(width: 32),
+                    Text(
+                      '${report.latitude.toStringAsFixed(6)}, ${report.longitude.toStringAsFixed(6)}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[700],
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
           
-          // Details
-          _buildDetailRow(
-            Icons.access_time_rounded,
-            l10n.reported,
-            report.createdAt != null 
-                ? _formatDateTime(context, report.createdAt!)
-                : l10n.now,
-          ),
-          const SizedBox(height: 12),
-          _buildDetailRow(
-            Icons.info_outline_rounded,
-            l10n.status,
-            _getStatusLabel(context, report.status),
+          // Details Grid
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                _buildDetailRow(
+                  Icons.access_time_rounded,
+                  l10n.reported,
+                  report.createdAt != null 
+                      ? _formatDateTime(context, report.createdAt!)
+                      : l10n.now,
+                ),
+                const Divider(height: 24),
+                _buildDetailRow(
+                  Icons.info_outline_rounded,
+                  l10n.status,
+                  _getStatusLabel(context, report.status),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
           
           // Actions
-          if (onEditLocation != null && report.status == ReportStatus.pending)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    onEditLocation?.call(report);
-                  },
-                  icon: const Icon(Icons.edit_location_outlined),
-                  label: Text(l10n.editLocation),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-              ),
-            ),
           Row(
             children: [
               Expanded(
@@ -445,8 +623,14 @@ class ReportDetailsSheet extends StatelessWidget {
               Expanded(
                 child: FilledButton.icon(
                   onPressed: () {
-                    // TODO: Navigate to report details page
                     Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Detailed view coming in next update'),
+                        backgroundColor: Colors.orange,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.visibility_rounded),
                   label: Text(l10n.viewDetails),
@@ -504,22 +688,6 @@ class ReportDetailsSheet extends StatelessWidget {
     }
   }
 
-  IconData _getReportIcon(RiskType type) {
-    switch (type) {
-      case RiskType.crime: return Icons.gavel_outlined;
-      case RiskType.accident: return Icons.car_crash_outlined;
-      case RiskType.naturalDisaster: return Icons.water_outlined;
-      case RiskType.fire: return Icons.local_fire_department_outlined;
-      case RiskType.health: return Icons.medical_services_outlined;
-      case RiskType.infrastructure: return Icons.construction_outlined;
-      case RiskType.environment: return Icons.eco_outlined;
-      case RiskType.violence: return Icons.report_problem_outlined;
-      case RiskType.publicSafety: return Icons.shield_outlined;
-      case RiskType.traffic: return Icons.traffic_outlined;
-      case RiskType.urbanIssue: return Icons.location_city_outlined;
-    }
-  }
-
   String _getRiskTypeLabel(BuildContext context, RiskType type) {
     final l10n = AppLocalizations.of(context)!;
     switch (type) {
@@ -563,5 +731,37 @@ class ReportDetailsSheet extends StatelessWidget {
     } else {
       return '${dateTime.day}/${dateTime.month} às ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
     }
+  }
+
+  /// Extract topic name from message (before ":")
+  /// Example: "vazamento_quimico: Descrição" -> "vazamento_quimico"
+  String? _extractTopicName(String message) {
+    if (message.contains(':')) {
+      return message.split(':').first.trim();
+    }
+    return null;
+  }
+
+  /// Extract description from message (after ":")
+  /// Example: "vazamento_quimico: Descrição" -> "Descrição"
+  String _extractDescription(String message) {
+    if (message.contains(':')) {
+      final parts = message.split(':');
+      if (parts.length > 1) {
+        return parts.sublist(1).join(':').trim();
+      }
+    }
+    return message;
+  }
+
+  /// Format topic name for display (replace underscores with spaces and capitalize)
+  /// Example: "vazamento_quimico" -> "Vazamento Químico"
+  String _formatTopicName(String topicName) {
+    return topicName
+        .split('_')
+        .map((word) => word.isEmpty 
+            ? '' 
+            : word[0].toUpperCase() + word.substring(1))
+        .join(' ');
   }
 }

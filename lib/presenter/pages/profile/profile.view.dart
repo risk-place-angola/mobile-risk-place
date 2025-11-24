@@ -143,7 +143,15 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Coming Soon'),
+                      backgroundColor: Colors.orange,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 16),
