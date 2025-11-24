@@ -26,7 +26,8 @@ platform :ios do
     match(
       type: "appstore",
       readonly: true,
-      app_identifier: "ao.riskplace.makanetu"
+      app_identifier: "ao.riskplace.makanetu",
+      git_url: ENV['MATCH_GIT_URL']
     )
 
     # Build the app
@@ -46,9 +47,9 @@ platform :ios do
     # Upload to TestFlight with tester groups
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
-      distribute_external: false,
-      notify_external_testers: false,
-      groups: ["Nete Testers", "Internal Testers"],  # Grupos de testadores
+      distribute_external: true,
+      notify_external_testers: true,
+      groups: ["Nete Testers"],
       changelog: "Development build #{ENV['GITHUB_RUN_NUMBER']} - #{Time.now.strftime('%Y-%m-%d %H:%M')}"
     )
   end
@@ -68,7 +69,8 @@ platform :ios do
     match(
       type: "appstore",
       readonly: true,
-      app_identifier: "ao.riskplace.makanetu"
+      app_identifier: "ao.riskplace.makanetu",
+      git_url: ENV['MATCH_GIT_URL']
     )
 
     # Build the app
@@ -90,7 +92,7 @@ platform :ios do
       skip_waiting_for_build_processing: false,  # Aguardar processamento
       distribute_external: true,
       notify_external_testers: true,
-      groups: ["Internal Testers", "Beta Testers"],
+      groups: ["Nete Testers"],
       changelog: "Production build #{ENV['GITHUB_RUN_NUMBER']}"
     )
 
@@ -112,7 +114,7 @@ platform :ios do
   # LANE: Production Release
   # ==========================================
   desc "Build and submit to App Store"
-  lane :release do
+  lane :beta do
     # Increment build number
     increment_build_number(
       xcodeproj: "ios/Runner.xcodeproj",
@@ -123,7 +125,8 @@ platform :ios do
     match(
       type: "appstore",
       readonly: true,
-      app_identifier: "ao.riskplace.makanetu"
+      app_identifier: "ao.riskplace.makanetu",
+      git_url: ENV['MATCH_GIT_URL']
     )
 
     # Build the app
@@ -190,10 +193,10 @@ platform :android do
       project_dir: "android/"
     )
 
-    # Upload to Firebase App Distribution com múltiplos grupos
+    # Upload to Firebase App Distribution
     firebase_app_distribution(
       app: ENV['FIREBASE_APP_ID_ANDROID'],
-      groups: "nete-testers, internal-team, qa-testers",  # Múltiplos grupos
+      groups: "nete-testers",
       release_notes: "Development build #{ENV['GITHUB_RUN_NUMBER']} - #{Time.now.strftime('%Y-%m-%d %H:%M')}",
       android_artifact_type: "APK",
       android_artifact_path: "build/app/outputs/flutter-apk/app-debug.apk",
