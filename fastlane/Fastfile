@@ -35,6 +35,7 @@ platform :ios do
       workspace: "ios/Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates",
       export_options: {
         provisioningProfiles: {
           "ao.riskplace.makanetu" => "match AppStore ao.riskplace.makanetu"
@@ -78,6 +79,7 @@ platform :ios do
       workspace: "ios/Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates",
       export_options: {
         provisioningProfiles: {
           "ao.riskplace.makanetu" => "match AppStore ao.riskplace.makanetu"

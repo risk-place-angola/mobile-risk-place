@@ -32,14 +32,6 @@ jobs:
       - name: 📦 Install Flutter dependencies
         run: flutter pub get
 
-      - name: 🔨 Build Flutter iOS
-        run: |
-          flutter build ios --release --no-codesign \
-            --dart-define=ENV=${{ secrets.ENV_PROD }} \
-            --dart-define=BASE_URL=${{ secrets.BASE_URL_PROD }} \
-            --dart-define=WS_URL=${{ secrets.WS_URL_PROD }} \
-            --dart-define=OSM_TILE_URL=${{ secrets.OSM_TILE_URL }}
-
       - name: 🚀 Build and Upload to TestFlight
         env:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
@@ -50,6 +42,11 @@ jobs:
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
         run: |
+          flutter build ios --release --no-codesign \
+            --dart-define=ENV=${{ secrets.ENV_PROD }} \
+            --dart-define=BASE_URL=${{ secrets.BASE_URL_PROD }} \
+            --dart-define=WS_URL=${{ secrets.WS_URL_PROD }} \
+            --dart-define=OSM_TILE_URL=${{ secrets.OSM_TILE_URL }}
           bundle exec fastlane ios beta
 
       - name: 📤 Upload Build Artifacts
