@@ -77,9 +77,12 @@ class _MapViewState extends ConsumerState<MapView> {
     final wsService = ref.read(alertWebSocketProvider);
     
     wsService.onNearbyUsersReceived = (users) {
-      if (mounted) {
-        log('🗺️ ${users.length} nearby users', name: 'MapView');
-        ref.read(userAvatarsProvider.notifier).updateNearbyUsers(users);
+      try {
+        if (mounted) {
+          ref.read(userAvatarsProvider.notifier).updateNearbyUsers(users);
+        }
+      } catch (e) {
+        log('Error updating user avatars: $e', name: 'MapView');
       }
     };
   }
@@ -1084,10 +1087,10 @@ class _MapViewState extends ConsumerState<MapView> {
                 ],
               ),
             MarkerLayer(
-              markers: _buildUserAvatarMarkers(ref.watch(userAvatarsProvider).activeUsers),
+              markers: riskMarkers,
             ),
             MarkerLayer(
-              markers: riskMarkers,
+              markers: _buildUserAvatarMarkers(ref.watch(userAvatarsProvider).activeUsers),
             ),
             // Search result marker
             if (_selectedSearchResult != null)

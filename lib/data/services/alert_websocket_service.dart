@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' as developer;
+import 'dart:math';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
@@ -12,14 +14,10 @@ import 'package:rpa/data/providers/repository_providers.dart';
 
 final alertWebSocketProvider = Provider((ref) => AlertWebSocketService());
 
-/// WebSocket service for real-time alerts
-/// 
-/// 🌟 WAZE-STYLE: Works with or without authentication!
-/// - Anonymous users can send location and receive public alerts
-/// - Authenticated users get personalized alerts and additional features
-class AlertWebSocketService {
+class AlertWebSocketService with WidgetsBindingObserver {
   WebSocketChannel? _channel;
   String? _currentToken;
+  String? _currentDeviceId;
   Timer? _locationUpdateTimer;
   
   Function(Map<String, dynamic>)? onAlertReceived;
@@ -27,6 +25,26 @@ class AlertWebSocketService {
   Function(String)? onError;
   Function()? onConnected;
   Function()? onDisconnected;
+
+  AlertWebSocketService() {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      developer.log('App paused, disconnecting WebSocket', name: 'AlertWebSocketService');
+      disconnect();
+    } else if (state == AppLifecycleState.resumed) {
+      developer.log('App resumed, reconnecting WebSocket', name: 'AlertWebSocketService');
+      if (_currentToken != null || _currentDeviceId != null) {
+        connect(
+          token: _currentToken,
+          deviceId: _currentDeviceId,
+        );
+      }
+    }
+  }
 
   void connect({
     String? token,
@@ -38,13 +56,10 @@ class AlertWebSocketService {
     Function()? onDisconnected,
   }) {
     String? authToken = token ?? AuthTokenManager().token;
+    _currentDeviceId = deviceId;
     
-    if (authToken != null && authToken.isNotEmpty) {
-      log('🔐 [WebSocket] Authenticated connection (JWT)', name: 'AlertWebSocketService');
-    } else if (deviceId != null && deviceId.isNotEmpty) {
-      log('🌐 [WebSocket] Anonymous connection (device_id)', name: 'AlertWebSocketService');
-    } else {
-      log('❌ [WebSocket] No JWT or device_id provided', name: 'AlertWebSocketService');
+    if (authToken == null && (deviceId == null || deviceId.isEmpty)) {
+      developer.log('No authentication credentials provided', name: 'AlertWebSocketService');
       onError?.call('No authentication credentials provided');
       return;
     }
@@ -71,65 +86,56 @@ class AlertWebSocketService {
     Function()? onConnected,
     Function()? onDisconnected,
   }) async {
-    if (attempt >= 3) {
-      log('❌ [WebSocket] Failed to connect after 3 attempts', name: 'AlertWebSocketService');
-      onError?.call('Failed to connect after 3 attempts');
+    if (attempt >= 5) {
+      developer.log('Failed to connect after 5 attempts', name: 'AlertWebSocketService');
+      onError?.call('Failed to connect after 5 attempts');
       return;
     }
 
     try {
       if (_channel != null && _currentToken == token) {
-        log('ℹ️ [WebSocket] Already connected', name: 'AlertWebSocketService');
+        developer.log('Already connected', name: 'AlertWebSocketService');
         return;
       }
 
       disconnect();
 
-      // Only update callbacks if they are provided (don't overwrite with null)
       if (onAlert != null) this.onAlertReceived = onAlert;
       if (onNearbyUsers != null) this.onNearbyUsersReceived = onNearbyUsers;
       if (onError != null) this.onError = onError;
       if (onConnected != null) this.onConnected = onConnected;
       if (onDisconnected != null) this.onDisconnected = onDisconnected;
 
-      // 🎯 Use WS_URL directly from environment variables
       final fullUrl = WS_URL;
-
-      log('📡 [WebSocket] Connecting to: $fullUrl', name: 'AlertWebSocketService');
+      developer.log('Connecting to: $fullUrl', name: 'AlertWebSocketService');
       
-      // 🔐 Create WebSocket with Authorization header (if authenticated) or X-Device-ID (if anonymous)
       final headers = <String, dynamic>{};
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
-        log('🔑 [WebSocket] Authorization: Bearer ${token.substring(0, token.length > 20 ? 20 : token.length)}...', 
-            name: 'AlertWebSocketService');
       } else if (deviceId != null && deviceId.isNotEmpty) {
         headers['X-Device-ID'] = deviceId;
-        log('🌐 [WebSocket] X-Device-ID: $deviceId', 
-            name: 'AlertWebSocketService');
-      } else {
-        log('🌐 [WebSocket] No authentication headers', 
-            name: 'AlertWebSocketService');
       }
 
-      // Connect with headers
       _channel = IOWebSocketChannel.connect(
         Uri.parse(fullUrl),
         headers: headers,
       );
       _currentToken = token;
 
-      // Listen to messages
       _channel?.stream.listen(
         (message) => _handleMessage(message),
         onDone: () => _onDone(token, deviceId, attempt),
         onError: (error) => _onError(token, deviceId, error, attempt),
       );
 
-      log('✅ [WebSocket] Connected successfully!', name: 'AlertWebSocketService');
-      onConnected?.call();
+      developer.log('Connected successfully', name: 'AlertWebSocketService');
+      try {
+        onConnected?.call();
+      } catch (e) {
+        developer.log('Error in onConnected callback: $e', name: 'AlertWebSocketService');
+      }
     } catch (e) {
-      log('❌ [WebSocket] Failed to connect: $e', name: 'AlertWebSocketService');
+      developer.log('Failed to connect: $e', name: 'AlertWebSocketService');
       await _handleReconnect(token, deviceId, attempt, 
         onAlert: onAlert,
         onNearbyUsers: onNearbyUsers,
@@ -140,11 +146,6 @@ class AlertWebSocketService {
     }
   }
 
-
-
-  /// Update user location for proximity alerts
-  /// Call this periodically to receive alerts near the user
-  /// Uses the format: { "event": "update_location", "data": { "latitude": -8.842560, "longitude": 13.300120, "speed": 0, "heading": 0 } }
   void updateLocation(
     double latitude, 
     double longitude, {
@@ -153,7 +154,7 @@ class AlertWebSocketService {
   }) {
     try {
       if (_channel == null) {
-        log('⚠️ [WebSocket] Cannot update location: WebSocket not connected', name: 'AlertWebSocketService');
+        developer.log('Cannot update location: WebSocket not connected', name: 'AlertWebSocketService');
         return;
       }
 
@@ -172,20 +173,17 @@ class AlertWebSocketService {
       final jsonMessage = jsonEncode(locationMessage.toJson((data) => data.toJson()));
       
       _channel?.sink.add(jsonMessage);
-      log('📍 [WebSocket] Location update sent: ($latitude, $longitude, speed: $speed, heading: $heading)', name: 'AlertWebSocketService');
-      log('📤 [WebSocket] Message: $jsonMessage', name: 'AlertWebSocketService');
+      developer.log('Location update sent: ($latitude, $longitude)', name: 'AlertWebSocketService');
     } catch (e) {
-      log('❌ [WebSocket] Error updating location: $e', name: 'AlertWebSocketService');
+      developer.log('Error updating location: $e', name: 'AlertWebSocketService');
     }
   }
 
-  /// Start automatic location updates (best practice like Waze)
-  /// Updates location every [intervalSeconds] seconds
   void startLocationUpdates({
     required double latitude,
     required double longitude,
     required Function() getCurrentLocation,
-    int intervalSeconds = 30, // Update every 30 seconds like Waze
+    int intervalSeconds = 30,
   }) {
     // Cancel previous timer if exists
     stopLocationUpdates();
@@ -201,48 +199,57 @@ class AlertWebSocketService {
           // Call the callback to get current location
           getCurrentLocation();
         } catch (e) {
-          log('Error in location update callback: $e', name: 'AlertWebSocketService');
+          developer.log('Error in location update callback: $e', name: 'AlertWebSocketService');
         }
       },
     );
 
-    log('Started automatic location updates (every $intervalSeconds seconds)', 
+    developer.log('Started location updates: ${intervalSeconds}s interval', 
         name: 'AlertWebSocketService');
   }
 
-  /// Stop automatic location updates
   void stopLocationUpdates() {
     _locationUpdateTimer?.cancel();
     _locationUpdateTimer = null;
-    log('Stopped automatic location updates', name: 'AlertWebSocketService');
+    developer.log('Stopped automatic location updates', name: 'AlertWebSocketService');
   }
 
   void _handleMessage(String message) {
     try {
-      log('📩 [WebSocket] Raw message received: $message', name: 'AlertWebSocketService');
-      
       final decodedMessage = jsonDecode(message);
       final event = decodedMessage['event'] as String?;
       final type = decodedMessage['type'] as String?;
-      
-      log('📨 [WebSocket] Message event: $event, type: $type', name: 'AlertWebSocketService');
 
       if (event == 'nearby_users') {
         _handleNearbyUsers(decodedMessage['data'] as Map<String, dynamic>);
       } else if (type == 'alert' || event == 'alert') {
         final alertData = decodedMessage['data'] as Map<String, dynamic>;
-        log('🚨 [WebSocket] Alert received: ${alertData['message']}', name: 'AlertWebSocketService');
-        onAlertReceived?.call(alertData);
+        developer.log('Alert received: ${alertData['message']}', name: 'AlertWebSocketService');
+        try {
+          onAlertReceived?.call(alertData);
+        } catch (e) {
+          developer.log('Error in onAlertReceived callback: $e', name: 'AlertWebSocketService');
+        }
       } else if (type == 'error') {
         final errorMessage = decodedMessage['message'] as String;
-        log('❌ [WebSocket] Error from server: $errorMessage', name: 'AlertWebSocketService');
-        onError?.call(errorMessage);
+        developer.log('Server error: $errorMessage', name: 'AlertWebSocketService');
+        try {
+          onError?.call(errorMessage);
+        } catch (e) {
+          developer.log('Error in onError callback: $e', name: 'AlertWebSocketService');
+        }
+      } else if (event == 'location_updated' || event == 'location_update_failed') {
+        return;
       } else {
-        log('ℹ️ [WebSocket] Unknown message event: $event, type: $type', name: 'AlertWebSocketService');
+        developer.log('Unknown message type: $type, event: $event', name: 'AlertWebSocketService');
       }
     } catch (e) {
-      log('❌ [WebSocket] Error handling message: $e', name: 'AlertWebSocketService');
-      onError?.call('Error processing message: $e');
+      developer.log('Error handling message: $e', name: 'AlertWebSocketService');
+      try {
+        onError?.call('Error processing message: $e');
+      } catch (callbackError) {
+        developer.log('Error in onError callback: $callbackError', name: 'AlertWebSocketService');
+      }
     }
   }
 
@@ -253,22 +260,35 @@ class AlertWebSocketService {
           .map((json) => NearbyUserModel.fromJson(json as Map<String, dynamic>))
           .toList();
       
-      log('👥 Received ${users.length} nearby users', name: 'AlertWebSocketService');
-      onNearbyUsersReceived?.call(users);
+      developer.log('Received ${users.length} nearby users', name: 'AlertWebSocketService');
+      
+      try {
+        onNearbyUsersReceived?.call(users);
+      } catch (e) {
+        developer.log('Error in onNearbyUsersReceived callback: $e', name: 'AlertWebSocketService');
+      }
     } catch (e) {
-      log('❌ Error parsing nearby users: $e', name: 'AlertWebSocketService');
+      developer.log('Error parsing nearby users: $e', name: 'AlertWebSocketService');
     }
   }
 
   void _onDone(String? token, String? deviceId, int attempt) {
-    log('🔌 [WebSocket] Connection closed', name: 'AlertWebSocketService');
-    onDisconnected?.call();
+    developer.log('Connection closed', name: 'AlertWebSocketService');
+    try {
+      onDisconnected?.call();
+    } catch (e) {
+      developer.log('Error in onDisconnected callback: $e', name: 'AlertWebSocketService');
+    }
     _handleReconnect(token, deviceId, attempt);
   }
 
   void _onError(String? token, String? deviceId, error, int attempt) {
-    log('❌ [WebSocket] Connection error: $error', name: 'AlertWebSocketService');
-    onError?.call('Connection error: $error');
+    developer.log('Connection error: $error', name: 'AlertWebSocketService');
+    try {
+      onError?.call('Connection error: $error');
+    } catch (e) {
+      developer.log('Error in onError callback: $e', name: 'AlertWebSocketService');
+    }
     _handleReconnect(token, deviceId, attempt);
   }
 
@@ -282,10 +302,9 @@ class AlertWebSocketService {
     Function()? onConnected,
     Function()? onDisconnected,
   }) async {
-    final delayDurations = [1, 5, 8];
-    if (attempt < delayDurations.length) {
-      final delay = delayDurations[attempt];
-      log('🔄 [WebSocket] Retrying connection in $delay seconds...', name: 'AlertWebSocketService');
+    if (attempt < 5) {
+      final delay = pow(2, attempt).toInt();
+      developer.log('Retrying connection in ${delay}s (attempt ${attempt + 1}/5)', name: 'AlertWebSocketService');
       await Future.delayed(Duration(seconds: delay));
       _tryConnect(token, deviceId, attempt + 1,
         onAlert: onAlert,
@@ -297,7 +316,6 @@ class AlertWebSocketService {
     }
   }
 
-  /// Disconnect from WebSocket
   void disconnect() {
     try {
       stopLocationUpdates();
@@ -306,12 +324,22 @@ class AlertWebSocketService {
         _channel!.sink.close();
         _channel = null;
         _currentToken = null;
-        log('Disconnected from WebSocket', name: 'AlertWebSocketService');
-        onDisconnected?.call();
+        _currentDeviceId = null;
+        developer.log('Disconnected from WebSocket', name: 'AlertWebSocketService');
+        try {
+          onDisconnected?.call();
+        } catch (e) {
+          developer.log('Error in onDisconnected callback: $e', name: 'AlertWebSocketService');
+        }
       }
     } catch (e) {
-      log('Error disconnecting from WebSocket: $e', name: 'AlertWebSocketService');
+      developer.log('Error disconnecting: $e', name: 'AlertWebSocketService');
     }
+  }
+
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    disconnect();
   }
 
   bool get isConnected => _channel != null;

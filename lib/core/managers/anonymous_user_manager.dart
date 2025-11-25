@@ -138,19 +138,16 @@ class AnonymousUserManager {
       _wsService.connect(
         token: authToken,
         onAlert: (alert) {
-          log('🚨 Alert: ${alert['message']}', name: 'AnonymousUserManager');
-        },
-        onNearbyUsers: (users) {
-          log('👥 ${users.length} nearby users', name: 'AnonymousUserManager');
+          log('Alert: ${alert['message']}', name: 'AnonymousUserManager');
         },
         onError: (error) {
-          log('❌ WebSocket error: $error', name: 'AnonymousUserManager');
+          log('WebSocket error: $error', name: 'AnonymousUserManager');
         },
         onConnected: () {
-          log('✅ Connected', name: 'AnonymousUserManager');
+          log('Connected', name: 'AnonymousUserManager');
         },
         onDisconnected: () {
-          log('🔌 Disconnected', name: 'AnonymousUserManager');
+          log('Disconnected', name: 'AnonymousUserManager');
         },
       );
     } else {
@@ -158,19 +155,16 @@ class AnonymousUserManager {
       _wsService.connect(
         deviceId: _deviceId,
         onAlert: (alert) {
-          log('🚨 Alert: ${alert['message']}', name: 'AnonymousUserManager');
-        },
-        onNearbyUsers: (users) {
-          log('👥 ${users.length} nearby users', name: 'AnonymousUserManager');
+          log('Alert: ${alert['message']}', name: 'AnonymousUserManager');
         },
         onError: (error) {
-          log('❌ WebSocket error: $error', name: 'AnonymousUserManager');
+          log('WebSocket error: $error', name: 'AnonymousUserManager');
         },
         onConnected: () {
-          log('✅ Connected', name: 'AnonymousUserManager');
+          log('Connected', name: 'AnonymousUserManager');
         },
         onDisconnected: () {
-          log('🔌 Disconnected', name: 'AnonymousUserManager');
+          log('Disconnected', name: 'AnonymousUserManager');
         },
       );
     }

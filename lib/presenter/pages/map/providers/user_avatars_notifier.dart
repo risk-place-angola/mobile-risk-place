@@ -42,33 +42,36 @@ class UserAvatarsNotifier extends Notifier<UserAvatarsState> {
     if (_throttleTimer?.isActive ?? false) return;
     
     _throttleTimer = Timer(const Duration(milliseconds: 500), () {
-      final updatedUsers = Map<String, NearbyUserModel>.from(state.users);
-      bool hasChanges = false;
-      
-      final limitedUsers = newUsers.take(maxVisibleUsers);
-      
-      for (final user in limitedUsers) {
-        final existing = updatedUsers[user.userId];
+      try {
+        final updatedUsers = Map<String, NearbyUserModel>.from(state.users);
+        bool hasChanges = false;
         
-        // Only update if position changed significantly (>10m ≈ 0.0001 degrees)
-        if (existing == null || _hasSignificantChange(existing, user)) {
-          updatedUsers[user.userId] = user;
-          hasChanges = true;
+        final limitedUsers = newUsers.take(maxVisibleUsers);
+        
+        for (final user in limitedUsers) {
+          final existing = updatedUsers[user.userId];
+          
+          // Only update if position changed significantly (>10m ≈ 0.0001 degrees)
+          if (existing == null || _hasSignificantChange(existing, user)) {
+            updatedUsers[user.userId] = user;
+            hasChanges = true;
+          }
         }
-      }
-      
-      // Remove inactive users
-      final before = updatedUsers.length;
-      updatedUsers.removeWhere((_, user) => user.isInactive);
-      if (before != updatedUsers.length) hasChanges = true;
+        
+        // Remove inactive users
+        final before = updatedUsers.length;
+        updatedUsers.removeWhere((_, user) => user.isInactive);
+        if (before != updatedUsers.length) hasChanges = true;
 
-      // Only update state if there are actual changes
-      if (hasChanges) {
-        log('✅ ${updatedUsers.length} avatars', name: 'UserAvatarsNotifier');
-        state = state.copyWith(
-          users: updatedUsers,
-          lastUpdate: DateTime.now(),
-        );
+        if (hasChanges) {
+          log('${updatedUsers.values.where((u) => !u.isInactive).length} active avatars', name: 'UserAvatarsNotifier');
+          state = state.copyWith(
+            users: updatedUsers,
+            lastUpdate: DateTime.now(),
+          );
+        }
+      } catch (e) {
+        log('Error updating nearby users: $e', name: 'UserAvatarsNotifier');
       }
     });
   }
