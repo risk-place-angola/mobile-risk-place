@@ -125,13 +125,28 @@ platform :ios do
       groups: ["Nete Testers"],
       changelog: "Production build #{ENV['GITHUB_RUN_NUMBER']}"
     )
+    
+    # Note: Submit for App Store Review should be done manually after testing
+    # or create a separate lane for submission
+  end
 
-    # Submit for App Store Review
+  # ==========================================
+  # LANE: Submit to App Store Review (Manual)
+  # ==========================================
+  desc "Submit the latest TestFlight build to App Store Review"
+  lane :release do
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
+      key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH']
+    )
+    
     deliver(
       api_key: api_key,
       submit_for_review: true,
-      automatic_release: false,  # Release manual após aprovação
+      automatic_release: false,
       force: true,
+      skip_binary_upload: true,  # Use existing TestFlight build
       skip_metadata: false,
       skip_screenshots: false,
       precheck_include_in_app_purchases: false,
@@ -205,13 +220,14 @@ platform :android do
 
     # Upload to Internal Testing first (obrigatório para novos apps)
     upload_to_play_store(
+      package_name: "ao.riskplace.makanetu",
       track: "internal",
       aab: "build/app/outputs/bundle/release/app-release.aab",
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      release_status: "completed",  # Publicar imediatamente
-      rollout: "1.0"  # 100% dos testadores internos
+      release_status: "completed",
+      rollout: "1.0"
     )
 
     # Aguardar alguns segundos para processar
@@ -219,15 +235,16 @@ platform :android do
 
     # Promover para Open Testing (14 dias obrigatórios)
     upload_to_play_store(
+      package_name: "ao.riskplace.makanetu",
       track: "internal",
-      track_promote_to: "beta",  # Beta = Open Testing
+      track_promote_to: "beta",
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
       skip_upload_apk: true,
       skip_upload_aab: true,
       release_status: "completed",
-      rollout: "1.0"  # 100% para iniciar período de 14 dias
+      rollout: "1.0"
     )
   end
 
@@ -245,6 +262,7 @@ platform :android do
 
     # Upload to Google Play Production
     upload_to_play_store(
+      package_name: "ao.riskplace.makanetu",
       track: "production",
       aab: "build/app/outputs/bundle/release/app-release.aab",
       skip_upload_metadata: false,
