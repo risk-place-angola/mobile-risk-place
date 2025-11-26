@@ -34,6 +34,8 @@ import 'package:rpa/core/error/error_handler.dart';
 import 'package:rpa/domain/usecases/create_report_usecase.dart';
 import 'package:rpa/domain/usecases/update_report_location_usecase.dart';
 import 'package:rpa/core/services/risk_topic_translation_service.dart';
+import 'package:rpa/presenter/providers/settings_notifier.dart';
+import 'package:rpa/presenter/providers/danger_zones_notifier.dart';
 
 class MapView extends ConsumerStatefulWidget {
   const MapView({super.key});
@@ -45,15 +47,15 @@ class MapView extends ConsumerStatefulWidget {
 class _MapViewState extends ConsumerState<MapView> {
   final MapController controller = MapController();
   PlaceSearchResult? _selectedSearchResult;
-  int _currentRadius = 5000; // Default 5km radius for nearby reports
-  bool _isLoadingReports = false; // Prevent duplicate loads
+  int _currentRadius = 5000;
+  bool _isLoadingReports = false;
 
   @override
   void initState() {
     super.initState();
-    
+
     _setupWebSocketForAvatars();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeMap();
     });
@@ -61,21 +63,73 @@ class _MapViewState extends ConsumerState<MapView> {
 
   Future<void> _initializeMap() async {
     ref.read(allRiskTypesProvider);
-    
+
     final locationController = ref.read(locationControllerProvider);
     if (locationController.permissionGranted) {
       locationController.startLocationUpdates();
     }
 
-    // ✅ Load reports immediately instead of arbitrary delay
+    _loadRadiusFromSettings();
+
     if (mounted) {
       _loadNearbyReportsFromBackend();
+      _loadDangerZonesFromBackend();
     }
+  }
+
+  Future<void> _loadDangerZonesFromBackend() async {
+    final locationController = ref.read(locationControllerProvider);
+    final currentPosition = locationController.currentPosition;
+
+    if (currentPosition == null) {
+      log('[MapView] No location for danger zones');
+      return;
+    }
+
+    final settingsAsync = ref.read(settingsNotifierProvider);
+    final dangerZonesEnabled = settingsAsync.when(
+      data: (settings) => settings.dangerZonesEnabled,
+      loading: () => true,
+      error: (_, __) => true,
+    );
+
+    if (!dangerZonesEnabled) {
+      log('[MapView] Danger zones disabled in settings');
+      return;
+    }
+
+    try {
+      await ref.read(dangerZonesNotifierProvider.notifier).loadDangerZones(
+            latitude: currentPosition.latitude,
+            longitude: currentPosition.longitude,
+            radiusMeters: _currentRadius.toDouble(),
+          );
+    } catch (e) {
+      log('[MapView] Error loading danger zones: $e');
+    }
+  }
+
+  void _loadRadiusFromSettings() {
+    final settingsAsync = ref.read(settingsNotifierProvider);
+    settingsAsync.when(
+      data: (settings) {
+        if (_currentRadius != settings.notificationReportRadiusMeters) {
+          setState(() {
+            _currentRadius = settings.notificationReportRadiusMeters;
+          });
+          log('[MapView] Loaded radius from settings: $_currentRadius meters');
+        }
+      },
+      loading: () {},
+      error: (_, __) {
+        log('[MapView] Using default radius: $_currentRadius meters');
+      },
+    );
   }
 
   void _setupWebSocketForAvatars() {
     final wsService = ref.read(alertWebSocketProvider);
-    
+
     wsService.onNearbyUsersReceived = (users) {
       try {
         if (mounted) {
@@ -122,30 +176,13 @@ class _MapViewState extends ConsumerState<MapView> {
 
       log('Loaded ${reports.length} reports from backend', name: 'MapView');
 
-      // Add reports to map markers with dynamic risk type lookup
+      // Add reports to map markers using data directly from backend
       final mapMarkersNotifier = ref.read(mapMarkersProvider.notifier);
       for (final reportDTO in reports) {
-        // Fetch risk type name from backend and map to enum
-        enums.RiskType riskType = enums.RiskType.infrastructure; // Default fallback
-        
-        try {
-          final riskTypeAsync = ref.read(riskTypeProvider(reportDTO.riskTypeId));
-          await riskTypeAsync.when(
-            data: (riskTypeDTO) {
-              // Map backend risk type name to enum
-              riskType = _mapRiskTypeNameToEnum(riskTypeDTO.name);
-              log('Mapped risk type "${riskTypeDTO.name}" to ${riskType.name}', name: 'MapView');
-            },
-            loading: () {
-              log('Loading risk type for ${reportDTO.riskTypeId}', name: 'MapView');
-            },
-            error: (err, _) {
-              log('Error loading risk type ${reportDTO.riskTypeId}: $err', name: 'MapView');
-            },
-          );
-        } catch (e) {
-          log('Exception getting risk type for report ${reportDTO.id}: $e', name: 'MapView');
-        }
+        // Map backend risk type name to enum (backend already provides the name)
+        final riskType = reportDTO.riskTypeName != null
+            ? _mapRiskTypeNameToEnum(reportDTO.riskTypeName!)
+            : enums.RiskType.infrastructure;
 
         // Convert DTO to ReportModel for the map
         final reportModel = ReportModel(
@@ -154,6 +191,10 @@ class _MapViewState extends ConsumerState<MapView> {
           latitude: reportDTO.latitude,
           longitude: reportDTO.longitude,
           riskType: riskType,
+          riskTopicId: reportDTO.riskTopicId,
+          riskTopicName: reportDTO.riskTopicName,
+          riskTopicIconUrl: reportDTO.riskTopicIconUrl,
+          riskTypeIconUrl: reportDTO.riskTypeIconUrl,
           status: _mapReportStatusFromString(reportDTO.status),
           createdAt: reportDTO.createdAt,
         );
@@ -194,16 +235,26 @@ class _MapViewState extends ConsumerState<MapView> {
     if (normalized.contains('violence') || normalized.contains('violência')) {
       return enums.RiskType.violence;
     }
-    if (normalized.contains('fire') || normalized.contains('fogo') || normalized.contains('incêndio')) {
+    if (normalized.contains('fire') ||
+        normalized.contains('fogo') ||
+        normalized.contains('incêndio')) {
       return enums.RiskType.fire;
     }
-    if (normalized.contains('traffic') || normalized.contains('trânsito') || normalized.contains('transito')) {
+    if (normalized.contains('traffic') ||
+        normalized.contains('trânsito') ||
+        normalized.contains('transito')) {
       return enums.RiskType.traffic;
     }
-    if (normalized.contains('infrastructure') || normalized.contains('infraestrutura')) {
+    if (normalized.contains('infrastructure') ||
+        normalized.contains('infraestrutura')) {
       return enums.RiskType.infrastructure;
     }
-    if (normalized.contains('flood') || normalized.contains('inundação') || normalized.contains('cheia') || normalized.contains('natural') || normalized.contains('disaster') || normalized.contains('desastre')) {
+    if (normalized.contains('flood') ||
+        normalized.contains('inundação') ||
+        normalized.contains('cheia') ||
+        normalized.contains('natural') ||
+        normalized.contains('disaster') ||
+        normalized.contains('desastre')) {
       return enums.RiskType.naturalDisaster;
     }
     if (normalized.contains('crime') || normalized.contains('criminal')) {
@@ -212,13 +263,21 @@ class _MapViewState extends ConsumerState<MapView> {
     if (normalized.contains('accident') || normalized.contains('acidente')) {
       return enums.RiskType.accident;
     }
-    if (normalized.contains('health') || normalized.contains('saúde') || normalized.contains('medical') || normalized.contains('médic')) {
+    if (normalized.contains('health') ||
+        normalized.contains('saúde') ||
+        normalized.contains('medical') ||
+        normalized.contains('médic')) {
       return enums.RiskType.health;
     }
-    if (normalized.contains('environment') || normalized.contains('ambiente') || normalized.contains('ambiental')) {
+    if (normalized.contains('environment') ||
+        normalized.contains('ambiente') ||
+        normalized.contains('ambiental')) {
       return enums.RiskType.environment;
     }
-    if (normalized.contains('public') || normalized.contains('safety') || normalized.contains('segurança') || normalized.contains('pública')) {
+    if (normalized.contains('public') ||
+        normalized.contains('safety') ||
+        normalized.contains('segurança') ||
+        normalized.contains('pública')) {
       return enums.RiskType.publicSafety;
     }
     if (normalized.contains('urban') || normalized.contains('urbano')) {
@@ -296,7 +355,7 @@ class _MapViewState extends ConsumerState<MapView> {
   void _adjustMapZoomForRadius(int radius) {
     final locationController = ref.read(locationControllerProvider);
     final currentPosition = locationController.currentPosition;
-    
+
     if (currentPosition == null) return;
 
     // Calculate appropriate zoom level based on radius
@@ -323,7 +382,8 @@ class _MapViewState extends ConsumerState<MapView> {
       zoomLevel,
     );
 
-    log('Adjusted map zoom to $zoomLevel for radius ${radius}m', name: 'MapView');
+    log('Adjusted map zoom to $zoomLevel for radius ${radius}m',
+        name: 'MapView');
   }
 
   @override
@@ -765,17 +825,19 @@ class _MapViewState extends ConsumerState<MapView> {
   }
 
   List<Marker> _buildUserAvatarMarkers(List<NearbyUserModel> users) {
-    return users.map((user) => Marker(
-      width: 48.0,
-      height: 48.0,
-      point: LatLng(user.latitude, user.longitude),
-      child: AnimatedUserAvatarMarker(
-        avatarId: user.avatarId,
-        color: user.color,
-        size: 48,
-        isMoving: user.speed != null && user.speed! > 0.5,
-      ),
-    )).toList();
+    return users
+        .map((user) => Marker(
+              width: 48.0,
+              height: 48.0,
+              point: LatLng(user.latitude, user.longitude),
+              child: AnimatedUserAvatarMarker(
+                avatarId: user.avatarId,
+                color: user.color,
+                size: 48,
+                isMoving: user.speed != null && user.speed! > 0.5,
+              ),
+            ))
+        .toList();
   }
 
   void _proceedWithReport() {
@@ -849,7 +911,7 @@ class _MapViewState extends ConsumerState<MapView> {
         context,
         topic.name,
       );
-      
+
       final params = CreateReportParams(
         riskTypeId: riskType.id,
         riskTopicId: topic.id,
@@ -967,14 +1029,24 @@ class _MapViewState extends ConsumerState<MapView> {
         ref.watch(locationControllerProvider).currentPosition;
     final menuController = ref.watch(menu_ctrl.menuControllerProvider);
     final alertRadiusCircles = ref.watch(alertRadiusCirclesProvider);
+    final dangerZonesState = ref.watch(dangerZonesNotifierProvider);
 
-    // Watch state to rebuild when markers change
     ref.watch(mapMarkersProvider);
 
-    // Create clickable markers
     final riskMarkers = ref
         .read(mapMarkersProvider.notifier)
         .getAllMarkersWithContext((data) => _showMarkerDetails(context, data));
+
+    final dangerZoneCircles = dangerZonesState.zones
+        .map((zone) => CircleMarker(
+              point: LatLng(zone.latitude, zone.longitude),
+              radius: 500,
+              useRadiusInMeter: true,
+              color: zone.riskLevel.color.withOpacity(0.2),
+              borderColor: zone.riskLevel.color.withOpacity(0.6),
+              borderStrokeWidth: 2,
+            ))
+        .toList();
 
     // Default center or use current position if available
     final center = currentPosition != null
@@ -1005,11 +1077,13 @@ class _MapViewState extends ConsumerState<MapView> {
               userAgentPackageName: 'ao.riskplace.makanetu',
               tileDisplay: TileDisplay.instantaneous(),
             ),
-            // Alert radius circles (drawn first, under markers)
+            if (dangerZoneCircles.isNotEmpty)
+              CircleLayer(
+                circles: dangerZoneCircles,
+              ),
             CircleLayer(
               circles: alertRadiusCircles,
             ),
-            // User location accuracy circle
             if (currentPosition != null)
               CircleLayer(
                 circles: [
@@ -1090,7 +1164,8 @@ class _MapViewState extends ConsumerState<MapView> {
               markers: riskMarkers,
             ),
             MarkerLayer(
-              markers: _buildUserAvatarMarkers(ref.watch(userAvatarsProvider).activeUsers),
+              markers: _buildUserAvatarMarkers(
+                  ref.watch(userAvatarsProvider).activeUsers),
             ),
             // Search result marker
             if (_selectedSearchResult != null)
@@ -1176,14 +1251,20 @@ class _MapViewState extends ConsumerState<MapView> {
             right: 80,
             child: RadiusControlWidget(
               currentRadius: _currentRadius,
-              onRadiusChanged: (newRadius) {
+              onRadiusChanged: (newRadius) async {
                 setState(() {
                   _currentRadius = newRadius;
                 });
-                // Adjust map zoom to fit the new radius
+
                 _adjustMapZoomForRadius(newRadius);
-                // Reload reports with new radius
                 _loadNearbyReportsFromBackend();
+                _loadDangerZonesFromBackend();
+
+                try {
+                  await SettingsHelper.updateReportRadius(ref, newRadius);
+                } catch (e) {
+                  log('[MapView] Failed to persist radius to settings: $e');
+                }
               },
             ),
           ),
