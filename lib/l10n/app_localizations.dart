@@ -1010,6 +1010,156 @@ abstract class AppLocalizations {
   /// **'Medical Emergency'**
   String get emergencia_medica;
 
+  /// No description provided for @impactArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Approximate impact area'**
+  String get impactArea;
+
+  /// No description provided for @coordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get coordinates;
+
+  /// No description provided for @detailedViewComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed view coming in next update'**
+  String get detailedViewComingSoon;
+
+  /// No description provided for @verifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifications'**
+  String get verifications;
+
+  /// No description provided for @rejections.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejections'**
+  String get rejections;
+
+  /// No description provided for @netScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Score'**
+  String get netScore;
+
+  /// No description provided for @reportDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Details'**
+  String get reportDetails;
+
+  /// No description provided for @riskType.
+  ///
+  /// In en, this message translates to:
+  /// **'Risk Type'**
+  String get riskType;
+
+  /// No description provided for @riskTopic.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic'**
+  String get riskTopic;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// No description provided for @province.
+  ///
+  /// In en, this message translates to:
+  /// **'Province'**
+  String get province;
+
+  /// No description provided for @reportedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported At'**
+  String get reportedAt;
+
+  /// No description provided for @relationFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get relationFamily;
+
+  /// No description provided for @relationFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend'**
+  String get relationFriend;
+
+  /// No description provided for @relationColleague.
+  ///
+  /// In en, this message translates to:
+  /// **'Colleague'**
+  String get relationColleague;
+
+  /// No description provided for @relationNeighbor.
+  ///
+  /// In en, this message translates to:
+  /// **'Neighbor'**
+  String get relationNeighbor;
+
+  /// No description provided for @relationOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get relationOther;
+
+  /// No description provided for @priority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get priority;
+
+  /// No description provided for @call.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get call;
+
+  /// No description provided for @sendSMS.
+  ///
+  /// In en, this message translates to:
+  /// **'Send SMS'**
+  String get sendSMS;
+
+  /// No description provided for @errorLoadingSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Error Loading Settings'**
+  String get errorLoadingSettings;
+
+  /// No description provided for @noSettingsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No settings available'**
+  String get noSettingsAvailable;
+
+  /// No description provided for @lastUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Update'**
+  String get lastUpdate;
+
+  /// No description provided for @expiresAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires At'**
+  String get expiresAt;
+
   /// No description provided for @surto_doenca.
   ///
   /// In en, this message translates to:
@@ -1399,12 +1549,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Relation'**
   String get relation;
-
-  /// No description provided for @priority.
-  ///
-  /// In en, this message translates to:
-  /// **'Priority'**
-  String get priority;
 
   /// No description provided for @priorityContact.
   ///
@@ -1847,7 +1991,7 @@ abstract class AppLocalizations {
   /// No description provided for @minutesAgo.
   ///
   /// In en, this message translates to:
-  /// **'{minutes}m ago'**
+  /// **'{minutes} min ago'**
   String minutesAgo(Object minutes);
 
   /// No description provided for @hoursAgo.
@@ -2315,13 +2459,13 @@ abstract class AppLocalizations {
   /// No description provided for @waitingLocation.
   ///
   /// In en, this message translates to:
-  /// **'Waiting for location...'**
+  /// **'Waiting location...'**
   String get waitingLocation;
 
   /// No description provided for @waitingGPS.
   ///
   /// In en, this message translates to:
-  /// **'Waiting for GPS location...'**
+  /// **'Waiting GPS location...'**
   String get waitingGPS;
 
   /// No description provided for @homeAddressSavedSuccess.
@@ -2341,6 +2485,264 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} added successfully!'**
   String addedSuccessfully(Object name);
+
+  /// No description provided for @allReportsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All Reports'**
+  String get allReportsTitle;
+
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// No description provided for @filterBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by:'**
+  String get filterBy;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @noReportsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No reports found'**
+  String get noReportsFound;
+
+  /// No description provided for @loadingReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading reports...'**
+  String get loadingReports;
+
+  /// No description provided for @loadingRiskTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing report options...'**
+  String get loadingRiskTypes;
+
+  /// No description provided for @loadingRiskTypesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading available risk categories, please wait a moment.'**
+  String get loadingRiskTypesMessage;
+
+  /// No description provided for @errorLoadingRiskTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to Load Options'**
+  String get errorLoadingRiskTypes;
+
+  /// No description provided for @errorLoadingRiskTypesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load the report categories. This may be due to a slow connection or server issue.'**
+  String get errorLoadingRiskTypesMessage;
+
+  /// No description provided for @apiSlowWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'API may be slow, please wait...'**
+  String get apiSlowWarning;
+
+  /// No description provided for @timeoutError.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Timeout'**
+  String get timeoutError;
+
+  /// No description provided for @timeoutErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The server is taking too long to respond. This may be due to slow API or poor internet connection.'**
+  String get timeoutErrorMessage;
+
+  /// No description provided for @timeoutTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: Check your internet connection or try again in a few moments.'**
+  String get timeoutTip;
+
+  /// No description provided for @totalReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Total: {count} reports'**
+  String totalReports(Object count);
+
+  /// No description provided for @pageOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {current} of {total}'**
+  String pageOf(Object current, Object total);
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d ago'**
+  String daysAgo(Object days);
+
+  /// No description provided for @shareLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Location'**
+  String get shareLocationTitle;
+
+  /// No description provided for @shareLocationQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How long do you want to share?'**
+  String get shareLocationQuestion;
+
+  /// No description provided for @minutes15.
+  ///
+  /// In en, this message translates to:
+  /// **'15 minutes'**
+  String get minutes15;
+
+  /// No description provided for @minutes30.
+  ///
+  /// In en, this message translates to:
+  /// **'30 minutes'**
+  String get minutes30;
+
+  /// No description provided for @minutes60.
+  ///
+  /// In en, this message translates to:
+  /// **'60 minutes'**
+  String get minutes60;
+
+  /// No description provided for @shortSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Short sharing'**
+  String get shortSharing;
+
+  /// No description provided for @recommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get recommended;
+
+  /// No description provided for @longSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Long sharing'**
+  String get longSharing;
+
+  /// No description provided for @sharingLocationActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing Location'**
+  String get sharingLocationActive;
+
+  /// No description provided for @activeSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Sharing'**
+  String get activeSharing;
+
+  /// No description provided for @expiresIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires in: {time}'**
+  String expiresIn(Object time);
+
+  /// No description provided for @stopSharingQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to stop sharing your location?'**
+  String get stopSharingQuestion;
+
+  /// No description provided for @linkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied to clipboard'**
+  String get linkCopied;
+
+  /// No description provided for @locationUpdating.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location is being updated every 10 seconds'**
+  String get locationUpdating;
+
+  /// No description provided for @shareMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m sharing my real-time location with you.\n\nAccess: {link}\n\nValid until: {expires}\n\nRiskPlace - Safer Cities 🛡️'**
+  String shareMessage(Object expires, Object link);
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
+
+  /// No description provided for @featureComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature will be available soon. Stay tuned for updates!'**
+  String get featureComingSoon;
+
+  /// No description provided for @settingsUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting updated successfully'**
+  String get settingsUpdatedSuccess;
+
+  /// No description provided for @visibilityPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get visibilityPublic;
+
+  /// No description provided for @visibilityFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get visibilityFriends;
+
+  /// No description provided for @visibilityPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get visibilityPrivate;
+
+  /// No description provided for @alertTypeLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get alertTypeLow;
+
+  /// No description provided for @alertTypeMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get alertTypeMedium;
+
+  /// No description provided for @alertTypeHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get alertTypeHigh;
+
+  /// No description provided for @alertTypeCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get alertTypeCritical;
+
+  /// No description provided for @reportTypeRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get reportTypeRejected;
 }
 
 class _AppLocalizationsDelegate

@@ -498,6 +498,81 @@ class AppLocalizationsPt extends AppLocalizations {
   String get emergencia_medica => 'Emergência Médica';
 
   @override
+  String get impactArea => 'Área de impacto aproximada';
+
+  @override
+  String get coordinates => 'Coordenadas';
+
+  @override
+  String get detailedViewComingSoon => 'Visualização detalhada em breve';
+
+  @override
+  String get verifications => 'Verificações';
+
+  @override
+  String get rejections => 'Rejeições';
+
+  @override
+  String get netScore => 'Pontuação Líquida';
+
+  @override
+  String get reportDetails => 'Detalhes do Report';
+
+  @override
+  String get riskType => 'Tipo de Risco';
+
+  @override
+  String get riskTopic => 'Tópico';
+
+  @override
+  String get location => 'Localização';
+
+  @override
+  String get address => 'Endereço';
+
+  @override
+  String get province => 'Província';
+
+  @override
+  String get reportedAt => 'Reportado em';
+
+  @override
+  String get relationFamily => 'Família';
+
+  @override
+  String get relationFriend => 'Amigo';
+
+  @override
+  String get relationColleague => 'Colega';
+
+  @override
+  String get relationNeighbor => 'Vizinho';
+
+  @override
+  String get relationOther => 'Outro';
+
+  @override
+  String get priority => 'Prioridade';
+
+  @override
+  String get call => 'Ligar';
+
+  @override
+  String get sendSMS => 'Enviar SMS';
+
+  @override
+  String get errorLoadingSettings => 'Erro ao Carregar Configurações';
+
+  @override
+  String get noSettingsAvailable => 'Nenhuma configuração disponível';
+
+  @override
+  String get lastUpdate => 'Última Atualização';
+
+  @override
+  String get expiresAt => 'Expira Em';
+
+  @override
   String get surto_doenca => 'Surto de Doença';
 
   @override
@@ -697,9 +772,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relation => 'Relação';
 
   @override
-  String get priority => 'Prioridade';
-
-  @override
   String get priorityContact => 'Contato prioritário';
 
   @override
@@ -750,10 +822,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get unsubscribe => 'Cancelar Inscrição';
 
   @override
-  String get alertRadius => 'Raio de Alertas';
+  String get alertRadius => 'Raio de Alerta';
 
   @override
-  String get reportRadius => 'Raio de Relatórios';
+  String get reportRadius => 'Raio de Relatório';
 
   @override
   String get allReports => 'Todos os Relatórios';
@@ -927,12 +999,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String minutesAgo(Object minutes) {
-    return 'Há $minutes min';
+    return '$minutes min atrás';
   }
 
   @override
   String hoursAgo(Object hours) {
-    return 'Há ${hours}h';
+    return '${hours}h atrás';
   }
 
   @override
@@ -1202,4 +1274,150 @@ class AppLocalizationsPt extends AppLocalizations {
   String addedSuccessfully(Object name) {
     return '$name adicionado com sucesso!';
   }
+
+  @override
+  String get allReportsTitle => 'Todos os Relatórios';
+
+  @override
+  String get refresh => 'Atualizar';
+
+  @override
+  String get filterBy => 'Filtrar por:';
+
+  @override
+  String get all => 'Todos';
+
+  @override
+  String get noReportsFound => 'Nenhum relatório encontrado';
+
+  @override
+  String get loadingReports => 'Carregando relatórios...';
+
+  @override
+  String get loadingRiskTypes => 'Preparando opções de relatório...';
+
+  @override
+  String get loadingRiskTypesMessage =>
+      'Carregando categorias de risco disponíveis, aguarde um momento.';
+
+  @override
+  String get errorLoadingRiskTypes => 'Não Foi Possível Carregar Opções';
+
+  @override
+  String get errorLoadingRiskTypesMessage =>
+      'Não conseguimos carregar as categorias de relatório. Isso pode ser devido à conexão lenta ou problema no servidor.';
+
+  @override
+  String get apiSlowWarning => 'A API pode estar lenta, por favor aguarde...';
+
+  @override
+  String get timeoutError => 'Tempo Esgotado';
+
+  @override
+  String get timeoutErrorMessage =>
+      'O servidor está demorando muito para responder. Isso pode ser devido à API lenta ou conexão de internet ruim.';
+
+  @override
+  String get timeoutTip =>
+      'Dica: Verifique sua conexão de internet ou tente novamente em alguns instantes.';
+
+  @override
+  String totalReports(Object count) {
+    return 'Total: $count relatórios';
+  }
+
+  @override
+  String pageOf(Object current, Object total) {
+    return 'Página $current de $total';
+  }
+
+  @override
+  String daysAgo(Object days) {
+    return '${days}d atrás';
+  }
+
+  @override
+  String get shareLocationTitle => 'Compartilhar Localização';
+
+  @override
+  String get shareLocationQuestion => 'Por quanto tempo deseja compartilhar?';
+
+  @override
+  String get minutes15 => '15 minutos';
+
+  @override
+  String get minutes30 => '30 minutos';
+
+  @override
+  String get minutes60 => '60 minutos';
+
+  @override
+  String get shortSharing => 'Compartilhamento curto';
+
+  @override
+  String get recommended => 'Recomendado';
+
+  @override
+  String get longSharing => 'Compartilhamento longo';
+
+  @override
+  String get sharingLocationActive => 'Compartilhando Localização';
+
+  @override
+  String get activeSharing => 'Compartilhamento Ativo';
+
+  @override
+  String expiresIn(Object time) {
+    return 'Expira em: $time';
+  }
+
+  @override
+  String get stopSharingQuestion =>
+      'Deseja realmente parar de compartilhar sua localização?';
+
+  @override
+  String get linkCopied => 'Link copiado para a área de transferência';
+
+  @override
+  String get locationUpdating =>
+      'Sua localização está sendo atualizada a cada 10 segundos';
+
+  @override
+  String shareMessage(Object expires, Object link) {
+    return 'Estou compartilhando minha localização em tempo real com você.\n\nAcesse: $link\n\nLink válido até: $expires\n\nRiskPlace - Cidades Mais Seguras 🛡️';
+  }
+
+  @override
+  String get comingSoon => 'Em Breve';
+
+  @override
+  String get featureComingSoon =>
+      'Esta funcionalidade estará disponível em breve. Fique atento às atualizações!';
+
+  @override
+  String get settingsUpdatedSuccess => 'Configuração atualizada com sucesso';
+
+  @override
+  String get visibilityPublic => 'Público';
+
+  @override
+  String get visibilityFriends => 'Amigos';
+
+  @override
+  String get visibilityPrivate => 'Privado';
+
+  @override
+  String get alertTypeLow => 'Baixo';
+
+  @override
+  String get alertTypeMedium => 'Médio';
+
+  @override
+  String get alertTypeHigh => 'Alto';
+
+  @override
+  String get alertTypeCritical => 'Crítico';
+
+  @override
+  String get reportTypeRejected => 'Rejeitado';
 }

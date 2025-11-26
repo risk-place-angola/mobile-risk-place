@@ -496,6 +496,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emergencia_medica => 'Medical Emergency';
 
   @override
+  String get impactArea => 'Approximate impact area';
+
+  @override
+  String get coordinates => 'Coordinates';
+
+  @override
+  String get detailedViewComingSoon => 'Detailed view coming in next update';
+
+  @override
+  String get verifications => 'Verifications';
+
+  @override
+  String get rejections => 'Rejections';
+
+  @override
+  String get netScore => 'Net Score';
+
+  @override
+  String get reportDetails => 'Report Details';
+
+  @override
+  String get riskType => 'Risk Type';
+
+  @override
+  String get riskTopic => 'Topic';
+
+  @override
+  String get location => 'Location';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get province => 'Province';
+
+  @override
+  String get reportedAt => 'Reported At';
+
+  @override
+  String get relationFamily => 'Family';
+
+  @override
+  String get relationFriend => 'Friend';
+
+  @override
+  String get relationColleague => 'Colleague';
+
+  @override
+  String get relationNeighbor => 'Neighbor';
+
+  @override
+  String get relationOther => 'Other';
+
+  @override
+  String get priority => 'Priority';
+
+  @override
+  String get call => 'Call';
+
+  @override
+  String get sendSMS => 'Send SMS';
+
+  @override
+  String get errorLoadingSettings => 'Error Loading Settings';
+
+  @override
+  String get noSettingsAvailable => 'No settings available';
+
+  @override
+  String get lastUpdate => 'Last Update';
+
+  @override
+  String get expiresAt => 'Expires At';
+
+  @override
   String get surto_doenca => 'Disease Outbreak';
 
   @override
@@ -692,9 +767,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get relation => 'Relation';
-
-  @override
-  String get priority => 'Priority';
 
   @override
   String get priorityContact => 'Priority contact';
@@ -920,7 +992,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String minutesAgo(Object minutes) {
-    return '${minutes}m ago';
+    return '$minutes min ago';
   }
 
   @override
@@ -1176,10 +1248,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get safeRouteButton => 'Safe Route';
 
   @override
-  String get waitingLocation => 'Waiting for location...';
+  String get waitingLocation => 'Waiting location...';
 
   @override
-  String get waitingGPS => 'Waiting for GPS location...';
+  String get waitingGPS => 'Waiting GPS location...';
 
   @override
   String get homeAddressSavedSuccess => 'Home address saved successfully!';
@@ -1191,4 +1263,150 @@ class AppLocalizationsEn extends AppLocalizations {
   String addedSuccessfully(Object name) {
     return '$name added successfully!';
   }
+
+  @override
+  String get allReportsTitle => 'All Reports';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get filterBy => 'Filter by:';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get noReportsFound => 'No reports found';
+
+  @override
+  String get loadingReports => 'Loading reports...';
+
+  @override
+  String get loadingRiskTypes => 'Preparing report options...';
+
+  @override
+  String get loadingRiskTypesMessage =>
+      'Loading available risk categories, please wait a moment.';
+
+  @override
+  String get errorLoadingRiskTypes => 'Unable to Load Options';
+
+  @override
+  String get errorLoadingRiskTypesMessage =>
+      'We couldn\'t load the report categories. This may be due to a slow connection or server issue.';
+
+  @override
+  String get apiSlowWarning => 'API may be slow, please wait...';
+
+  @override
+  String get timeoutError => 'Request Timeout';
+
+  @override
+  String get timeoutErrorMessage =>
+      'The server is taking too long to respond. This may be due to slow API or poor internet connection.';
+
+  @override
+  String get timeoutTip =>
+      'Tip: Check your internet connection or try again in a few moments.';
+
+  @override
+  String totalReports(Object count) {
+    return 'Total: $count reports';
+  }
+
+  @override
+  String pageOf(Object current, Object total) {
+    return 'Page $current of $total';
+  }
+
+  @override
+  String daysAgo(Object days) {
+    return '${days}d ago';
+  }
+
+  @override
+  String get shareLocationTitle => 'Share Location';
+
+  @override
+  String get shareLocationQuestion => 'How long do you want to share?';
+
+  @override
+  String get minutes15 => '15 minutes';
+
+  @override
+  String get minutes30 => '30 minutes';
+
+  @override
+  String get minutes60 => '60 minutes';
+
+  @override
+  String get shortSharing => 'Short sharing';
+
+  @override
+  String get recommended => 'Recommended';
+
+  @override
+  String get longSharing => 'Long sharing';
+
+  @override
+  String get sharingLocationActive => 'Sharing Location';
+
+  @override
+  String get activeSharing => 'Active Sharing';
+
+  @override
+  String expiresIn(Object time) {
+    return 'Expires in: $time';
+  }
+
+  @override
+  String get stopSharingQuestion =>
+      'Do you really want to stop sharing your location?';
+
+  @override
+  String get linkCopied => 'Link copied to clipboard';
+
+  @override
+  String get locationUpdating =>
+      'Your location is being updated every 10 seconds';
+
+  @override
+  String shareMessage(Object expires, Object link) {
+    return 'I\'m sharing my real-time location with you.\n\nAccess: $link\n\nValid until: $expires\n\nRiskPlace - Safer Cities 🛡️';
+  }
+
+  @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
+  String get featureComingSoon =>
+      'This feature will be available soon. Stay tuned for updates!';
+
+  @override
+  String get settingsUpdatedSuccess => 'Setting updated successfully';
+
+  @override
+  String get visibilityPublic => 'Public';
+
+  @override
+  String get visibilityFriends => 'Friends';
+
+  @override
+  String get visibilityPrivate => 'Private';
+
+  @override
+  String get alertTypeLow => 'Low';
+
+  @override
+  String get alertTypeMedium => 'Medium';
+
+  @override
+  String get alertTypeHigh => 'High';
+
+  @override
+  String get alertTypeCritical => 'Critical';
+
+  @override
+  String get reportTypeRejected => 'Rejected';
 }
