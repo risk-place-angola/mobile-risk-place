@@ -110,7 +110,7 @@ class _AddEmergencyContactDialogState extends State<AddEmergencyContactDialog> {
                   items: ContactRelation.values.map((relation) {
                     return DropdownMenuItem(
                       value: relation,
-                      child: Text(relation.displayName),
+                      child: Text(getLocalizedRelationName(relation, l10n)),
                     );
                   }).toList(),
                   onChanged: (value) {

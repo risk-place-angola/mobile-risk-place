@@ -5,6 +5,8 @@ enum ContactRelation {
   neighbor,
   other;
 
+  /// Get localized display name
+  /// Note: This is a fallback. Use getLocalizedName(context) instead when context is available.
   String get displayName {
     switch (this) {
       case ContactRelation.family:
@@ -35,6 +37,11 @@ enum ContactRelation {
       default:
         return ContactRelation.other;
     }
+  }
+  
+  /// Convert enum to backend string value
+  String toBackendString() {
+    return name; // Returns 'family', 'friend', 'colleague', 'neighbor', 'other'
   }
 }
 
@@ -79,5 +86,21 @@ class EmergencyContact {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
+  }
+}
+
+// Helper function to get localized contact relation name
+String getLocalizedRelationName(ContactRelation relation, dynamic l10n) {
+  switch (relation) {
+    case ContactRelation.family:
+      return l10n?.relationFamily ?? 'Família';
+    case ContactRelation.friend:
+      return l10n?.relationFriend ?? 'Amigo';
+    case ContactRelation.colleague:
+      return l10n?.relationColleague ?? 'Colega';
+    case ContactRelation.neighbor:
+      return l10n?.relationNeighbor ?? 'Vizinho';
+    case ContactRelation.other:
+      return l10n?.relationOther ?? 'Outro';
   }
 }

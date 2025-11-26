@@ -70,7 +70,7 @@ class EmergencyContactTile extends StatelessWidget {
                   border: Border.all(color: Colors.red.shade200),
                 ),
                 child: Text(
-                  'Prioritário',
+                  AppLocalizations.of(context)?.priority ?? 'Prioritário',
                   style: TextStyle(
                     fontSize: isSmallScreen ? 9 : 11,
                     fontWeight: FontWeight.bold,
@@ -94,7 +94,10 @@ class EmergencyContactTile extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              contact.relation.displayName,
+              getLocalizedRelationName(
+                contact.relation, 
+                AppLocalizations.of(context)
+              ),
               style: TextStyle(
                 color: Colors.grey.shade600,
                 fontSize: isSmallScreen ? 11 : 12,
@@ -119,48 +122,54 @@ class EmergencyContactTile extends StatelessWidget {
                 break;
             }
           },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'call',
-              child: Row(
-                children: [
-                  Icon(Icons.phone, size: 20),
-                  SizedBox(width: 12),
-                  Text('Ligar'),
-                ],
+          itemBuilder: (context) {
+            final l10n = AppLocalizations.of(context);
+            return [
+              PopupMenuItem(
+                value: 'call',
+                child: Row(
+                  children: [
+                    const Icon(Icons.phone, size: 20),
+                    const SizedBox(width: 12),
+                    Text(l10n?.call ?? 'Ligar'),
+                  ],
+                ),
               ),
-            ),
-            const PopupMenuItem(
-              value: 'sms',
-              child: Row(
-                children: [
-                  Icon(Icons.message, size: 20),
-                  SizedBox(width: 12),
-                  Text('Enviar SMS'),
-                ],
+              PopupMenuItem(
+                value: 'sms',
+                child: Row(
+                  children: [
+                    const Icon(Icons.message, size: 20),
+                    const SizedBox(width: 12),
+                    Text(l10n?.sendSMS ?? 'Enviar SMS'),
+                  ],
+                ),
               ),
-            ),
-            const PopupMenuItem(
-              value: 'edit',
-              child: Row(
-                children: [
-                  Icon(Icons.edit, size: 20),
-                  SizedBox(width: 12),
-                  Text('Editar'),
-                ],
+              PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    const Icon(Icons.edit, size: 20),
+                    const SizedBox(width: 12),
+                    Text(l10n?.edit ?? 'Editar'),
+                  ],
+                ),
               ),
-            ),
-            PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  const Icon(Icons.delete, size: 20, color: Colors.red),
-                  const SizedBox(width: 12),
-                  Text(AppLocalizations.of(context)?.remove ?? 'Remover', style: const TextStyle(color: Colors.red)),
-                ],
+              PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    const Icon(Icons.delete, size: 20, color: Colors.red),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n?.remove ?? 'Remover',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ];
+          },
         ),
       ),
     );
