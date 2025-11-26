@@ -40,17 +40,142 @@ class _ReportSelectionBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    // Load risk types from backend API
     final riskTypesAsync = ref.watch(riskTypesProvider);
-    // Load all risk topics from backend API
     final riskTopicsAsync = ref.watch(riskTopicsProvider);
     
-    final screenHeight = MediaQuery.of(context).size.height;
-    final maxHeight = screenHeight * 0.85; // 85% da altura da tela
+    final size = MediaQuery.of(context).size;
+    final screenHeight = size.height;
+    final screenWidth = size.width;
+    final maxHeight = screenHeight * 0.85;
+    
+    // ✅ Show loading state while data is being fetched (non-blocking)
+    if (riskTypesAsync.isLoading || riskTopicsAsync.isLoading) {
+      return Container(
+        constraints: BoxConstraints(
+          maxHeight: maxHeight,
+          maxWidth: screenWidth,
+          minHeight: 300,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)?.loadingRiskTypes ?? 
+                    'Preparing report options...',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppLocalizations.of(context)?.loadingRiskTypesMessage ?? 
+                    'Loading available risk categories, please wait a moment.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    
+    // ✅ Show error state if data fetch failed
+    if (riskTypesAsync.hasError || riskTopicsAsync.hasError) {
+      return Container(
+        constraints: BoxConstraints(
+          maxHeight: maxHeight,
+          maxWidth: screenWidth,
+          minHeight: 300,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.cloud_off_outlined,
+                  size: 64,
+                  color: Colors.orange,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  AppLocalizations.of(context)?.errorLoadingRiskTypes ?? 
+                    'Unable to Load Options',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  AppLocalizations.of(context)?.errorLoadingRiskTypesMessage ?? 
+                    'We couldn\'t load the report categories. This may be due to a slow connection or server issue.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${riskTypesAsync.error ?? riskTopicsAsync.error}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    ref.invalidate(riskTypesProvider);
+                    ref.invalidate(riskTopicsProvider);
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: Text(
+                    AppLocalizations.of(context)?.tryAgainButton ?? 
+                      'Try Again',
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Container(
       constraints: BoxConstraints(
         maxHeight: maxHeight,
+        maxWidth: screenWidth,
         minHeight: 300,
       ),
       decoration: const BoxDecoration(

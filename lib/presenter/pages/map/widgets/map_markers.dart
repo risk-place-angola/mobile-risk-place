@@ -93,12 +93,16 @@ class AlertMarkerWidget extends StatelessWidget {
 /// Lower priority than alerts, more subtle styling
 class ReportMarkerWidget extends StatelessWidget {
   final RiskType? riskType;
+  final String? topicName;
+  final String? topicIconUrl;
   final bool isVerified;
   final bool isResolved;
 
   const ReportMarkerWidget({
     super.key,
     this.riskType,
+    this.topicName,
+    this.topicIconUrl,
     this.isVerified = false,
     this.isResolved = false,
   });
@@ -131,10 +135,11 @@ class ReportMarkerWidget extends StatelessWidget {
           ),
           child: ClipOval(
             child: IconResolverService.buildIcon(
-              typeName: (riskType ?? RiskType.infrastructure).name,
-              apiIconPath: null,
+              typeName: topicName ?? (riskType ?? RiskType.infrastructure).name,
+              apiIconPath: topicIconUrl,
               size: 20,
               color: Colors.white,
+              isTopic: topicName != null,
             ),
           ),
         ),

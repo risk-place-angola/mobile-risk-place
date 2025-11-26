@@ -130,6 +130,8 @@ class MapMarkersNotifier extends Notifier<MapMarkersState> {
             child: ReportMarkerWidget(
               riskType: report.riskType ??
                   _inferRiskTypeFromMessage(report.message),
+              topicName: report.riskTopicName,
+              topicIconUrl: report.riskTopicIconUrl,
               isVerified: report.status == ReportStatus.verified,
               isResolved: report.status == ReportStatus.resolved,
             ),
