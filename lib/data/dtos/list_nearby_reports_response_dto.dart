@@ -24,6 +24,9 @@ class NearbyReportDTO {
   final String? userVote;
   final bool verified;
   final DateTime? verifiedAt;
+  final int verificationCount;
+  final int rejectionCount;
+  final DateTime? expiresAt;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? resolvedAt;
@@ -54,6 +57,9 @@ class NearbyReportDTO {
     this.userVote,
     this.verified = false,
     this.verifiedAt,
+    this.verificationCount = 0,
+    this.rejectionCount = 0,
+    this.expiresAt,
     required this.createdAt,
     required this.updatedAt,
     this.resolvedAt,
@@ -87,6 +93,11 @@ class NearbyReportDTO {
       verified: json['verified'] as bool? ?? false,
       verifiedAt: json['verified_at'] != null
           ? DateTime.tryParse(json['verified_at'] as String)
+          : null,
+      verificationCount: json['verification_count'] as int? ?? 0,
+      rejectionCount: json['rejection_count'] as int? ?? 0,
+      expiresAt: json['expires_at'] != null
+          ? DateTime.tryParse(json['expires_at'] as String)
           : null,
       createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
           DateTime.now(),
@@ -124,6 +135,9 @@ class NearbyReportDTO {
         'user_vote': userVote,
         'verified': verified,
         'verified_at': verifiedAt?.toIso8601String(),
+        'verification_count': verificationCount,
+        'rejection_count': rejectionCount,
+        'expires_at': expiresAt?.toIso8601String(),
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt.toIso8601String(),
         'resolved_at': resolvedAt?.toIso8601String(),

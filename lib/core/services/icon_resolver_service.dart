@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rpa/constants.dart';
 
 class IconResolverService {
   static const String _assetBasePath = 'assets/icons';
@@ -20,12 +21,19 @@ class IconResolverService {
   };
 
   static ImageProvider? _resolveIcon(String name, String? apiIconUrl, bool isTopic) {
+    // Try API icon first
     if (apiIconUrl != null && apiIconUrl.isNotEmpty) {
+      String fullUrl;
       if (apiIconUrl.startsWith('http')) {
-        return NetworkImage(apiIconUrl);
+        fullUrl = apiIconUrl;
+      } else {
+        // Relative path from backend, prepend BASE_DOMAIN
+        fullUrl = '$BASE_DOMAIN$apiIconUrl';
       }
+      return NetworkImage(fullUrl);
     }
 
+    // Fallback to local assets
     final normalized = name.toLowerCase().trim().replaceAll(' ', '_');
     
     if (isTopic) {

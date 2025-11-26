@@ -1,29 +1,37 @@
 import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/core/services/notification_service.dart';
+import 'package:rpa/core/services/smart_notification_service.dart';
 import 'package:rpa/data/providers/api_providers.dart';
 import 'package:rpa/data/services/alert_websocket_service.dart';
+import 'package:rpa/presenter/controllers/location.controller.dart';
 
-/// Provider para gerenciar WebSocket com notificações integradas
 final websocketNotificationsProvider =
     Provider<WebSocketNotificationsManager>((ref) {
   final wsService = ref.watch(alertWebSocketServiceProvider);
   final notificationService = ref.watch(notificationServiceProvider);
+  final smartNotificationService = ref.watch(smartNotificationServiceProvider);
+  final locationController = ref.watch(locationControllerProvider);
 
   return WebSocketNotificationsManager(
     wsService: wsService,
     notificationService: notificationService,
+    smartNotificationService: smartNotificationService,
+    locationController: locationController,
   );
 });
 
-/// Manager que conecta WebSocket com Notificações
 class WebSocketNotificationsManager {
   final AlertWebSocketService wsService;
   final NotificationService notificationService;
+  final SmartNotificationService smartNotificationService;
+  final LocationController locationController;
 
   WebSocketNotificationsManager({
     required this.wsService,
     required this.notificationService,
+    required this.smartNotificationService,
+    required this.locationController,
   });
 
   /// Conecta ao WebSocket e configura notificações
@@ -61,9 +69,8 @@ class WebSocketNotificationsManager {
     log('🔌 WebSocket disconnected', name: 'WSNotifications');
   }
 
-  /// Handler para alertas recebidos
   void _handleAlert(Map<String, dynamic> alert) {
-    log('🚨 Alert received: $alert', name: 'WSNotifications');
+    log('Alert received: $alert', name: 'WSNotifications');
 
     try {
       final type = alert['type'] as String?;
@@ -71,26 +78,48 @@ class WebSocketNotificationsManager {
       final title = alert['title'] as String? ?? 'Novo Alerta';
       final message =
           alert['message'] as String? ?? 'Você recebeu um novo alerta';
+      final latitude = alert['latitude'] as double?;
+      final longitude = alert['longitude'] as double?;
 
-      if (type == 'alert') {
-        // Emergency alert - show high priority notification
+      final userPosition = locationController.currentPosition;
+
+      if (userPosition == null || latitude == null || longitude == null) {
+        log('Missing position data, showing without filtering',
+            name: 'WSNotifications');
         notificationService.showAlertNotification(
           title: title,
           message: message,
           severity: severity,
           data: alert,
         );
+        return;
+      }
+
+      if (type == 'alert') {
+        smartNotificationService.showAlertIfAllowed(
+          title: title,
+          message: message,
+          severity: severity,
+          latitude: latitude,
+          longitude: longitude,
+          userLatitude: userPosition.latitude,
+          userLongitude: userPosition.longitude,
+          data: alert,
+        );
       } else {
-        // Regular report - show normal priority notification
-        notificationService.showReportNotification(
+        smartNotificationService.showReportIfAllowed(
           title: title,
           message: message,
           status: 'pending',
+          latitude: latitude,
+          longitude: longitude,
+          userLatitude: userPosition.latitude,
+          userLongitude: userPosition.longitude,
           data: alert,
         );
       }
     } catch (e) {
-      log('❌ Error handling alert: $e', name: 'WSNotifications');
+      log('Error handling alert: $e', name: 'WSNotifications');
     }
   }
 

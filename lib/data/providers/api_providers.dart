@@ -35,15 +35,23 @@ final reportVoteServiceProvider = Provider<ReportVoteService>((ref) {
 // ============================================================================
 
 /// Provider for risk types list
+/// ✅ Cached after first load to avoid blocking UI on subsequent calls
 final riskTypesProvider =
     FutureProvider<List<RiskTypeResponseDTO>>((ref) async {
+  // Keep alive to cache the result
+  ref.keepAlive();
+  
   final service = ref.read(riskTypesServiceProvider);
   return await service.getRiskTypes();
 });
 
 /// Provider for risk topics list (all topics)
+/// ✅ Cached after first load to avoid blocking UI on subsequent calls
 final riskTopicsProvider =
     FutureProvider<List<RiskTopicResponseDTO>>((ref) async {
+  // Keep alive to cache the result
+  ref.keepAlive();
+  
   final service = ref.read(riskTypesServiceProvider);
   return await service.getRiskTopics();
 });

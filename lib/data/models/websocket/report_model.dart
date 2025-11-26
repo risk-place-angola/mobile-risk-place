@@ -8,6 +8,10 @@ class ReportModel {
   final double latitude;
   final double longitude;
   final RiskType? riskType;
+  final String? riskTopicId;
+  final String? riskTopicName;
+  final String? riskTopicIconUrl;
+  final String? riskTypeIconUrl;
   final ReportStatus status;
   final DateTime? createdAt;
 
@@ -17,6 +21,10 @@ class ReportModel {
     required this.latitude,
     required this.longitude,
     this.riskType,
+    this.riskTopicId,
+    this.riskTopicName,
+    this.riskTopicIconUrl,
+    this.riskTypeIconUrl,
     this.status = ReportStatus.pending,
     this.createdAt,
   });
@@ -33,6 +41,10 @@ class ReportModel {
       'latitude': latitude,
       'longitude': longitude,
       if (riskType != null) 'risk_type': riskType!.name,
+      if (riskTopicId != null) 'risk_topic_id': riskTopicId,
+      if (riskTopicName != null) 'risk_topic_name': riskTopicName,
+      if (riskTopicIconUrl != null) 'risk_topic_icon_url': riskTopicIconUrl,
+      if (riskTypeIconUrl != null) 'risk_type_icon_url': riskTypeIconUrl,
       'status': status.name,
       if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
     };
@@ -47,6 +59,10 @@ class ReportModel {
       riskType: json['risk_type'] != null
           ? RiskType.fromString(json['risk_type'] as String)
           : null,
+      riskTopicId: json['risk_topic_id'] as String?,
+      riskTopicName: json['risk_topic_name'] as String?,
+      riskTopicIconUrl: json['risk_topic_icon_url'] as String?,
+      riskTypeIconUrl: json['risk_type_icon_url'] as String?,
       status: json['status'] != null
           ? ReportStatus.fromString(json['status'] as String)
           : ReportStatus.pending,
@@ -62,6 +78,10 @@ class ReportModel {
     double? latitude,
     double? longitude,
     RiskType? riskType,
+    String? riskTopicId,
+    String? riskTopicName,
+    String? riskTopicIconUrl,
+    String? riskTypeIconUrl,
     ReportStatus? status,
     DateTime? createdAt,
   }) {
@@ -71,6 +91,10 @@ class ReportModel {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       riskType: riskType ?? this.riskType,
+      riskTopicId: riskTopicId ?? this.riskTopicId,
+      riskTopicName: riskTopicName ?? this.riskTopicName,
+      riskTopicIconUrl: riskTopicIconUrl ?? this.riskTopicIconUrl,
+      riskTypeIconUrl: riskTypeIconUrl ?? this.riskTypeIconUrl,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
     );
