@@ -40,6 +40,9 @@ class AlertRepositoryImpl implements IAlertRepository {
           statusCode: response.statusCode,
         );
       }
+    } on UnauthorizedException {
+      log('Anonymous user - returning empty alerts', name: 'AlertRepository');
+      return [];
     } catch (e) {
       log('Error fetching my alerts: $e', name: 'AlertRepository');
       rethrow;
@@ -68,6 +71,9 @@ class AlertRepositoryImpl implements IAlertRepository {
           statusCode: response.statusCode,
         );
       }
+    } on UnauthorizedException {
+      log('Anonymous user - returning empty alerts', name: 'AlertRepository');
+      return [];
     } catch (e) {
       log('Error fetching subscribed alerts: $e', name: 'AlertRepository');
       rethrow;
