@@ -70,9 +70,9 @@ platform :ios do
   end
 
   # ==========================================
-  # LANE: Production Release (TestFlight + App Store)
+  # LANE: Production Release (Build Only - Manual TestFlight Review)
   # ==========================================
-  desc "Build, upload to TestFlight and submit for App Store review"
+  desc "Build production IPA for manual App Store submission (no TestFlight upload)"
   lane :beta do
     # Setup API key first to fetch latest build number
     api_key = app_store_connect_api_key(
@@ -81,13 +81,16 @@ platform :ios do
       key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH']
     )
     
-    # Get latest build number from TestFlight
-    latest_build = latest_testflight_build_number(
+    # Get latest build number from App Store Connect (all builds, not just TestFlight)
+    # This ensures we don't conflict with dev builds
+    latest_build = app_store_build_number(
       api_key: api_key,
-      app_identifier: "ao.riskplace.makanetu"
+      app_identifier: "ao.riskplace.makanetu",
+      live: false  # Include all builds, not just live ones
     )
     
-    # Increment build number
+    # Increment build number with offset to avoid dev conflicts
+    # Dev uses TestFlight builds, Prod uses all builds + safety margin
     increment_build_number(
       xcodeproj: "ios/Runner.xcodeproj",
       build_number: latest_build + 1
@@ -101,7 +104,7 @@ platform :ios do
       git_url: ENV['MATCH_GIT_URL']
     )
 
-    # Build the app
+    # Build the app for App Store submission
     build_ios_app(
       workspace: "ios/Runner.xcworkspace",
       scheme: "Runner",
@@ -116,18 +119,15 @@ platform :ios do
       output_name: "makanetu-prod.ipa"
     )
 
-    # Upload to TestFlight first (api_key already configured above)
-    upload_to_testflight(
-      api_key: api_key,
-      skip_waiting_for_build_processing: false,  # Aguardar processamento
-      distribute_external: true,
-      notify_external_testers: true,
-      groups: ["Nete Testers"],
-      changelog: "Production build #{ENV['GITHUB_RUN_NUMBER']}"
-    )
-    
-    # Note: Submit for App Store Review should be done manually after testing
-    # or create a separate lane for submission
+    # Build complete - IPA ready for manual TestFlight review and App Store submission
+    UI.success "✅ Production build completed!"
+    UI.success "📦 IPA Location: ./build/ios/makanetu-prod.ipa"
+    UI.success "📋 Build Number: #{lane_context[SharedValues::BUILD_NUMBER]}"
+    UI.message "➡️  Next steps:"
+    UI.message "   1. Download the IPA from CI artifacts"
+    UI.message "   2. Upload manually to TestFlight via App Store Connect"
+    UI.message "   3. Review and test on TestFlight"
+    UI.message "   4. Submit for App Store review when ready"
   end
 
   # ==========================================
