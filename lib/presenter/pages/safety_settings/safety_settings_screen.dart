@@ -16,6 +16,7 @@ class SafetySettingsScreen extends ConsumerStatefulWidget {
 class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
   bool _isLoading = false;
   UserSettings? _settings;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -24,7 +25,10 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
     try {
       final settingsService = ref.read(settingsServiceProvider);
       final settings = await settingsService.getSettings();
@@ -32,12 +36,15 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
         setState(() {
           _settings = settings;
           _isLoading = false;
+          _errorMessage = null;
         });
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isLoading = false);
-        ErrorHandler.showErrorSnackBar(context, e);
+        setState(() {
+          _isLoading = false;
+          _errorMessage = ErrorHandler.getUserFriendlyMessage(e, context);
+        });
       }
     }
   }
@@ -50,8 +57,11 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
       final updatedSettings = await settingsService.updateSettings(updates);
       if (mounted) {
         setState(() => _settings = updatedSettings);
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Configuração atualizada com sucesso')),
+          SnackBar(
+              content: Text(l10n?.settingsUpdatedSuccess ??
+                  'Configuração atualizada com sucesso')),
         );
       }
     } catch (e) {
@@ -64,26 +74,82 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    if (_isLoading || _settings == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text(l10n?.safetySettings ?? 'Safety Settings')),
-        body: const Center(child: CircularProgressIndicator()),
+
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n?.safetySettings ?? 'Safety Settings')),
+      body: _buildBody(l10n),
+    );
+  }
+
+  Widget _buildBody(AppLocalizations? l10n) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.cloud_off_outlined,
+                size: 64,
+                color: Colors.orange,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                l10n?.errorLoadingSettings ?? 'Erro ao Carregar Configurações',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _errorMessage!,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _loadSettings,
+                icon: const Icon(Icons.refresh),
+                label: Text(l10n?.tryAgainButton ?? 'Tentar Novamente'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.safetySettings ?? 'Safety Settings'),
-      ),
-      body: ListView(
-        children: [
-          _buildNotificationsSection(),
-          _buildLocationSection(),
-          _buildPrivacySection(),
-          _buildAutoAlertsSection(),
-          _buildNightModeSection(),
-        ],
-      ),
+    if (_settings == null) {
+      return Center(
+        child: Text(
+            l10n?.noSettingsAvailable ?? 'Nenhuma configuração disponível'),
+      );
+    }
+
+    return ListView(
+      children: [
+        _buildNotificationsSection(),
+        _buildLocationSection(),
+        _buildPrivacySection(),
+        _buildAutoAlertsSection(),
+        _buildNightModeSection(),
+      ],
     );
   }
 
@@ -122,7 +188,7 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
             subtitle: Text(_settings!.notificationAlertTypes.isEmpty
                 ? (l10n?.noneSelected ?? 'None selected')
                 : _settings!.notificationAlertTypes
-                    .map((t) => t.name)
+                    .map((t) => t.getLocalizedName(l10n!))
                     .join(', ')),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showAlertTypesDialog(),
@@ -133,7 +199,7 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
                 '${(_settings!.notificationAlertRadiusMeters / 1000).toStringAsFixed(1)} km'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showRadiusDialog(
-              title: l10n?.alertRadius ?? 'Alert Radius',
+              title: l10n?.alertRadius ?? 'Raio de Alerta',
               currentValue: _settings!.notificationAlertRadiusMeters,
               onSave: (value) =>
                   _updateSetting({'notificationAlertRadiusMeters': value}),
@@ -144,7 +210,7 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
             subtitle: Text(_settings!.notificationReportTypes.isEmpty
                 ? (l10n?.noneSelected ?? 'None selected')
                 : _settings!.notificationReportTypes
-                    .map((t) => t.name)
+                    .map((t) => t.getLocalizedName(l10n!))
                     .join(', ')),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showReportTypesDialog(),
@@ -155,7 +221,7 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
                 '${(_settings!.notificationReportRadiusMeters / 1000).toStringAsFixed(1)} km'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showRadiusDialog(
-              title: l10n?.reportRadius ?? 'Report Radius',
+              title: l10n?.reportRadius ?? 'Raio de Relatório',
               currentValue: _settings!.notificationReportRadiusMeters,
               onSave: (value) =>
                   _updateSetting({'notificationReportRadiusMeters': value}),
@@ -234,21 +300,19 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
         ),
         ListTile(
           title: Text(l10n?.profileVisibility ?? 'Profile Visibility'),
-          subtitle: Text(_settings!.profileVisibility.displayName),
+          subtitle: Text(_settings!.profileVisibility.getLocalizedName(l10n!)),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => _showProfileVisibilityDialog(),
         ),
         SwitchListTile(
-          title: Text(l10n?.anonymousReports ?? 'Anonymous Reports'),
-          subtitle: Text(
-              l10n?.dontShowNameReports ?? 'Don\'t show your name on reports'),
+          title: Text(l10n.anonymousReports),
+          subtitle: Text(l10n.dontShowNameReports),
           value: _settings!.anonymousReports,
           onChanged: (value) => _updateSetting({'anonymousReports': value}),
         ),
         SwitchListTile(
-          title: Text(l10n?.showOnlineStatus ?? 'Show Online Status'),
-          subtitle: Text(
-              l10n?.othersCanSeeOnline ?? 'Others can see if you\'re online'),
+          title: Text(l10n.showOnlineStatus),
+          subtitle: Text(l10n.othersCanSeeOnline),
           value: _settings!.showOnlineStatus,
           onChanged: (value) => _updateSetting({'showOnlineStatus': value}),
         ),
@@ -400,7 +464,7 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: AlertType.values.map((type) {
                   return CheckboxListTile(
-                    title: Text(type.name.toUpperCase()),
+                    title: Text(type.getLocalizedName(l10n!)),
                     value: selected.contains(type),
                     onChanged: (checked) {
                       setState(() {
@@ -449,7 +513,7 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: ReportType.values.map((type) {
                   return CheckboxListTile(
-                    title: Text(type.name.toUpperCase()),
+                    title: Text(type.getLocalizedName(l10n!)),
                     value: selected.contains(type),
                     onChanged: (checked) {
                       setState(() {
@@ -493,7 +557,7 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: ProfileVisibility.values.map((visibility) {
             return RadioListTile<ProfileVisibility>(
-              title: Text(visibility.displayName),
+              title: Text(visibility.getLocalizedName(l10n!)),
               value: visibility,
               groupValue: _settings!.profileVisibility,
               onChanged: (value) {
@@ -514,6 +578,7 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
     required int currentValue,
     required Function(int) onSave,
   }) {
+    final l10n = AppLocalizations.of(context);
     double sliderValue = currentValue.toDouble();
     showDialog(
       context: context,
@@ -546,14 +611,14 @@ class _SafetySettingsScreenState extends ConsumerState<SafetySettingsScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
+                child: Text(l10n?.cancel ?? 'Cancelar'),
               ),
               TextButton(
                 onPressed: () {
                   onSave(sliderValue.toInt());
                   Navigator.pop(context);
                 },
-                child: const Text('Salvar'),
+                child: Text(l10n?.save ?? 'Salvar'),
               ),
             ],
           );

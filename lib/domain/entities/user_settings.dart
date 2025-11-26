@@ -1,3 +1,5 @@
+import 'package:rpa/l10n/app_localizations.dart';
+
 enum ProfileVisibility {
   public,
   friends,
@@ -11,6 +13,17 @@ enum ProfileVisibility {
         return 'Amigos';
       case ProfileVisibility.private:
         return 'Privado';
+    }
+  }
+
+  String getLocalizedName(AppLocalizations l10n) {
+    switch (this) {
+      case ProfileVisibility.public:
+        return l10n.visibilityPublic;
+      case ProfileVisibility.friends:
+        return l10n.visibilityFriends;
+      case ProfileVisibility.private:
+        return l10n.visibilityPrivate;
     }
   }
 
@@ -34,6 +47,19 @@ enum AlertType {
   high,
   critical;
 
+  String getLocalizedName(AppLocalizations l10n) {
+    switch (this) {
+      case AlertType.low:
+        return l10n.alertTypeLow;
+      case AlertType.medium:
+        return l10n.alertTypeMedium;
+      case AlertType.high:
+        return l10n.alertTypeHigh;
+      case AlertType.critical:
+        return l10n.alertTypeCritical;
+    }
+  }
+
   static AlertType fromString(String value) {
     switch (value.toLowerCase()) {
       case 'low':
@@ -55,6 +81,19 @@ enum ReportType {
   verified,
   resolved,
   rejected;
+
+  String getLocalizedName(AppLocalizations l10n) {
+    switch (this) {
+      case ReportType.pending:
+        return l10n.pending;
+      case ReportType.verified:
+        return l10n.verified;
+      case ReportType.resolved:
+        return l10n.resolved;
+      case ReportType.rejected:
+        return l10n.reportTypeRejected;
+    }
+  }
 
   static ReportType fromString(String value) {
     switch (value.toLowerCase()) {
