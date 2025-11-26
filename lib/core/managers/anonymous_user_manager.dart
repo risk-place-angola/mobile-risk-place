@@ -52,14 +52,18 @@ class AnonymousUserManager {
       // ✅ ENHANCEMENT: FCM token (background, non-blocking)
       _fetchFCMTokenInBackground();
 
-      // ✅ ENHANCEMENT: Device registration (best-effort, non-blocking)
-      _registerDeviceInBackground();
-
       // ✅ ENHANCEMENT: WebSocket (fire-and-forget)
       _connectWebSocket();
 
       // ✅ Start location tracking immediately
       _startLocationTracking();
+
+      // ✅ DELAYED: Device registration after 15s (gives API time to wake up, doesn't block UI)
+      log('⏳ [AnonymousUserManager] Scheduling device registration for 15s from now...', name: 'AnonymousUserManager');
+      Future.delayed(const Duration(seconds: 15), () {
+        log('✅ [AnonymousUserManager] Starting delayed device registration', name: 'AnonymousUserManager');
+        _registerDeviceInBackground();
+      });
 
       log('✅ [AnonymousUserManager] Core initialization complete (enhancements in background)', name: 'AnonymousUserManager');
     } catch (e) {
