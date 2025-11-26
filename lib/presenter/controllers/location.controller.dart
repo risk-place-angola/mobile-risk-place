@@ -7,27 +7,38 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rpa/data/services/location.service.dart';
 import 'package:rpa/data/services/alert_websocket_service.dart';
+import 'package:rpa/core/managers/location_history_manager.dart';
+import 'package:rpa/core/managers/danger_zones_calculator.dart';
+import 'package:rpa/core/managers/permission_manager.dart';
 
 /// Location controller using ChangeNotifier
 class LocationController extends ChangeNotifier {
   final LocationService _locationService;
   final AlertWebSocketService? _webSocketService;
+  final LocationHistoryManager? _historyManager;
+  final DangerZonesCalculator? _dangerZonesCalculator;
   StreamSubscription<Position>? _positionStreamSubscription;
 
   Position? _currentPosition;
   bool _isLoading = false;
   dynamic _error;
   bool _permissionGranted = false;
+  DangerZone? _currentDangerZone;
 
-  // Getters
   Position? get currentPosition => _currentPosition;
   bool get isLoading => _isLoading;
   dynamic get error => _error;
   bool get permissionGranted => _permissionGranted;
+  DangerZone? get currentDangerZone => _currentDangerZone;
 
-  LocationController(this._locationService,
-      {AlertWebSocketService? webSocketService})
-      : _webSocketService = webSocketService;
+  LocationController(
+    this._locationService, {
+    AlertWebSocketService? webSocketService,
+    LocationHistoryManager? historyManager,
+    DangerZonesCalculator? dangerZonesCalculator,
+  })  : _webSocketService = webSocketService,
+        _historyManager = historyManager,
+        _dangerZonesCalculator = dangerZonesCalculator;
 
   /// Request location permission and get current position
   Future<bool> requestLocationPermission() async {
@@ -36,12 +47,14 @@ class LocationController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      bool hasPermission = await _locationService.handleLocationPermission();
+      final permissionManager = PermissionManager();
+      final permission = await permissionManager.requestLocationPermission();
 
-      if (!hasPermission) {
+      if (permission != LocationPermission.always &&
+          permission != LocationPermission.whileInUse) {
         _isLoading = false;
         _permissionGranted = false;
-        _error = Exception('Permissão de localização negada');
+        _error = Exception('Location permission denied');
         notifyListeners();
         return false;
       }
@@ -49,7 +62,6 @@ class LocationController extends ChangeNotifier {
       _permissionGranted = true;
       notifyListeners();
 
-      // Get initial position after permission granted
       await getCurrentPosition();
       return true;
     } catch (e) {
@@ -104,20 +116,31 @@ class LocationController extends ChangeNotifier {
       (Position position) {
         _currentPosition = position;
         _permissionGranted = true;
+
+        _historyManager?.addLocation(position);
+
+        _currentDangerZone = _dangerZonesCalculator?.findNearestDangerZone(
+          position.latitude,
+          position.longitude,
+        );
+
         notifyListeners();
-        log('[LocationController] Position stream updated: ${position.latitude}, ${position.longitude}',
+        log('[LocationController] Position: ${position.latitude}, ${position.longitude}',
             name: 'LocationController');
 
-        // 🌐 Send location update to WebSocket for real-time alerts (like Waze)
-        // This ensures the backend knows the user's current position to send relevant alerts
         if (_webSocketService != null && _webSocketService!.isConnected) {
           _webSocketService!.updateLocation(
-            position.latitude, 
+            position.latitude,
             position.longitude,
             speed: position.speed,
             heading: position.heading,
           );
           log('[LocationController] Location sent to WebSocket',
+              name: 'LocationController');
+        }
+
+        if (_currentDangerZone != null) {
+          log('[LocationController] In danger zone: ${_currentDangerZone!.incidentCount} incidents',
               name: 'LocationController');
         }
       },
@@ -152,11 +175,17 @@ final locationServiceProvider = Provider<LocationService>((ref) {
   return LocationService();
 });
 
-/// Provider for LocationController with WebSocket integration
 final locationControllerProvider =
     ChangeNotifierProvider<LocationController>((ref) {
   final locationService = ref.read(locationServiceProvider);
   final webSocketService = ref.read(alertWebSocketProvider);
-  return LocationController(locationService,
-      webSocketService: webSocketService);
+  final historyManager = ref.read(locationHistoryManagerProvider);
+  final dangerZonesCalculator = ref.read(dangerZonesCalculatorProvider);
+
+  return LocationController(
+    locationService,
+    webSocketService: webSocketService,
+    historyManager: historyManager,
+    dangerZonesCalculator: dangerZonesCalculator,
+  );
 });

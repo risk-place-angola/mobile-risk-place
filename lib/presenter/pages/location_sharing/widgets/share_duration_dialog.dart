@@ -1,69 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:rpa/l10n/app_localizations.dart';
 
 class ShareDurationDialog extends StatelessWidget {
   const ShareDurationDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+    
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Compartilhar Localização',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: screenHeight * 0.7),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n?.shareLocationTitle ?? 'Share Location',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n?.shareLocationQuestion ?? 'How long do you want to share?',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _DurationOption(
+                  icon: Icons.access_time,
+                  title: l10n?.minutes15 ?? '15 minutes',
+                  subtitle: l10n?.shortSharing ?? 'Short sharing',
+                  minutes: 15,
+                  onTap: () => Navigator.pop(context, 15),
+                ),
+                const SizedBox(height: 12),
+                _DurationOption(
+                  icon: Icons.schedule,
+                  title: l10n?.minutes30 ?? '30 minutes',
+                  subtitle: l10n?.recommended ?? 'Recommended',
+                  minutes: 30,
+                  isRecommended: true,
+                  onTap: () => Navigator.pop(context, 30),
+                ),
+                const SizedBox(height: 12),
+                _DurationOption(
+                  icon: Icons.timer,
+                  title: l10n?.minutes60 ?? '60 minutes',
+                  subtitle: l10n?.longSharing ?? 'Long sharing',
+                  minutes: 60,
+                  onTap: () => Navigator.pop(context, 60),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n?.cancel ?? 'Cancel'),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Por quanto tempo deseja compartilhar?',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 24),
-            _DurationOption(
-              icon: Icons.access_time,
-              title: '15 minutos',
-              subtitle: 'Compartilhamento curto',
-              minutes: 15,
-              onTap: () => Navigator.pop(context, 15),
-            ),
-            const SizedBox(height: 12),
-            _DurationOption(
-              icon: Icons.schedule,
-              title: '30 minutos',
-              subtitle: 'Recomendado',
-              minutes: 30,
-              isRecommended: true,
-              onTap: () => Navigator.pop(context, 30),
-            ),
-            const SizedBox(height: 12),
-            _DurationOption(
-              icon: Icons.timer,
-              title: '60 minutos',
-              subtitle: 'Compartilhamento longo',
-              minutes: 60,
-              onTap: () => Navigator.pop(context, 60),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -89,11 +98,14 @@ class _DurationOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSmallScreen = MediaQuery.of(context).size.width < 360;
+    final padding = isSmallScreen ? 12.0 : 16.0;
+    
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(padding),
         decoration: BoxDecoration(
           border: Border.all(
             color: isRecommended

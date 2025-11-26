@@ -109,12 +109,15 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
   }
 
   Future<void> _shareLink() async {
+    final l10n = AppLocalizations.of(context);
+    final message = (l10n?.shareMessage ?? 'I\'m sharing my real-time location with you.\n\nAccess: {link}\n\nValid until: {expires}\n\nRiskPlace - Safer Cities 🛡️')
+        .toString()
+        .replaceAll('{link}', widget.session.shareLink)
+        .replaceAll('{expires}', _formatDateTime(_expiresAt));
+    
     await Share.share(
-      'Estou compartilhando minha localização em tempo real com você.\n\n'
-      'Acesse: ${widget.session.shareLink}\n\n'
-      'Link válido até: ${_formatDateTime(_expiresAt)}\n\n'
-      'RiskPlace - Cidades Mais Seguras 🛡️',
-      subject: 'Minha Localização - RiskPlace',
+      message,
+      subject: 'RiskPlace - Location Sharing',
     );
   }
 
@@ -122,10 +125,11 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
     await Clipboard.setData(ClipboardData(text: widget.session.shareLink));
 
     if (mounted) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Link copiado para a área de transferência'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(l10n?.linkCopied ?? 'Link copied to clipboard'),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -154,10 +158,12 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
     final locationController = ref.watch(locationControllerProvider);
     final currentPosition = locationController.currentPosition;
 
+    final l10n = AppLocalizations.of(context);
+    
     if (currentPosition == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Compartilhar Localização'),
+          title: Text(l10n?.shareLocationTitle ?? 'Share Location'),
         ),
         body: const Center(
           child: CircularProgressIndicator(),
@@ -169,7 +175,7 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Compartilhando Localização'),
+        title: Text(l10n?.sharingLocationActive ?? 'Sharing Location'),
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
@@ -177,18 +183,18 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Parar Compartilhamento'),
-                  content: const Text(
-                    'Deseja realmente parar de compartilhar sua localização?',
+                  title: Text(l10n?.stopSharing ?? 'Stop Sharing'),
+                  content: Text(
+                    l10n?.stopSharingQuestion ?? 'Do you really want to stop sharing your location?',
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancelar'),
+                      child: Text(l10n?.cancel ?? 'Cancel'),
                     ),
                     FilledButton(
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Parar'),
+                      child: Text(l10n?.stopSharing ?? 'Stop'),
                     ),
                   ],
                 ),
@@ -227,15 +233,15 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Compartilhamento Ativo',
-                            style: TextStyle(
+                          Text(
+                            l10n?.activeSharing ?? 'Active Sharing',
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            'Expira em: ${_formatRemainingTime()}',
+                            (l10n?.expiresIn ?? 'Expires in: {time}').toString().replaceAll('{time}', _formatRemainingTime()),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey.shade700,
@@ -333,9 +339,9 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Sua localização está sendo atualizada a cada 10 segundos',
-                  style: TextStyle(
+                Text(
+                  l10n?.locationUpdating ?? 'Your location is being updated every 10 seconds',
+                  style: const TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
                   ),
@@ -346,7 +352,7 @@ class _ShareLocationScreenState extends ConsumerState<ShareLocationScreen> {
                   child: FilledButton.icon(
                     onPressed: _stopSharing,
                     icon: const Icon(Icons.stop),
-                    label: const Text('Parar Compartilhamento'),
+                    label: Text(l10n?.stopSharing ?? 'Stop Sharing'),
                     style: FilledButton.styleFrom(
                       backgroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(vertical: 16),

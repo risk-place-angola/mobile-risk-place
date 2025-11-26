@@ -1,40 +1,28 @@
 import 'dart:developer';
 import 'package:geolocator/geolocator.dart';
+import 'package:rpa/core/managers/permission_manager.dart';
 
 class LocationService {
-  /// Check if location services are enabled on the device
-  Future<bool> isLocationServiceEnabled() async {
-    return await Geolocator.isLocationServiceEnabled();
-  }
-
-  /// Check current location permission status
-  Future<LocationPermission> checkPermission() async {
-    return await Geolocator.checkPermission();
-  }
-
-  /// Request location permission from user
-  Future<LocationPermission> requestPermission() async {
-    return await Geolocator.requestPermission();
-  }
-
   Future<Position?> getCurrentPosition() async {
     try {
-      bool serviceEnabled = await isLocationServiceEnabled();
+      final permissionManager = PermissionManager();
+
+      final serviceEnabled = await permissionManager.isLocationServiceEnabled();
       if (!serviceEnabled) {
         log('Location services are disabled', name: 'LocationService');
         return null;
       }
 
-      LocationPermission permission = await checkPermission();
-
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      final hasPermission = await permissionManager.hasLocationPermission();
+      if (!hasPermission) {
         log('Location permission not granted', name: 'LocationService');
         return null;
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+        ),
       );
 
       log('Location obtained: ${position.latitude}, ${position.longitude}',
@@ -44,30 +32,6 @@ class LocationService {
       log('Error getting location: $e', name: 'LocationService');
       return null;
     }
-  }
-
-  /// Check and request permission with comprehensive handling
-  /// Returns true if permission granted, false otherwise
-  Future<bool> handleLocationPermission() async {
-    bool serviceEnabled = await isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      log('Location services are disabled', name: 'LocationService');
-      return false;
-    }
-
-    LocationPermission permission = await checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await requestPermission();
-      if (permission == LocationPermission.denied) {
-        return false;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return false;
-    }
-
-    return true;
   }
 
   /// Get position stream for real-time location updates
