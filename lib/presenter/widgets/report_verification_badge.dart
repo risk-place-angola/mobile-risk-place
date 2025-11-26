@@ -18,6 +18,20 @@ class ReportVerificationBadge extends ConsumerWidget {
 
   Color _getVerificationColor() {
     if (report.verified) return const Color(0xFF00C853);
+    
+    // Use new verification/rejection counts if available
+    final verificationCount = report.verificationCount;
+    final rejectionCount = report.rejectionCount;
+    
+    if (verificationCount > 0 || rejectionCount > 0) {
+      final netScore = verificationCount - rejectionCount;
+      if (netScore >= 3) return const Color(0xFF64DD17);
+      if (netScore >= 1) return const Color(0xFFFFAB00);
+      if (netScore <= -3) return const Color(0xFFFF3D00);
+      return const Color(0xFF9E9E9E);
+    }
+    
+    // Fallback to legacy netVotes
     if (report.netVotes >= 3) return const Color(0xFF64DD17);
     if (report.netVotes >= 1) return const Color(0xFFFFAB00);
     if (report.netVotes <= -3) return const Color(0xFFFF3D00);
@@ -26,6 +40,20 @@ class ReportVerificationBadge extends ConsumerWidget {
 
   IconData _getVerificationIcon() {
     if (report.verified) return Icons.verified;
+    
+    // Use new verification/rejection counts if available
+    final verificationCount = report.verificationCount;
+    final rejectionCount = report.rejectionCount;
+    
+    if (verificationCount > 0 || rejectionCount > 0) {
+      final netScore = verificationCount - rejectionCount;
+      if (netScore >= 3) return Icons.check_circle;
+      if (netScore >= 1) return Icons.thumbs_up_down;
+      if (netScore <= -3) return Icons.report_problem;
+      return Icons.help_outline;
+    }
+    
+    // Fallback to legacy netVotes
     if (report.netVotes >= 3) return Icons.check_circle;
     if (report.netVotes >= 1) return Icons.thumbs_up_down;
     if (report.netVotes <= -3) return Icons.report_problem;
@@ -35,6 +63,21 @@ class ReportVerificationBadge extends ConsumerWidget {
   String _getVerificationText(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     if (report.verified) return l10n?.verifiedBadge ?? 'Verified';
+    
+    // Use new verification_count if available, otherwise fall back to netVotes
+    final verificationCount = report.verificationCount;
+    final rejectionCount = report.rejectionCount;
+    final netScore = verificationCount - rejectionCount;
+    
+    if (verificationCount > 0 || rejectionCount > 0) {
+      // Show net score if new counts are available
+      if (netScore >= 3) return '+$netScore';
+      if (netScore >= 1) return '+$netScore';
+      if (netScore <= -3) return '$netScore';
+      return '$netScore';
+    }
+    
+    // Fallback to legacy netVotes
     if (report.netVotes >= 3) return (l10n?.confirmsBadge ?? '{count} confirm').toString().replaceAll('{count}', report.netVotes.toString());
     if (report.netVotes >= 1) return '${report.netVotes}';
     if (report.netVotes <= -3) return l10n?.unreliableBadge ?? 'Unreliable';
@@ -224,7 +267,7 @@ class _VoteButtonsState extends ConsumerState<_VoteButtons> {
                   ),
                   const SizedBox(width: 3),
                   Text(
-                    '${widget.report.upvotes}',
+                    '${widget.report.verificationCount > 0 ? widget.report.verificationCount : widget.report.upvotes}',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -266,7 +309,7 @@ class _VoteButtonsState extends ConsumerState<_VoteButtons> {
                   ),
                   const SizedBox(width: 3),
                   Text(
-                    '${widget.report.downvotes}',
+                    '${widget.report.rejectionCount > 0 ? widget.report.rejectionCount : widget.report.downvotes}',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,

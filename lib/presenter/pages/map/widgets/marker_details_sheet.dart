@@ -181,7 +181,7 @@ class AlertDetailsSheet extends StatelessWidget {
                     const SizedBox(width: 32),
                     Expanded(
                       child: Text(
-                        'Área de impacto aproximada',
+                        l10n.impactArea,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -375,11 +375,11 @@ class ReportDetailsSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: IconResolverService.buildIcon(
-                  typeName: riskType.name,
-                  apiIconPath: null,
+                  typeName: report.riskTopicName ?? riskType.name,
+                  apiIconPath: report.riskTopicIconUrl,
                   size: 28,
                   color: _getReportColor(riskType),
-                  isTopic: false,
+                  isTopic: report.riskTopicName != null,
                 ),
               ),
               const SizedBox(width: 16),
@@ -550,7 +550,7 @@ class ReportDetailsSheet extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Coordenadas',
+                        l10n.coordinates,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -625,10 +625,10 @@ class ReportDetailsSheet extends StatelessWidget {
                   onPressed: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Detailed view coming in next update'),
+                      SnackBar(
+                        content: Text(l10n.detailedViewComingSoon),
                         backgroundColor: Colors.orange,
-                        duration: Duration(seconds: 2),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   },
