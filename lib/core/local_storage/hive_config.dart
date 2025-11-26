@@ -5,7 +5,11 @@ import 'package:rpa/data/models/user.model.dart';
 import 'package:rpa/data/models/safe_place.model.dart';
 
 class HiveConfig {
+  static bool _initialized = false;
+
   static Future<void> initialize() async {
+    if (_initialized) return;
+
     if (kIsWeb) {
       await Hive.initFlutter();
     } else {
@@ -13,11 +17,21 @@ class HiveConfig {
       await Hive.initFlutter(appDocumentDir.path);
     }
 
-    Hive.registerAdapter(UserAdapter());
-    Hive.registerAdapter(SafePlaceAdapter());
-    Hive.registerAdapter(SafePlaceCategoryAdapter());
+    if (!Hive.isAdapterRegistered(0)) {
+      Hive.registerAdapter(UserAdapter());
+    }
+    if (!Hive.isAdapterRegistered(1)) {
+      Hive.registerAdapter(SafePlaceAdapter());
+    }
+    if (!Hive.isAdapterRegistered(2)) {
+      Hive.registerAdapter(SafePlaceCategoryAdapter());
+    }
 
-    await Hive.openBox(HiveBoxs.USERBOX);
+    if (!Hive.isBoxOpen(HiveBoxs.USERBOX)) {
+      await Hive.openBox(HiveBoxs.USERBOX);
+    }
+
+    _initialized = true;
   }
 
   static void dispose() {
