@@ -157,7 +157,7 @@ class AuthInterceptor extends Interceptor {
         // For anonymous users, add Device ID header
         try {
           final deviceId = await _deviceIdManager.getDeviceId();
-          options.headers['X-Device-ID'] = deviceId;
+          options.headers['X-Device-Id'] = deviceId;
           log('Added device ID for anonymous user: ${options.path}',
               name: 'AuthInterceptor');
         } catch (e) {
@@ -251,8 +251,15 @@ class AuthInterceptor extends Interceptor {
       AuthTokenManager().clearToken();
 
       try {
-        await _dbHelper.deleteData(
-            collection: BDCollections.USERS, key: 'user');
+        final userData = await _dbHelper.getData(
+          collection: BDCollections.USERS,
+          key: 'user',
+        );
+
+        if (userData != null) {
+          await _dbHelper.deleteData(
+              collection: BDCollections.USERS, key: 'user');
+        }
       } catch (e) {
         log('Error clearing user data: $e', name: 'AuthInterceptor');
       }
