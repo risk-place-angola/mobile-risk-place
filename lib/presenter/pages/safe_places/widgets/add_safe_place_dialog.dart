@@ -118,12 +118,15 @@ class _AddSafePlaceDialogState extends ConsumerState<AddSafePlaceDialog> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.existingPlace != null;
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.width < 360 || size.height < 600;
+    final padding = isSmallScreen ? 16.0 : 24.0;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(padding),
           child: Form(
             key: _formKey,
             child: Column(

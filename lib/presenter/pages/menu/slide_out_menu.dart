@@ -88,14 +88,14 @@ class SlideOutMenu extends ConsumerWidget {
                     icon: UniconsLine.comment_dots,
                     title: AppLocalizations.of(context)?.communityFeedback ?? 'Community & Feedback',
                     subtitle: AppLocalizations.of(context)?.sendFeedbackReadUpdates ?? 'Send feedback or read updates',
-                    onTap: () => _handleMenuTap('community'),
+                    onTap: () => _handleMenuTap('community', context),
                     iconColor: Colors.purple,
                   ),
                   MenuItem(
                     icon: UniconsLine.user,
                     title: AppLocalizations.of(context)?.myProfile ?? 'My Profile',
                     subtitle: AppLocalizations.of(context)?.editPersonalInfoPreferences ?? 'Edit personal info & preferences',
-                    onTap: () => _handleMenuTap('profile'),
+                    onTap: () => _handleMenuTap('profile', context),
                     iconColor: Colors.indigo,
                   ),
                 ],
@@ -183,7 +183,7 @@ class SlideOutMenu extends ConsumerWidget {
             )
           else
             OutlinedButton(
-              onPressed: () => _handleMenuTap('profile'),
+              onPressed: () => _handleMenuTap('profile', context),
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
                   color: Theme.of(context).colorScheme.primary,
@@ -240,9 +240,22 @@ class SlideOutMenu extends ConsumerWidget {
     );
   }
 
-  void _handleMenuTap(String action) {
+  void _handleMenuTap(String action, BuildContext context) {
     onClose();
     log('Menu action: $action', name: 'SlideOutMenu');
+    
+    final l10n = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n?.featureComingSoon ?? 'This feature will be available soon. Stay tuned for updates!'),
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: l10n?.close ?? 'Close',
+          onPressed: () {},
+        ),
+      ),
+    );
   }
 
   void _handleEmergencyContacts(BuildContext context) {

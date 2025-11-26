@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rpa/core/managers/anonymous_user_manager.dart';
-import 'package:rpa/core/services/permission_service.dart';
+import 'package:rpa/core/managers/permission_manager.dart';
 import 'package:rpa/data/services/alert_websocket_service.dart';
 import 'package:rpa/data/providers/repository_providers.dart';
+import 'package:rpa/data/providers/api_providers.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
 import 'package:rpa/presenter/controllers/location.controller.dart';
 import 'package:rpa/presenter/pages/map/map_view.dart';
@@ -49,11 +50,18 @@ class _HomePageState extends ConsumerState<HomePage> {
       }
 
       if (mounted) {
-        await _initializeAnonymousUser();
+        // ✅ Fire-and-forget: Don't block UI waiting for anonymous user setup
+        _initializeAnonymousUser();
       }
 
       if (mounted) {
-        await _connectWebSocket();
+        // ✅ Fire-and-forget: Don't block UI waiting for WebSocket
+        _connectWebSocket();
+      }
+
+      // ✅ Pre-load risk types and topics in background (for report creation)
+      if (mounted) {
+        _preloadRiskData();
       }
     } catch (e) {
       dev.log('App initialization error: $e', name: 'HomePage');
@@ -64,28 +72,28 @@ class _HomePageState extends ConsumerState<HomePage> {
     try {
       dev.log('Checking permissions', name: 'HomePage');
 
-      final permissionService = ref.read(permissionServiceProvider);
+      final permissionManager = PermissionManager();
       final locationController = ref.read(locationControllerProvider);
 
-      final hasNotificationPermission = await permissionService.checkNotificationPermission();
-      if (!hasNotificationPermission) {
+      final hasNotification =
+          await permissionManager.hasNotificationPermission();
+      if (!hasNotification) {
         dev.log('Requesting notification permission', name: 'HomePage');
-        await permissionService.requestNotificationPermission();
+        await permissionManager.requestNotificationPermission();
       } else {
         dev.log('Notification permission already granted', name: 'HomePage');
       }
 
-      final locationService = ref.read(locationServiceProvider);
-      final locationPermission = await locationService.checkPermission();
-      
-      if (locationPermission == LocationPermission.always || 
-          locationPermission == LocationPermission.whileInUse) {
+      final hasLocation = await permissionManager.hasLocationPermission();
+
+      if (hasLocation) {
         dev.log('Location permission already granted', name: 'HomePage');
         locationController.startLocationUpdates();
       } else {
         dev.log('Requesting location permission', name: 'HomePage');
-        final granted = await locationController.requestLocationPermission();
-        if (granted) {
+        final permission = await permissionManager.requestLocationPermission();
+        if (permission == LocationPermission.always ||
+            permission == LocationPermission.whileInUse) {
           dev.log('Location permission granted', name: 'HomePage');
           locationController.startLocationUpdates();
         } else {
@@ -107,32 +115,56 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
+  /// Pre-load risk types and topics in background
+  /// This prevents UI blocking when user wants to create a report
+  void _preloadRiskData() {
+    try {
+      dev.log('📦 [HomePage] Pre-loading risk types and topics in background',
+          name: 'HomePage');
+
+      // Read providers to trigger data load (cached after first load)
+      ref.read(riskTypesProvider);
+      ref.read(riskTopicsProvider);
+
+      dev.log('✅ [HomePage] Risk data pre-load initiated', name: 'HomePage');
+    } catch (e) {
+      dev.log('⚠️ [HomePage] Risk data pre-load error: $e (non-critical)',
+          name: 'HomePage');
+    }
+  }
+
   Future<void> _connectWebSocket() async {
     if (_webSocketConnected || _wsConnectionAttempts >= _maxWsAttempts) {
       if (_wsConnectionAttempts >= _maxWsAttempts) {
-        dev.log('⚠️ [HomePage] WebSocket max attempts reached, continuing offline', name: 'HomePage');
+        dev.log(
+            '⚠️ [HomePage] WebSocket max attempts reached, continuing offline',
+            name: 'HomePage');
         _showOfflineInfo();
       }
       return;
     }
 
     _wsConnectionAttempts++;
-    
+
     try {
-      dev.log('🔌 [HomePage] Connecting WebSocket (attempt $_wsConnectionAttempts/$_maxWsAttempts)', name: 'HomePage');
-      
+      dev.log(
+          '🔌 [HomePage] Connecting WebSocket (attempt $_wsConnectionAttempts/$_maxWsAttempts)',
+          name: 'HomePage');
+
       final wsService = ref.read(alertWebSocketProvider);
       final authToken = AuthTokenManager().token;
-      
+
       if (authToken != null && authToken.isNotEmpty) {
-        dev.log('✅ [HomePage] Authenticated WebSocket connection', name: 'HomePage');
-        
+        dev.log('✅ [HomePage] Authenticated WebSocket connection',
+            name: 'HomePage');
+
         wsService.connect(
           token: authToken,
           onConnected: () {
             if (mounted) {
               setState(() => _webSocketConnected = true);
-              dev.log('✅ [HomePage] WebSocket connected successfully', name: 'HomePage');
+              dev.log('✅ [HomePage] WebSocket connected successfully',
+                  name: 'HomePage');
               _wsConnectionAttempts = 0;
             }
           },
@@ -151,7 +183,8 @@ class _HomePageState extends ConsumerState<HomePage> {
           },
         );
       } else {
-        dev.log('🌐 [HomePage] No auth token, app continues offline', name: 'HomePage');
+        dev.log('🌐 [HomePage] No auth token, app continues offline',
+            name: 'HomePage');
       }
     } catch (e) {
       dev.log('❌ [HomePage] WebSocket connection error: $e', name: 'HomePage');
@@ -163,10 +196,12 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _scheduleReconnect() {
     if (!mounted || _wsConnectionAttempts >= _maxWsAttempts) return;
-    
-    final delay = Duration(seconds: min(30, pow(2, _wsConnectionAttempts).toInt()));
-    dev.log('🔄 [HomePage] Scheduling reconnect in ${delay.inSeconds}s', name: 'HomePage');
-    
+
+    final delay =
+        Duration(seconds: min(30, pow(2, _wsConnectionAttempts).toInt()));
+    dev.log('🔄 [HomePage] Scheduling reconnect in ${delay.inSeconds}s',
+        name: 'HomePage');
+
     Future.delayed(delay, () {
       if (mounted) _connectWebSocket();
     });
@@ -174,7 +209,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void _showOfflineInfo() {
     if (!mounted) return;
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Row(
@@ -182,7 +217,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             Icon(Icons.cloud_off, color: Colors.white),
             SizedBox(width: 8),
             Expanded(
-              child: Text('Real-time updates unavailable. App continues offline.'),
+              child:
+                  Text('Real-time updates unavailable. App continues offline.'),
             ),
           ],
         ),

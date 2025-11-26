@@ -1,7 +1,6 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:rpa/presenter/controllers/alert.controller.dart';
 import 'package:rpa/presenter/pages/home_page/widgets/alert_button.widget.dart';
 
@@ -13,28 +12,10 @@ class AlertPage extends ConsumerStatefulWidget {
 }
 
 class _AlertPageState extends ConsumerState<AlertPage> {
-  Position? _currentPosition;
-
-  _getMyPosition() async {
-    var permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      await Geolocator.requestPermission();
-    } else {
-      _currentPosition = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
-
-      print(_currentPosition!.latitude);
-      print(_currentPosition!.longitude);
-    }
-  }
-
   @override
   void initState() {
-    ref.read(alertProvider).init();
-    _getMyPosition();
     super.initState();
+    ref.read(alertProvider).init();
   }
 
   @override
