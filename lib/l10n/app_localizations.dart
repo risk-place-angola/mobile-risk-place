@@ -1418,17 +1418,11 @@ abstract class AppLocalizations {
   /// **'Find the safest path'**
   String get checkSafeRouteSubtitle;
 
-  /// No description provided for @emergencyServices.
+  /// No description provided for @emergencyContactsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Emergency Services'**
-  String get emergencyServices;
-
-  /// No description provided for @emergencyServicesSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Call 112 / Police / Firefighters'**
-  String get emergencyServicesSubtitle;
+  /// **'Manually dial local emergency numbers'**
+  String get emergencyContactsSubtitle;
 
   /// No description provided for @editAlert.
   ///
