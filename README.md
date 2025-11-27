@@ -11,13 +11,23 @@
 
 ## 📋 Índice
 
-1. [Sobre o Projeto](#sobre-o-projeto)
-2. [Funcionalidades](#funcionalidades)
-3. [🚀 Setup Rápido (5 minutos)](#-setup-rápido-5-minutos)
-4. [Documentação](#documentação)
-5. [Arquitetura](#arquitetura)
-6. [Tecnologias](#tecnologias)
-7. [Contribuindo](#contribuindo)
+- [🚨 MakaNetu - Mobile App](#-makanetu---mobile-app)
+  - [📋 Índice](#-índice)
+  - [🎯 Sobre o Projeto](#-sobre-o-projeto)
+  - [✨ Funcionalidades](#-funcionalidades)
+    - [✅ Implementadas](#-implementadas)
+    - [🚧 Em Desenvolvimento](#-em-desenvolvimento)
+  - [🚀 Setup Rápido (5 minutos)](#-setup-rápido-5-minutos)
+  - [📖 Documentação](#-documentação)
+  - [🏗️ Arquitetura](#️-arquitetura)
+  - [🤝 Contribuindo](#-contribuindo)
+  - [📝 License](#-license)
+  - [👥 Team](#-team)
+  - [📞 Suporte](#-suporte)
+  - [🗺️ Roadmap](#️-roadmap)
+    - [Q1 2025](#q1-2025)
+    - [Q2 2025](#q2-2025)
+    - [Q3 2025](#q3-2025)
 
 ---
 
@@ -138,7 +148,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 - **Documentação**: [`/docs`](/docs)
 - **Issues**: [GitHub Issues](https://github.com/risk-place-angola/mobile-risk-place/issues)
 - **Email**: suporte@riskplace.ao
-
+- 
 ---
 
 ## 🗺️ Roadmap
