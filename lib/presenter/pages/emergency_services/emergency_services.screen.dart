@@ -58,7 +58,7 @@ class EmergencyServicesScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          'Serviços de Emergência',
+          'Contatos de Emergência',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -84,44 +84,101 @@ class EmergencyServicesScreen extends StatelessWidget {
   }
 
   Widget _buildWarningCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.shade200),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.warning_amber_rounded,
-              color: Colors.red.shade700, size: 28),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Apenas para Emergências',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red.shade900,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Use estes números apenas em situações de emergência real.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.red.shade800,
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      children: [
+        // Disclaimer sobre não ser governamental
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.orange.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.orange.shade200, width: 2),
           ),
-        ],
-      ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.info_outline,
+                  color: Colors.orange.shade700, size: 28),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '⚠️ AVISO IMPORTANTE',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange.shade900,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'MakaNetu é um app comunitário independente. NÃO somos afiliados a serviços governamentais de emergência.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.orange.shade900,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Card de números oficiais
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.red.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red.shade200),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.warning_amber_rounded,
+                  color: Colors.red.shade700, size: 28),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'NÚMEROS OFICIAIS DE EMERGÊNCIA',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red.shade900,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Estes são os números oficiais do governo de Angola. Use apenas em situações de emergência real.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.red.shade800,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Fonte: www.minint.gov.ao (Ministério do Interior)',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.red.shade700,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
