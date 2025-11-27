@@ -700,10 +700,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkSafeRouteSubtitle => 'Find the safest path';
 
   @override
-  String get emergencyServices => 'Emergency Services';
-
-  @override
-  String get emergencyServicesSubtitle => 'Call 112 / Police / Firefighters';
+  String get emergencyContactsSubtitle =>
+      'Manually dial local emergency numbers';
 
   @override
   String get editAlert => 'Edit Alert';

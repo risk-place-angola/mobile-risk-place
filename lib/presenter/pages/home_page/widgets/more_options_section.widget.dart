@@ -49,13 +49,15 @@ class MoreOptionsSection extends StatelessWidget {
           subtitle: l10n?.checkSafeRouteSubtitle ?? 'Find the safest path',
           onTap: () => onOptionTap('safe_route'),
         ),
-        _OptionTile(
-          icon: UniconsLine.phone_volume,
-          iconColor: Colors.red,
-          title: l10n?.emergencyServices ?? 'Emergency Services',
-          subtitle: l10n?.emergencyServicesSubtitle ?? 'Call 112 / Police / Firefighters',
-          onTap: () => onOptionTap('emergency_services'),
-        ),
+        // TODO: Comming soon feature flag
+        // Aguardando implementação do sistema de feature flags
+        // _OptionTile(
+        //   icon: UniconsLine.phone_volume,
+        //   iconColor: Colors.red,
+        //   title: l10n?.emergencyContacts ?? 'Emergency Contacts',
+        //   subtitle: l10n?.emergencyContactsSubtitle ?? 'Manually dial local emergency numbers',
+        //   onTap: () => onOptionTap('emergency_services'),
+        // ),
       ],
     );
   }

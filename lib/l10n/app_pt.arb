@@ -312,9 +312,9 @@
   
   "checkSafeRouteSubtitle": "Encontre o caminho mais seguro",
   
-  "emergencyServices": "Serviços de Emergência",
+  "emergencyContacts": "Contatos de Emergência",
   
-  "emergencyServicesSubtitle": "Ligar 112 / Polícia / Bombeiros",
+  "emergencyContactsSubtitle": "Discar manualmente números locais de emergência",
   "editAlert": "Editar Alerta",
   "updateAlertMessage": "Atualize a mensagem, gravidade ou raio do alerta.",
   "message": "Mensagem",

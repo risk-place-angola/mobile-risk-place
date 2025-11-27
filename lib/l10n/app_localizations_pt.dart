@@ -703,10 +703,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checkSafeRouteSubtitle => 'Encontre o caminho mais seguro';
 
   @override
-  String get emergencyServices => 'Serviços de Emergência';
-
-  @override
-  String get emergencyServicesSubtitle => 'Ligar 112 / Polícia / Bombeiros';
+  String get emergencyContactsSubtitle =>
+      'Discar manualmente números locais de emergência';
 
   @override
   String get editAlert => 'Editar Alerta';

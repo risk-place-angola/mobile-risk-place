@@ -23,10 +23,12 @@ platform :ios do
       key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH']
     )
     
-    # Get latest build number from TestFlight
-    latest_build = latest_testflight_build_number(
+    # Get latest build number from App Store Connect (all builds)
+    # Note: TestFlight and Production share the same build number space
+    latest_build = app_store_build_number(
       api_key: api_key,
-      app_identifier: "ao.riskplace.makanetu"
+      app_identifier: "ao.riskplace.makanetu",
+      live: false  # Include all builds (TestFlight + Production)
     )
     
     # Increment build number
@@ -81,16 +83,16 @@ platform :ios do
       key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH']
     )
     
-    # Get latest build number from App Store Connect (all builds, not just TestFlight)
-    # This ensures we don't conflict with dev builds
+    # Get latest build number from App Store Connect (all builds)
+    # Note: TestFlight and Production share the same build number space
+    # Both dev and beta lanes use the same source to prevent conflicts
     latest_build = app_store_build_number(
       api_key: api_key,
       app_identifier: "ao.riskplace.makanetu",
-      live: false  # Include all builds, not just live ones
+      live: false  # Include all builds (TestFlight + Production)
     )
     
-    # Increment build number with offset to avoid dev conflicts
-    # Dev uses TestFlight builds, Prod uses all builds + safety margin
+    # Increment build number
     increment_build_number(
       xcodeproj: "ios/Runner.xcodeproj",
       build_number: latest_build + 1
