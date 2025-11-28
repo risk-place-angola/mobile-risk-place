@@ -1094,7 +1094,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get welcome => 'Bem-vindo!';
 
   @override
+  String get welcomeNeter => 'Bem-vindo, Neter!';
+
+  @override
   String get loginOrRegister => 'Entrar / Registrar';
+
+  @override
+  String get myProfileTitle => 'Meu Perfil';
 
   @override
   String get viewProfile => 'Ver perfil';
@@ -1144,6 +1150,42 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get notInformed => 'Não informado';
+
+  @override
+  String get helloNeter => 'Olá, Neter!';
+
+  @override
+  String get exploringAsVisitor => 'Você está explorando como visitante';
+
+  @override
+  String get anonymousMode => 'Modo Anônimo';
+
+  @override
+  String get asNeterYouCan => 'Como Neter, você pode:';
+
+  @override
+  String get viewNearbyAlerts => 'Ver alertas próximos';
+
+  @override
+  String get receiveNotifications => 'Receber notificações';
+
+  @override
+  String get createAccountToUnlock => 'Crie sua conta para desbloquear:';
+
+  @override
+  String get reportAlerts => 'Reportar alertas';
+
+  @override
+  String get commentAndInteract => 'Comentar e interagir';
+
+  @override
+  String get customizeProfile => 'Personalizar seu perfil';
+
+  @override
+  String get createAccountOrLogin => 'Criar Conta / Login';
+
+  @override
+  String get joinNeterCommunity => 'Junte-se à comunidade de Neters!';
 
   @override
   String get voteConfirmed => 'Obrigado por confirmar!';

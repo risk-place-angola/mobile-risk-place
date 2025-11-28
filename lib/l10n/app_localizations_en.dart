@@ -1087,7 +1087,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome => 'Welcome!';
 
   @override
+  String get welcomeNeter => 'Welcome, Neter!';
+
+  @override
   String get loginOrRegister => 'Login / Register';
+
+  @override
+  String get myProfileTitle => 'My Profile';
 
   @override
   String get viewProfile => 'View Profile';
@@ -1137,7 +1143,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notInformed => 'Not informed';
 
   @override
-  String get voteConfirmed => 'Thanks for confirming!';
+  String get helloNeter => 'Hello, Neter!';
+
+  @override
+  String get exploringAsVisitor => 'You\'re exploring as a visitor';
+
+  @override
+  String get anonymousMode => 'Anonymous Mode';
+
+  @override
+  String get asNeterYouCan => 'As a Neter, you can:';
+
+  @override
+  String get viewNearbyAlerts => 'View nearby alerts';
+
+  @override
+  String get receiveNotifications => 'Receive notifications';
+
+  @override
+  String get createAccountToUnlock => 'Create an account to unlock:';
+
+  @override
+  String get reportAlerts => 'Report alerts';
+
+  @override
+  String get commentAndInteract => 'Comment and interact';
+
+  @override
+  String get customizeProfile => 'Customize your profile';
+
+  @override
+  String get createAccountOrLogin => 'Create Account / Login';
+
+  @override
+  String get joinNeterCommunity => 'Join the Neter community!';
+
+  @override
+  String get voteConfirmed => 'Thank you for confirming!';
 
   @override
   String get voteFeedbackReceived => 'Feedback received';

@@ -1,0 +1,107 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A2A3E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3A3A4E;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F39C12;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E67E22;stop-opacity:1" />
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgGradient)"/>
+  
+  <!-- Signal Waves (outermost layer) -->
+  <path d="M 100 35 Q 75 40, 65 60" stroke="#F39C12" stroke-width="2.5" fill="none" opacity="0.3" stroke-linecap="round"/>
+  <path d="M 100 35 Q 125 40, 135 60" stroke="#F39C12" stroke-width="2.5" fill="none" opacity="0.3" stroke-linecap="round"/>
+  
+  <path d="M 100 30 Q 70 35, 55 58" stroke="#F39C12" stroke-width="2" fill="none" opacity="0.2" stroke-linecap="round"/>
+  <path d="M 100 30 Q 130 35, 145 58" stroke="#F39C12" stroke-width="2" fill="none" opacity="0.2" stroke-linecap="round"/>
+  
+  <path d="M 100 25 Q 65 30, 48 55" stroke="#F39C12" stroke-width="1.5" fill="none" opacity="0.15" stroke-linecap="round"/>
+  <path d="M 100 25 Q 135 30, 152 55" stroke="#F39C12" stroke-width="1.5" fill="none" opacity="0.15" stroke-linecap="round"/>
+  
+  <!-- Body Shield Base with shadow -->
+  <path d="M 70 85 L 70 135 Q 70 155, 85 165 L 100 175 L 115 165 Q 130 155, 130 135 L 130 85 Z" 
+        fill="#1A1A2E" opacity="0.3" transform="translate(2, 3)"/>
+  
+  <!-- Body Shield Main -->
+  <path d="M 70 85 L 70 135 Q 70 155, 85 165 L 100 175 L 115 165 Q 130 155, 130 135 L 130 85 Z" 
+        fill="url(#bodyGradient)" filter="url(#softShadow)"/>
+  
+  <!-- Shield Inner Glow -->
+  <path d="M 75 90 L 75 133 Q 75 150, 87 159 L 100 167 L 113 159 Q 125 150, 125 133 L 125 90 Z" 
+        fill="#2C3E50" opacity="0.4"/>
+  
+  <!-- Location Pin Symbol on Chest -->
+  <g transform="translate(100, 120)">
+    <path d="M 0 -12 Q -8 -12, -8 -4 Q -8 0, 0 10 Q 8 0, 8 -4 Q 8 -12, 0 -12 Z" 
+          fill="#FFD700" opacity="0.95"/>
+    <circle cx="0" cy="-5" r="3" fill="#2C3E50"/>
+  </g>
+  
+  <!-- Shoulders/Arms -->
+  <ellipse cx="60" cy="95" rx="12" ry="18" fill="#F39C12" opacity="0.8"/>
+  <ellipse cx="140" cy="95" rx="12" ry="18" fill="#F39C12" opacity="0.8"/>
+  
+  <!-- Head Base with shadow -->
+  <circle cx="102" cy="63" r="28" fill="#1A1A2E" opacity="0.3"/>
+  
+  <!-- Head Main -->
+  <circle cx="100" cy="60" r="28" fill="#2C3E50" filter="url(#softShadow)"/>
+  
+  <!-- Head Inner Circle -->
+  <circle cx="100" cy="60" r="24" fill="#34495E"/>
+  
+  <!-- Antennae -->
+  <path d="M 95 35 Q 92 28, 88 24" stroke="#F39C12" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 105 35 Q 108 28, 112 24" stroke="#F39C12" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- Antenna Tips -->
+  <circle cx="88" cy="24" r="3" fill="#FFD700"/>
+  <circle cx="112" cy="24" r="3" fill="#FFD700"/>
+  
+  <!-- Eyes Background -->
+  <ellipse cx="90" cy="58" rx="7" ry="10" fill="#1A1A2E"/>
+  <ellipse cx="110" cy="58" rx="7" ry="10" fill="#1A1A2E"/>
+  
+  <!-- Eyes Main -->
+  <ellipse cx="90" cy="57" rx="6" ry="9" fill="#FFD700"/>
+  <ellipse cx="110" cy="57" rx="6" ry="9" fill="#FFD700"/>
+  
+  <!-- Eye Pupils -->
+  <ellipse cx="90" cy="56" rx="3" ry="4" fill="#2C3E50"/>
+  <ellipse cx="110" cy="56" rx="3" ry="4" fill="#2C3E50"/>
+  
+  <!-- Eye Shine -->
+  <ellipse cx="91" cy="54" rx="2" ry="2.5" fill="white" opacity="0.9"/>
+  <ellipse cx="111" cy="54" rx="2" ry="2.5" fill="white" opacity="0.9"/>
+  
+  <!-- Determined Expression Line -->
+  <line x1="92" y1="68" x2="108" y2="68" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Alert Symbol (exclamation mark integrated) -->
+  <g transform="translate(100, 145)" opacity="0.7">
+    <rect x="-2" y="-8" width="4" height="10" rx="2" fill="#FFD700"/>
+    <circle cx="0" cy="5" r="2.5" fill="#FFD700"/>
+  </g>
+  
+  <!-- Base Foundation Line -->
+  <rect x="65" y="176" width="70" height="4" rx="2" fill="#2C3E50" opacity="0.6"/>
+  
+  <!-- Outer Border Ring -->
+  <circle cx="100" cy="100" r="95" stroke="#E8E8E8" stroke-width="1.5" fill="none" opacity="0.3"/>
+</svg>

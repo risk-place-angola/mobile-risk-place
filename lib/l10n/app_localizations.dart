@@ -2162,11 +2162,23 @@ abstract class AppLocalizations {
   /// **'Welcome!'**
   String get welcome;
 
+  /// No description provided for @welcomeNeter.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, Neter!'**
+  String get welcomeNeter;
+
   /// No description provided for @loginOrRegister.
   ///
   /// In en, this message translates to:
   /// **'Login / Register'**
   String get loginOrRegister;
+
+  /// No description provided for @myProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get myProfileTitle;
 
   /// No description provided for @viewProfile.
   ///
@@ -2258,10 +2270,82 @@ abstract class AppLocalizations {
   /// **'Not informed'**
   String get notInformed;
 
+  /// No description provided for @helloNeter.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, Neter!'**
+  String get helloNeter;
+
+  /// No description provided for @exploringAsVisitor.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re exploring as a visitor'**
+  String get exploringAsVisitor;
+
+  /// No description provided for @anonymousMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous Mode'**
+  String get anonymousMode;
+
+  /// No description provided for @asNeterYouCan.
+  ///
+  /// In en, this message translates to:
+  /// **'As a Neter, you can:'**
+  String get asNeterYouCan;
+
+  /// No description provided for @viewNearbyAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'View nearby alerts'**
+  String get viewNearbyAlerts;
+
+  /// No description provided for @receiveNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive notifications'**
+  String get receiveNotifications;
+
+  /// No description provided for @createAccountToUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to unlock:'**
+  String get createAccountToUnlock;
+
+  /// No description provided for @reportAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Report alerts'**
+  String get reportAlerts;
+
+  /// No description provided for @commentAndInteract.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment and interact'**
+  String get commentAndInteract;
+
+  /// No description provided for @customizeProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your profile'**
+  String get customizeProfile;
+
+  /// No description provided for @createAccountOrLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account / Login'**
+  String get createAccountOrLogin;
+
+  /// No description provided for @joinNeterCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the Neter community!'**
+  String get joinNeterCommunity;
+
   /// No description provided for @voteConfirmed.
   ///
   /// In en, this message translates to:
-  /// **'Thanks for confirming!'**
+  /// **'Thank you for confirming!'**
   String get voteConfirmed;
 
   /// No description provided for @voteFeedbackReceived.
