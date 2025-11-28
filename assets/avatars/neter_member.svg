@@ -1,0 +1,135 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A2A3E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3A3A4E;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bodyGradientMember" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3498DB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2980B9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="headGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2C3E50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#34495E;stop-opacity:1" />
+    </linearGradient>
+    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#bgGradient)"/>
+  
+  <!-- Connected Network Lines (background) -->
+  <line x1="100" y1="35" x2="60" y2="80" stroke="#3498DB" stroke-width="1.5" opacity="0.2"/>
+  <line x1="100" y1="35" x2="140" y2="80" stroke="#3498DB" stroke-width="1.5" opacity="0.2"/>
+  <line x1="60" y1="80" x2="140" y2="80" stroke="#3498DB" stroke-width="1.5" opacity="0.2"/>
+  
+  <!-- Network Nodes -->
+  <circle cx="60" cy="80" r="4" fill="#3498DB" opacity="0.4"/>
+  <circle cx="140" cy="80" r="4" fill="#3498DB" opacity="0.4"/>
+  
+  <!-- Body Shield Base with shadow -->
+  <path d="M 70 85 L 70 135 Q 70 155, 85 165 L 100 175 L 115 165 Q 130 155, 130 135 L 130 85 Z" 
+        fill="#1A1A2E" opacity="0.3" transform="translate(2, 3)"/>
+  
+  <!-- Body Shield Main (Blue for authenticated user) -->
+  <path d="M 70 85 L 70 135 Q 70 155, 85 165 L 100 175 L 115 165 Q 130 155, 130 135 L 130 85 Z" 
+        fill="url(#bodyGradientMember)" filter="url(#softShadow)"/>
+  
+  <!-- Shield Inner Glow -->
+  <path d="M 75 90 L 75 133 Q 75 150, 87 159 L 100 167 L 113 159 Q 125 150, 125 133 L 125 90 Z" 
+        fill="#2C3E50" opacity="0.4"/>
+  
+  <!-- Checkmark Symbol (Verified Member) -->
+  <g transform="translate(100, 118)">
+    <circle r="14" fill="#27AE60" opacity="0.95"/>
+    <path d="M -5 0 L -2 5 L 6 -5" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- User Icon -->
+  <g transform="translate(100, 145)">
+    <circle r="6" fill="#ECF0F1" opacity="0.9"/>
+    <path d="M -8 8 Q -8 2, -4 2 L 4 2 Q 8 2, 8 8" fill="#ECF0F1" opacity="0.9"/>
+  </g>
+  
+  <!-- Shoulders/Arms -->
+  <ellipse cx="60" cy="95" rx="12" ry="18" fill="#3498DB" opacity="0.8"/>
+  <ellipse cx="140" cy="95" rx="12" ry="18" fill="#3498DB" opacity="0.8"/>
+  
+  <!-- Head Base with shadow -->
+  <circle cx="102" cy="63" r="28" fill="#1A1A2E" opacity="0.3"/>
+  
+  <!-- Head Main -->
+  <circle cx="100" cy="60" r="28" fill="url(#headGradient)" filter="url(#softShadow)"/>
+  
+  <!-- Head Inner Circle -->
+  <circle cx="100" cy="60" r="24" fill="#34495E"/>
+  
+  <!-- Signal Badge (top right of head) -->
+  <g transform="translate(120, 45)">
+    <circle r="8" fill="#27AE60" filter="url(#glow)"/>
+    <path d="M -2 -2 L 0 2 L 2 -2" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <circle cx="0" cy="-4" r="1" fill="white"/>
+  </g>
+  
+  <!-- Active Connection Indicator (top left) -->
+  <g transform="translate(80, 45)">
+    <circle r="6" fill="#3498DB" opacity="0.3"/>
+    <circle r="4" fill="#3498DB" opacity="0.6"/>
+    <circle r="2" fill="#3498DB"/>
+  </g>
+  
+  <!-- Eyes Background -->
+  <ellipse cx="90" cy="58" rx="7" ry="10" fill="#1A1A2E"/>
+  <ellipse cx="110" cy="58" rx="7" ry="10" fill="#1A1A2E"/>
+  
+  <!-- Eyes Main (Alert but Friendly) -->
+  <ellipse cx="90" cy="57" rx="6" ry="9" fill="#3498DB"/>
+  <ellipse cx="110" cy="57" rx="6" ry="9" fill="#3498DB"/>
+  
+  <!-- Eye Pupils -->
+  <ellipse cx="90" cy="57" rx="3" ry="4" fill="#1A1A2E"/>
+  <ellipse cx="110" cy="57" rx="3" ry="4" fill="#1A1A2E"/>
+  
+  <!-- Eye Shine -->
+  <ellipse cx="91" cy="55" rx="2" ry="2.5" fill="white" opacity="0.9"/>
+  <ellipse cx="111" cy="55" rx="2" ry="2.5" fill="white" opacity="0.9"/>
+  
+  <!-- Friendly Smile -->
+  <path d="M 92 68 Q 100 72, 108 68" stroke="#3498DB" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Active Status Stars -->
+  <g transform="translate(70, 60)" opacity="0.5">
+    <path d="M 0 -3 L 1 0 L 0 1 L -1 0 Z" fill="#F39C12"/>
+  </g>
+  <g transform="translate(130, 60)" opacity="0.5">
+    <path d="M 0 -3 L 1 0 L 0 1 L -1 0 Z" fill="#F39C12"/>
+  </g>
+  
+  <!-- Base Foundation Line -->
+  <rect x="65" y="176" width="70" height="4" rx="2" fill="#3498DB" opacity="0.6"/>
+  
+  <!-- Active Indicator Dots -->
+  <circle cx="85" cy="178" r="2" fill="#27AE60" opacity="0.8"/>
+  <circle cx="100" cy="178" r="2" fill="#27AE60"/>
+  <circle cx="115" cy="178" r="2" fill="#27AE60" opacity="0.8"/>
+  
+  <!-- Outer Border Ring -->
+  <circle cx="100" cy="100" r="95" stroke="#3498DB" stroke-width="2" fill="none" opacity="0.4"/>
+</svg>
