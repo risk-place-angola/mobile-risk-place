@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rpa/presenter/controllers/auth.controller.dart';
-import 'package:unicons/unicons.dart';
+import 'package:rpa/core/managers/anonymous_user_manager.dart';
+import 'package:rpa/presenter/widgets/user_avatar.widget.dart';
 
-/// Floating profile button that appears in the top-right corner
-/// Similar to Waze's profile button
 class FloatingProfileButton extends ConsumerWidget {
   final VoidCallback? onTap;
 
@@ -16,9 +15,8 @@ class FloatingProfileButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).userStored;
-    final userName = user?.name?.isNotEmpty == true
-        ? user!.name!.substring(0, 1).toUpperCase()
-        : 'U';
+    final userId = user?.id;
+    final isLoggedIn = userId != null && userId.isNotEmpty;
 
     return Positioned(
       top: MediaQuery.of(context).padding.top + 16,
@@ -26,10 +24,7 @@ class FloatingProfileButton extends ConsumerWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: 48,
-          height: 48,
           decoration: BoxDecoration(
-            color: Colors.white,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
@@ -38,26 +33,14 @@ class FloatingProfileButton extends ConsumerWidget {
                 offset: const Offset(0, 2),
               ),
             ],
-            border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-              width: 2,
-            ),
           ),
-          child: Center(
-            child: user != null
-                ? Text(
-                    userName,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  )
-                : Icon(
-                    UniconsLine.user,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 24,
-                  ),
+          child: UserAvatar(
+            userId: isLoggedIn
+                ? userId
+                : ref.read(anonymousUserManagerProvider).deviceId ?? 'default',
+            size: 48,
+            borderWidth: 2,
+            isAnonymous: !isLoggedIn,
           ),
         ),
       ),
